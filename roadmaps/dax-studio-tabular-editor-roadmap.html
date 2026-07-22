@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAX Studio × Tabular Editor — Learning Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1015;
+  --panel:#151a23;
+  --panel2:#10151d;
+  --line:#242c3a;
+  --text:#e8ebf1;
+  --mut:#9aa4b3;
+  --dim:#6b7686;
+  --amber:#f2a33c;
+  --amber-b:#ffc670;
+  --amber-glow:rgba(242,163,60,.10);
+  --azure:#41a4e8;
+  --azure-b:#87c9f4;
+  --azure-glow:rgba(65,164,232,.10);
+  --ok:#5fc98e;
+  --disp:'Chakra Petch',system-ui,'Segoe UI',sans-serif;
+  --body:'IBM Plex Sans',system-ui,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;
+  background-image:radial-gradient(1100px 500px at 12% -5%, rgba(242,163,60,.06), transparent 60%),
+                   radial-gradient(1100px 500px at 88% -5%, rgba(65,164,232,.07), transparent 60%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(242,163,60,.35)}
+
+/* ---------- part theming ---------- */
+.pa{--acc:var(--amber);--acc-b:var(--amber-b);--glow:var(--amber-glow)}
+.pb{--acc:var(--azure);--acc-b:var(--azure-b);--glow:var(--azure-glow)}
+.pc{--acc:#63b3e6;--acc-b:#ffc670;--glow:rgba(120,160,190,.08)}
+
+/* ---------- sticky progress bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,16,21,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.brand .bx{color:var(--amber)}
+.brand .tx{color:var(--azure)}
+.obar{flex:1;min-width:140px;height:8px;border-radius:99px;background:var(--panel);border:1px solid var(--line);overflow:hidden}
+.obar>div{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--amber),var(--azure));transition:width .35s ease}
+.opct{font-family:var(--mono);font-size:.8rem;color:var(--mut);min-width:8.5ch;text-align:right}
+.chip{font-family:var(--mono);font-size:.72rem;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mut);text-decoration:none;white-space:nowrap}
+.chip b{font-weight:500}
+.chip.ca b{color:var(--amber)} .chip.cb b{color:var(--azure)} .chip.cc b{background:linear-gradient(90deg,var(--amber),var(--azure));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip:hover{border-color:var(--dim)}
+.tbtn{font-family:var(--mono);font-size:.72rem;background:none;border:1px solid var(--line);color:var(--mut);
+  padding:3px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{color:var(--text);border-color:var(--dim)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:880px;margin:0 auto;padding:0 22px}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 30px;text-align:left}
+.hero .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5vw,3rem);line-height:1.12;letter-spacing:.01em}
+.hero h1 .amber{color:var(--amber)}
+.hero h1 .azure{color:var(--azure)}
+.hero .sub{color:var(--mut);max-width:62ch;margin-top:16px;font-size:1.02rem}
+.pulse-wrap{margin:34px 0 8px}
+.pulse-wrap svg{display:block;width:100%;height:72px}
+.pulse-cap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+.pulse-cap .l{color:var(--amber)} .pulse-cap .r{color:var(--azure)}
+
+/* ---------- how to use ---------- */
+.howto{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:30px 0 8px}
+.howto h2{font-family:var(--disp);font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.howto p{color:var(--mut);font-size:.95rem;margin-bottom:8px}
+.howto p:last-child{margin-bottom:0}
+.howto b{color:var(--text);font-weight:600}
+#persistNote{font-family:var(--mono);font-size:.78rem;color:var(--dim)}
+
+/* ---------- part banners ---------- */
+.part{margin-top:64px}
+.pbanner{border:1px solid var(--line);border-radius:16px;padding:26px 26px 22px;background:linear-gradient(180deg,var(--glow),transparent 70%),var(--panel2);position:relative;overflow:hidden}
+.pbanner .pk{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.pbanner h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.4rem,3.4vw,1.9rem);line-height:1.15}
+.pbanner .pdesc{color:var(--mut);margin-top:10px;max-width:64ch;font-size:.97rem}
+.pbanner .motif{margin-top:16px}
+.pbanner .motif svg{display:block;height:34px;width:220px;max-width:100%}
+.pprog{display:flex;align-items:center;gap:12px;margin-top:16px}
+.pbar{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--line);overflow:hidden;max-width:340px}
+.pbar>div{height:100%;width:0%;background:var(--acc);transition:width .35s ease}
+.pcnt{font-family:var(--mono);font-size:.75rem;color:var(--mut)}
+
+/* ---------- sections ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:18px;overflow:hidden}
+.sec.done{border-color:color-mix(in srgb, var(--acc) 45%, var(--line))}
+.sec-head{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;background:none;border:none;color:inherit;
+  font-family:inherit;text-align:left;cursor:pointer}
+.sec-head:hover{background:rgba(255,255,255,.02)}
+.sec-head:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:14px}
+.snum{font-family:var(--mono);font-size:.8rem;color:var(--acc);border:1px solid color-mix(in srgb, var(--acc) 40%, var(--line));
+  border-radius:8px;padding:5px 9px;min-width:42px;text-align:center;flex-shrink:0}
+.stitle{flex:1;min-width:0}
+.stitle h3{font-family:var(--disp);font-weight:600;font-size:1.06rem;line-height:1.3}
+.stitle .ssub{color:var(--dim);font-size:.83rem;margin-top:2px}
+.lvl{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:99px;
+  border:1px solid var(--line);color:var(--mut);flex-shrink:0}
+.lvl.adv{color:var(--acc-b);border-color:color-mix(in srgb, var(--acc) 40%, var(--line))}
+.lvl.proj{color:var(--ok);border-color:rgba(95,201,142,.4)}
+.cnt{font-family:var(--mono);font-size:.75rem;color:var(--dim);flex-shrink:0;min-width:4ch;text-align:right}
+.cnt.full{color:var(--ok)}
+.chev{flex-shrink:0;transition:transform .25s ease;color:var(--dim)}
+.sec[data-open="true"] .chev{transform:rotate(180deg)}
+.sec-body{display:none;padding:4px 20px 22px;border-top:1px solid var(--line)}
+.sec[data-open="true"] .sec-body{display:block}
+.blurb{color:var(--mut);font-size:.95rem;margin:16px 0 6px;max-width:70ch}
+
+.gh{font-family:var(--mono);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin:20px 0 10px}
+ul.checks{list-style:none}
+ul.checks li{margin-bottom:2px}
+ul.checks label{display:flex;gap:12px;align-items:flex-start;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.95rem}
+ul.checks label:hover{background:rgba(255,255,255,.03)}
+ul.checks input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;margin-top:3px;border-radius:5px;
+  border:1.5px solid var(--dim);background:transparent;cursor:pointer;position:relative}
+ul.checks input:checked{background:var(--acc);border-color:var(--acc)}
+ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #0d1015;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.checks input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+
+ul.links{list-style:none}
+ul.links li{margin-bottom:6px}
+ul.links a{display:flex;gap:10px;align-items:baseline;padding:7px 10px;border-radius:9px;text-decoration:none;font-size:.93rem;flex-wrap:wrap}
+ul.links a:hover{background:var(--glow)}
+ul.links a:hover .lt{text-decoration:underline;text-underline-offset:3px}
+.tag{font-family:var(--mono);font-size:.63rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px;flex-shrink:0;
+  border:1px solid var(--line);color:var(--mut);min-width:52px;text-align:center}
+.tag.docs{color:var(--acc-b);border-color:color-mix(in srgb, var(--acc) 45%, var(--line))}
+.tag.video{color:#e88fb0;border-color:rgba(232,143,176,.4)}
+.tag.blog{color:#a5b4fc;border-color:rgba(165,180,252,.4)}
+.tag.tool{color:var(--ok);border-color:rgba(95,201,142,.4)}
+.tag.course{color:#f0d264;border-color:rgba(240,210,100,.4)}
+.tag.repo{color:#c8d0da;border-color:var(--line)}
+.lt{color:var(--text)}
+.dom{font-family:var(--mono);font-size:.72rem;color:var(--dim)}
+
+.tip{margin-top:18px;border-left:3px solid var(--acc);background:var(--glow);border-radius:0 10px 10px 0;padding:12px 16px;font-size:.9rem;color:var(--mut)}
+.tip b{color:var(--acc-b);font-weight:600;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+
+pre{background:#0a0d12;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin-top:14px}
+code{font-family:var(--mono);font-size:.82rem;line-height:1.55;color:#cdd6e3}
+code .kw{color:var(--acc-b)} code .cm{color:var(--dim)} code .st{color:#9ece8f}
+
+/* ---------- capstone ---------- */
+.steps{list-style:none;counter-reset:cap}
+.steps li{counter-increment:cap;margin-bottom:2px}
+.steps label{display:flex;gap:12px;align-items:flex-start;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:.95rem}
+.steps label:hover{background:rgba(255,255,255,.03)}
+.steps label::before{content:counter(cap,decimal-leading-zero);font-family:var(--mono);font-size:.75rem;color:var(--acc);
+  border-right:1px solid var(--line);padding-right:10px;margin-top:3px;flex-shrink:0}
+.steps input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;margin-top:3px;border-radius:5px;
+  border:1.5px solid var(--dim);background:transparent;cursor:pointer;position:relative}
+.steps input:checked{background:linear-gradient(135deg,var(--amber),var(--azure));border-color:transparent}
+.steps input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #0d1015;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+.steps input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}
+.steps span b{color:var(--text);font-weight:600}
+
+/* ---------- footer ---------- */
+footer{margin:70px 0 40px;padding-top:24px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer .fp{font-family:var(--mono);font-size:.75rem;margin-top:8px}
+footer a{color:var(--mut)}
+
+@media (max-width:640px){
+  .topbar{gap:8px;padding:9px 14px}
+  .opct{display:none}
+  .hero{padding:44px 0 22px}
+  .sec-head{padding:14px 14px;gap:10px}
+  .stitle .ssub{display:none}
+  .sec-body{padding:4px 14px 18px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+  html{scroll-behavior:auto}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .topbar,.chev{display:none}
+  .sec-body{display:block!important}
+  .sec,.pbanner,.howto{border-color:#bbb;background:#fff}
+  a{color:#111}
+}
+</style>
+</head>
+<body class="pa">
+
+<!-- ============ STICKY PROGRESS ============ -->
+<div class="topbar">
+  <span class="brand"><span class="bx">DAX Studio</span> &times; <span class="tx">Tabular Editor</span></span>
+  <div class="obar"><div id="obarFill"></div></div>
+  <span class="opct" id="opct">0% done</span>
+  <a class="chip ca" href="#parta"><b>A</b> Measure</a>
+  <a class="chip cb" href="#partb"><b>B</b> Refactor</a>
+  <a class="chip cc" href="#partc"><b>C</b> Ship</a>
+  <button class="tbtn" id="toggleAll" type="button">Collapse all</button>
+  <button class="tbtn" id="resetBtn" type="button">Reset progress</button>
+</div>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <p class="eyebrow">Reference hub &middot; Semantic model power tools</p>
+  <h1>Trace it in <span class="amber">DAX Studio</span>.<br>Rebuild it in <span class="azure">Tabular Editor</span>.</h1>
+  <p class="sub">A working roadmap for the two external tools that turn Power BI development from clicking into engineering.
+  DAX Studio is the oscilloscope &mdash; it shows you exactly what the engine is doing and why it's slow.
+  Tabular Editor is the wrench &mdash; it lets you change the model at metadata speed and automate the boring parts.
+  Learn them together and every model you touch gets faster, smaller, and cleaner.</p>
+
+  <div class="pulse-wrap" aria-hidden="true">
+    <svg viewBox="0 0 900 80" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pulseGrad" x1="0" y1="0" x2="900" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#f2a33c"/>
+          <stop offset=".45" stop-color="#f2a33c"/>
+          <stop offset=".62" stop-color="#41a4e8"/>
+          <stop offset="1" stop-color="#41a4e8"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,40 H70 L84,12 L100,66 L114,40 H190 L204,22 L218,56 L232,40 H330 L344,6 L362,72 L378,40 H460 H500 V22 H556 V58 H612 V22 H668 V58 H724 V40 H900"
+        fill="none" stroke="url(#pulseGrad)" stroke-width="2.5" stroke-linejoin="round" opacity=".9"/>
+      <path d="M0,40 H70 L84,12 L100,66 L114,40 H190 L204,22 L218,56 L232,40 H330 L344,6 L362,72 L378,40 H460 H500 V22 H556 V58 H612 V22 H668 V58 H724 V40 H900"
+        fill="none" stroke="url(#pulseGrad)" stroke-width="7" stroke-linejoin="round" opacity=".12"/>
+    </svg>
+    <div class="pulse-cap"><span class="l">query trace &mdash; measure it</span><span class="r">model metadata &mdash; structure it</span></div>
+  </div>
+
+  <div class="howto">
+    <h2>How to use this page</h2>
+    <p>Work each part top to bottom &mdash; the order matters within a part, but <b>Parts A and B are meant to run in parallel</b>: use both tools on real work every week rather than "finishing" one first. Sections marked <b>Foundation</b> are day-one skills, <b>Core</b> is where the payoff lives, and <b>Advanced</b> is where you'll grow into over the coming months. Part C closes the loop with the surrounding toolbelt and a capstone that uses everything at once.</p>
+    <p>Check items off as you go &mdash; each section, each part, and the bar at the top track your progress. <span id="persistNote">Progress saves automatically in this browser on this device; it will reset if you clear browser data or open the file somewhere else.</span></p>
+    <p>When you're ready for deeper or more complex material, bring this file back to Claude and ask for new sections &mdash; it's built to be extended, just like the Data Engineering roadmap.</p>
+  </div>
+</header>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART A ================================ -->
+<!-- ==================================================================== -->
+<section class="part pa" id="parta">
+  <div class="pbanner">
+    <p class="pk">Part A &middot; DAX Studio</p>
+    <h2>Measure it &mdash; queries, traces, and engine truth</h2>
+    <p class="pdesc">Free and open source, built by Darren Gosbell with SQLBI backing. DAX Studio connects live to Power BI Desktop, Analysis Services, or a Fabric/Premium workspace and shows you what your DAX actually costs. Nothing here changes your model &mdash; this is pure diagnosis.</p>
+    <div class="motif" aria-hidden="true">
+      <svg viewBox="0 0 220 34"><path d="M0,17 H40 L52,4 L66,29 L78,17 H120 L132,8 L144,25 L156,17 H220" fill="none" stroke="#f2a33c" stroke-width="2" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="pprog"><div class="pbar"><div data-pbar="a"></div></div><span class="pcnt" data-pcnt="a">0 / 0</span></div>
+  </div>
+
+  <!-- A1 -->
+  <div class="sec" data-open="true" id="a1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A1</span>
+      <span class="stitle"><h3>Setup &amp; orientation</h3><span class="ssub">Install, connect, and find your way around</span></span>
+      <span class="lvl">Foundation</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Get connected and comfortable. The whole point of DAX Studio is a live line into the engine behind your model &mdash; once you can open it against any model in seconds, everything else follows.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a1-1"><span>Install DAX Studio (installer or portable) and launch it from the External Tools ribbon in Power BI Desktop</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-2"><span>Understand the three main connection types: Power BI Desktop (local), SSAS Tabular, and a Premium/Fabric workspace via the XMLA endpoint</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-3"><span>Tour the UI: metadata pane, editor, results grid, output pane, and where traces appear</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-4"><span>Run your first queries: <code>EVALUATE 'YourTable'</code> and <code>EVALUATE ROW("Test", [Some Measure])</code></span></label></li>
+        <li><label><input type="checkbox" data-k="a1-5"><span>Learn the everyday keys: F5 run, F6 format query, and the Output destinations (grid, file, Excel)</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://daxstudio.org/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">DAX Studio — official site &amp; download</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://daxstudio.org/docs/intro/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Documentation home — start here</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://daxstudio.org/docs/tutorials/getting-connected/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Getting Connected — every connection type explained</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://www.sqlbi.com/p/dax-tools-video-course/" target="_blank" rel="noopener"><span class="tag course">Course</span><span class="lt">DAX Tools video course — free, ~2 hrs, covers DAX Studio + Tabular Editor + VertiPaq Analyzer</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-external-tools" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">External tools in Power BI Desktop — how the ribbon integration works</span><span class="dom">learn.microsoft.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Connected to Power BI Desktop, DAX Studio talks to the same live engine your report uses — no refresh, no export, no waiting. Keep it open next to Desktop like a second monitor for your model.</div>
+    </div>
+  </div>
+
+  <!-- A2 -->
+  <div class="sec" data-open="true" id="a2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A2</span>
+      <span class="stitle"><h3>The DAX query layer</h3><span class="ssub">EVALUATE, DEFINE, and testing measures without touching the model</span></span>
+      <span class="lvl">Foundation</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Queries are a different muscle from measures — and they're the muscle that makes you fast. Once you can express "show me this measure by these columns, filtered like the visual does it," you can test any idea in seconds.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a2-1"><span>Master the query skeleton: <code>DEFINE</code> &rarr; <code>EVALUATE</code> &rarr; <code>ORDER BY</code>, and why only one DEFINE block is allowed per batch</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-2"><span>Get fluent with the table functions queries live on: SUMMARIZECOLUMNS, ADDCOLUMNS, SELECTCOLUMNS, CALCULATETABLE, TOPN, FILTER</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-3"><span>Use <code>DEFINE MEASURE</code> to prototype a measure change against live data — before you ever edit the model</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-4"><span>Use the Query Builder to scaffold a query by drag-and-drop, then study the DAX it generates</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-5"><span>Keep a scratchpad .dax file of your favorite diagnostic queries and reuse it across models</span></label></li>
+      </ul>
+      <pre><code><span class="cm">// Prototype a fix without touching the model:</span>
+<span class="kw">DEFINE</span>
+    <span class="kw">MEASURE</span> Sales[Total Sales v2] =
+        <span class="kw">VAR</span> Result = SUMX ( Sales, Sales[Qty] * Sales[Net Price] )
+        <span class="kw">RETURN</span> Result
+<span class="kw">EVALUATE</span>
+SUMMARIZECOLUMNS (
+    'Date'[Year],
+    <span class="st">"Current"</span>, [Total Sales],
+    <span class="st">"Proposed"</span>, [Total Sales v2]
+)</code></pre>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://daxstudio.org/docs/tutorials/writing-dax-queries/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Writing DAX Queries — the practical, example-first tutorial</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://learn.microsoft.com/en-us/dax/dax-queries" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DAX queries — official syntax reference</span><span class="dom">learn.microsoft.com</span></a></li>
+        <li><a href="https://dax.guide/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DAX Guide — every function, with compatibility notes and examples</span><span class="dom">dax.guide</span></a></li>
+        <li><a href="https://dax.do/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">DAX.do — browser sandbox to test queries against a sample model</span><span class="dom">dax.do</span></a></li>
+        <li><a href="https://www.daxpatterns.com/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DAX Patterns — reusable solutions to standard business problems</span><span class="dom">daxpatterns.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Power BI Desktop now ships a built-in DAX query view — same EVALUATE skills apply there. Learn the language once in DAX Studio and you own it everywhere, including in the Service.</div>
+    </div>
+  </div>
+
+  <!-- A3 -->
+  <div class="sec" data-open="true" id="a3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A3</span>
+      <span class="stitle"><h3>Performance tuning core</h3><span class="ssub">Server Timings, query plans, and the FE/SE split</span></span>
+      <span class="lvl adv">Core</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">This is the reason DAX Studio exists. When a visual takes eight seconds, Server Timings tells you whether the problem is the storage engine (a model problem) or the formula engine (a DAX problem) — and that one distinction decides everything you do next.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a3-1"><span>Turn on the Server Timings trace and read the FE (formula engine) vs SE (storage engine) time split</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-2"><span>Always benchmark honestly: use Clear Cache &amp; Run, and compare cold vs warm executions</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-3"><span>Learn to skim xmSQL: count the SE queries, spot large materializations, and treat CallbackDataID as a red flag</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-4"><span>Capture a real slow query: Performance Analyzer in Desktop &rarr; Copy query &rarr; replay it in DAX Studio with traces on</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-5"><span>Use the Benchmark feature (N cold + N warm runs) to prove a rewrite is actually faster</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-6"><span>Open the Query Plan trace once you're comfortable — logical vs physical plans, and when to bother looking</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://daxstudio.org/docs/category/tutorials/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DAX Studio tutorials — 15-minute walkthroughs of the core concepts</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://daxstudio.org/docs/Videos/" target="_blank" rel="noopener"><span class="tag video">Video</span><span class="lt">Curated video library — feature reviews and tuning sessions by Gosbell &amp; Russo</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://www.sqlbi.com/training/dax/" target="_blank" rel="noopener"><span class="tag course">Course</span><span class="lt">SQLBI DAX learning hub — Optimizing DAX course + The Definitive Guide to DAX book</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://www.youtube.com/c/sqlbi" target="_blank" rel="noopener"><span class="tag video">Video</span><span class="lt">SQLBI on YouTube — hundreds of free deep dives on engine behavior</span><span class="dom">youtube.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/tools/dax-studio/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SQLBI's DAX Studio page — release notes so you catch new tuning features</span><span class="dom">sqlbi.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Rule of thumb: mostly-SE time means fix the model (cardinality, relationships, columns); mostly-FE time means fix the DAX (iterators, context transitions, CallbackDataID). Diagnose first, rewrite second.</div>
+    </div>
+  </div>
+
+  <!-- A4 -->
+  <div class="sec" data-open="true" id="a4">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A4</span>
+      <span class="stitle"><h3>VertiPaq Analyzer — know your model's weight</h3><span class="ssub">Column sizes, cardinality, encoding, and the .vpax snapshot</span></span>
+      <span class="lvl adv">Core</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Before optimizing anything, weigh it. VertiPaq Analyzer (built into DAX Studio's Advanced tab) shows exactly where your model's memory goes — and in most real models, two or three columns are quietly responsible for half the size.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a4-1"><span>Run View Metrics and sort columns by size — find what percentage of the model your top 5 columns consume</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-2"><span>Understand cardinality as the enemy: datetime columns with time, IDs, and high-precision decimals are the usual offenders</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-3"><span>Read encoding (hash vs value), dictionary size, and spot referential integrity violations in the relationships view</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-4"><span>Export a .vpax file as a baseline snapshot before changes — and import someone else's to help them remotely</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-5"><span>Make one real fix and re-measure: disable auto date/time, split a datetime, or drop an unused high-cardinality column</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://www.sqlbi.com/tools/vertipaq-analyzer/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">VertiPaq Analyzer — what it measures and how to read it</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/p/dax-tools-video-course/" target="_blank" rel="noopener"><span class="tag course">Course</span><span class="lt">DAX Tools course — the VertiPaq Analyzer module walks the metrics screen by screen</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/articles/tools-in-power-bi/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Tools in Power BI — where VertiPaq Analyzer fits in the whole lifecycle</span><span class="dom">sqlbi.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Save a .vpax before and after every optimization pass. "Model went from 480 MB to 210 MB" with the receipts to prove it is the easiest stakeholder win you will ever present.</div>
+    </div>
+  </div>
+
+  <!-- A5 -->
+  <div class="sec" data-open="true" id="a5">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A5</span>
+      <span class="stitle"><h3>Advanced diagnostics &amp; utility belt</h3><span class="ssub">DMVs, All Queries trace, EvaluateAndLog, and bulk export</span></span>
+      <span class="lvl adv">Advanced</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The features most people never find — and the ones that make you look like a wizard. DMVs turn your model into a queryable database about itself; the All Queries trace shows every query Desktop fires as you click around a report.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a5-1"><span>Query DMVs to inventory a model: <code>SELECT * FROM $SYSTEM.TMSCHEMA_MEASURES</code> gives every measure + expression in one grid</span></label></li>
+        <li><label><input type="checkbox" data-k="a5-2"><span>Run the All Queries trace while clicking through a report — rank real visuals by duration instead of guessing</span></label></li>
+        <li><label><input type="checkbox" data-k="a5-3"><span>Use Load Perf Data to import a Performance Analyzer export and analyze a whole report session at once</span></label></li>
+        <li><label><input type="checkbox" data-k="a5-4"><span>Debug context with the EvaluateAndLog trace — see intermediate results inside a measure (Desktop only)</span></label></li>
+        <li><label><input type="checkbox" data-k="a5-5"><span>Export table data to CSV/Excel/SQL in bulk when you need raw outputs without building a visual</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://daxstudio.org/docs/tutorials/evaluateandlog-trace/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">The EvaluateAndLog trace — step-by-step debugging tutorial</span><span class="dom">daxstudio.org</span></a></li>
+        <li><a href="https://learn.microsoft.com/en-us/analysis-services/instances/use-dynamic-management-views-dmvs-to-monitor-analysis-services" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DMV reference — the full catalog of $SYSTEM views you can query</span><span class="dom">learn.microsoft.com</span></a></li>
+        <li><a href="https://www.youtube.com/@GuyInACube" target="_blank" rel="noopener"><span class="tag video">Video</span><span class="lt">Guy in a Cube — short practical hits on DAX Studio features as they ship</span><span class="dom">youtube.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>The TMSCHEMA_MEASURES DMV pasted into Excel is instant model documentation — every measure, expression, and description, no extra tooling required. Pair it with descriptions you'll bulk-write in B8.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART B ================================ -->
+<!-- ==================================================================== -->
+<section class="part pb" id="partb">
+  <div class="pbanner">
+    <p class="pk">Part B &middot; Tabular Editor</p>
+    <h2>Refactor it &mdash; metadata speed, rules, and automation</h2>
+    <p class="pdesc">Tabular Editor 2 is free and open source; Tabular Editor 3 (arriving for you end of year) is the paid IDE built on the same foundations. Everything in this part is TE2-first on purpose &mdash; every skill transfers straight into TE3, which just makes it all more comfortable.</p>
+    <div class="motif" aria-hidden="true">
+      <svg viewBox="0 0 220 34"><path d="M0,17 H30 V6 H70 V28 H110 V6 H150 V28 H190 V17 H220" fill="none" stroke="#41a4e8" stroke-width="2" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="pprog"><div class="pbar"><div data-pbar="b"></div></div><span class="pcnt" data-pcnt="b">0 / 0</span></div>
+  </div>
+
+  <!-- B6 -->
+  <div class="sec" data-open="true" id="b6">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B6</span>
+      <span class="stitle"><h3>TE2 fundamentals</h3><span class="ssub">Connect, edit metadata in bulk, save back — no refresh cycles</span></span>
+      <span class="lvl">Foundation</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Tabular Editor edits the model's metadata (the Tabular Object Model) directly, without loading data. That's why creating twenty measures takes seconds instead of twenty refresh-and-wait cycles — and why it feels like cheating the first week you use it.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b6-1"><span>Install TE2 and launch it from the External Tools ribbon against a live Power BI Desktop model</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-2"><span>Learn the explorer tree: tables, columns, measures, hierarchies grouped by display folders — and the filter/search box above it</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-3"><span>Do your first bulk edit: multi-select 10 measures and set the format string, display folder, and description in one action</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-4"><span>Drag whole display folders to reorganize dozens of objects at once; use Ctrl+Z freely — undo is unlimited</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-5"><span>Understand saving: Ctrl+S writes changes back to the connected Desktop model instantly, with no visual re-render</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-6"><span>Know the boundaries: which operations Microsoft supports against Desktop, and what the "allow unsupported features" preference really means</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://github.com/TabularEditor/TabularEditor" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Tabular Editor 2 on GitHub — free download, actively maintained</span><span class="dom">github.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Getting-Started.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE2 Getting Started — connections, workflow, and deployment basics</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Features-at-a-glance.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Features at a glance — the quick tour of what TE2 can do</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://data-goblins.com/power-bi/learning-tabular-editor-part-1-beginner" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins: learning Tabular Editor series — the best community walkthrough, start at part 1</span><span class="dom">data-goblins.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/tools/tabular-editor/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SQLBI's Tabular Editor page — context, release notes, and why they recommend it</span><span class="dom">sqlbi.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>The instant-save loop is the whole pitch: edit a measure in TE, Ctrl+S, alt-tab to Desktop, and it's already there. Once your hands learn that rhythm, the formula bar starts to feel like dial-up.</div>
+    </div>
+  </div>
+
+  <!-- B7 -->
+  <div class="sec" data-open="true" id="b7">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B7</span>
+      <span class="stitle"><h3>Best Practice Analyzer</h3><span class="ssub">A free automated code review for every model</span></span>
+      <span class="lvl adv">Core</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">BPA scans your model against a rule set — performance, DAX expressions, formatting, naming — and lists every violation with a reason and often a one-click fix. Newer Tabular Editor builds ship with rules preloaded; the standard sets below are the ones the Microsoft Fabric CAT team runs with customers.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b7-1"><span>Load the standard rule sets (Tabular Editor's and/or Microsoft's) via Manage BPA Rules &rarr; Include Rule File from URL</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-2"><span>Run a scan on a real model and triage by category — fix performance findings first, cosmetics later</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-3"><span>Use Generate Fix Script on a rule and review the C# it produces before applying — this is also a scripting lesson</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-4"><span>Ignore a rule or an object deliberately, and understand where those ignore annotations get stored</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-5"><span>Write one custom rule that encodes a convention of yours (e.g., every visible measure must have a description)</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://docs.tabulareditor.com/te2/Best-Practice-Analyzer.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">BPA in TE2 — rule collections, precedence, and the management UI</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://github.com/TabularEditor/BestPracticeRules" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Official standard rules — the community-maintained BPARules.json</span><span class="dom">github.com</span></a></li>
+        <li><a href="https://github.com/microsoft/Analysis-Services/tree/master/BestPracticeRules" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Microsoft's rule set — the Fabric CAT team collection (Kovalsky's rules)</span><span class="dom">github.com</span></a></li>
+        <li><a href="https://tabulareditor.com/blog/best-practice-analyzer-bpa-rules-for-semantic-models" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">BPA rules for semantic models — current guidance incl. writing custom rules (with AI help)</span><span class="dom">tabulareditor.com</span></a></li>
+        <li><a href="https://data-mozart.com/mastering-dp-500-dp-600-exam-optimize-data-model-with-tabular-editor/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Mozart: BPA walkthrough — loading rules and fixing a deliberately broken model</span><span class="dom">data-mozart.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Make "BPA clean, or every ignore documented" your definition of done before anything ships. It costs five minutes and catches the bi-directional relationships and auto date/time bloat that cost hours later.</div>
+    </div>
+  </div>
+
+  <!-- B8 -->
+  <div class="sec" data-open="true" id="b8">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B8</span>
+      <span class="stitle"><h3>C# scripting &amp; macros</h3><span class="ssub">Automate every repetitive click you've ever made</span></span>
+      <span class="lvl adv">Advanced</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">This is the pandora's box — the feature that turns Tabular Editor from a fast editor into a force multiplier. Ten lines of C# against the model's object tree can do what used to be an afternoon of clicking. You don't need to be a C# developer; you need to steal well and read loops.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b8-1"><span>Learn the object model vocabulary: <code>Model</code>, <code>Selected</code>, and iterating <code>Tables</code> / <code>Columns</code> / <code>Measures</code></span></label></li>
+        <li><label><input type="checkbox" data-k="b8-2"><span>Run the classic first script: generate SUM measures for every selected numeric column (below)</span></label></li>
+        <li><label><input type="checkbox" data-k="b8-3"><span>Write a hygiene script: hide all key/FK columns, or apply <code>FormatDax()</code> to every measure in the model</span></label></li>
+        <li><label><input type="checkbox" data-k="b8-4"><span>Save a script as a macro (custom action) so it lives in your right-click menu forever</span></label></li>
+        <li><label><input type="checkbox" data-k="b8-5"><span>Raid the public script libraries below before writing anything from scratch — most problems are already solved</span></label></li>
+        <li><label><input type="checkbox" data-k="b8-6"><span>Bulk-write measure descriptions (from a CSV, or drafted with an LLM) so the model documents itself</span></label></li>
+      </ul>
+      <pre><code><span class="cm">// The classic: SUM measures for every selected column</span>
+<span class="kw">foreach</span>(<span class="kw">var</span> c <span class="kw">in</span> Selected.Columns)
+{
+    <span class="kw">var</span> m = c.Table.AddMeasure(
+        <span class="st">"Total "</span> + c.Name,
+        <span class="st">"SUM("</span> + c.DaxObjectFullName + <span class="st">")"</span>
+    );
+    m.FormatString = <span class="st">"#,0"</span>;
+    m.Description = <span class="st">"Auto-generated from "</span> + c.DaxObjectFullName;
+}</code></pre>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://docs.tabulareditor.com/te2/Advanced-Scripting.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">C# scripting in TE2 — the object model and how scripts execute</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Useful-script-snippets.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Useful script snippets — the official copy-paste library</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://github.com/m-kovalsky/Tabular" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Michael Kovalsky's script collection — VertiPaq annotations, BPA automation, model exports, and more</span><span class="dom">github.com</span></a></li>
+        <li><a href="https://www.elegantbi.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Elegant BI — Kovalsky's articles on automating tabular development end to end</span><span class="dom">elegantbi.com</span></a></li>
+        <li><a href="https://data-goblins.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins — Kurt Buhler's script-heavy deep dives (DMVs, macros, assessments)</span><span class="dom">data-goblins.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>The test for whether something should be a script: did you just do the same edit three times in a row? Then it's a macro. Your future self inherits every macro you save this year — TE3 will carry them forward.</div>
+    </div>
+  </div>
+
+  <!-- B9 -->
+  <div class="sec" data-open="true" id="b9">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B9</span>
+      <span class="stitle"><h3>Calculation groups &amp; advanced model features</h3><span class="ssub">Kill measure sprawl; perspectives, translations, and OLS</span></span>
+      <span class="lvl adv">Advanced</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Twenty measures × five time-intelligence variants = a hundred-measure model nobody wants to maintain. A calculation group replaces the whole grid with one set of calculation items. Tabular Editor was the original home of calc groups, and it's still the most comfortable place to build them.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b9-1"><span>Build a time-intelligence calculation group (YTD, PY, YoY %) using <code>SELECTEDMEASURE()</code> and apply it to a real report</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-2"><span>Add format string expressions so YoY % formats as a percent while base measures stay currency</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-3"><span>Understand precedence when multiple calc groups exist, and the sharp edges: non-additive measures and measure filters</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-4"><span>Use perspectives to give different audiences a trimmed view of one model</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-5"><span>Explore metadata translations and object-level security — both live naturally in the TE tree</span></label></li>
+      </ul>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://www.sqlbi.com/calculation-groups/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SQLBI calculation groups hub — the definitive article series, start to finish</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://dax.guide/st/selectedmeasure/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SELECTEDMEASURE and friends — the calc-item function family on DAX Guide</span><span class="dom">dax.guide</span></a></li>
+        <li><a href="https://www.daxpatterns.com/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DAX Patterns: time intelligence — the measure logic your calc items will wrap</span><span class="dom">daxpatterns.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/p/dax-tools-video-course/" target="_blank" rel="noopener"><span class="tag course">Course</span><span class="lt">DAX Tools course — includes building a calc group in Tabular Editor on camera</span><span class="dom">sqlbi.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Prototype calc groups on a copy of the model first — they change how every measure in the report behaves under that group's filter, and it's much easier to reason about the blast radius in a sandbox.</div>
+    </div>
+  </div>
+
+  <!-- B10 -->
+  <div class="sec" data-open="true" id="b10">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B10</span>
+      <span class="stitle"><h3>Automation, DevOps &amp; the TE3 upgrade</h3><span class="ssub">CLI pipelines, TMDL in git, and what's waiting in Tabular Editor 3</span></span>
+      <span class="lvl adv">Advanced</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The endgame: models in source control, best-practice checks running in a pipeline, and deployments nobody does by hand. And since TE3 lands on your desk at the end of the year — this section doubles as your upgrade prep. Everything you've built (scripts, macros, BPA rules) carries straight over.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b10-1"><span>Run the TE2 command line once by hand: load a model, execute a script, run BPA with <code>-A</code>, and read the violation output</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-2"><span>Understand TMDL — the readable, folder-per-object model format that makes git diffs and PR reviews actually work</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-3"><span>Save a model as a Power BI Project (.pbip) with TMDL and put it in a repo; make one change and read the diff</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-4"><span>Sketch a CI gate: pipeline fails if BPA reports errors — even a local batch file counts as a first version</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-5"><span>Preview TE3: the DAX debugger, DAX query editor with traces, diagram view, built-in VertiPaq analysis, and workspace mode</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-6"><span>Plan your upgrade week: import your macros and BPA rules, remap muscle memory, and note the TE3-only panes you want to master first</span></label></li>
+      </ul>
+      <pre><code><span class="cm">:: BPA as a quality gate (TE2 CLI, runs free — no TE3 license needed in pipelines)</span>
+start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class="st">"Rules\BPARules.json"</span> -V</code></pre>
+      <p class="gh">Go deeper</p>
+      <ul class="links">
+        <li><a href="https://docs.tabulareditor.com/en/features/Command-line-Options.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Command-line options — TE2 CLI flags, pipeline examples, and the new cross-platform CLI</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TMDL overview — the model-as-code format explained</span><span class="dom">learn.microsoft.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/en/index.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE2 vs TE3 — the official side-by-side feature table</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/en/getting-started/index.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE3 onboarding guide — the official new-user path for when your license arrives</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://tabulareditor.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">tabulareditor.com — TE3 editions, blog, and release announcements</span><span class="dom">tabulareditor.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Best possible position for the TE3 handover: arrive fluent in TE2 scripting and BPA. TE3 doesn't replace those skills — it wraps them in a real IDE (IntelliSense, debugger, integrated traces) so the ceiling gets higher, not different.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART C ================================ -->
+<!-- ==================================================================== -->
+<section class="part pc" id="partc">
+  <div class="pbanner">
+    <p class="pk">Part C &middot; The ecosystem</p>
+    <h2>Ship it &mdash; the wider toolbelt and a capstone tune-up</h2>
+    <p class="pdesc">DAX Studio and Tabular Editor sit inside a small, excellent ecosystem of free tools and a community that publishes its best tricks. This part rounds out the toolbelt, then puts everything together on a real model.</p>
+    <div class="motif" aria-hidden="true">
+      <svg viewBox="0 0 220 34">
+        <defs><linearGradient id="mixGrad" x1="0" y1="0" x2="220" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2a33c"/><stop offset="1" stop-color="#41a4e8"/></linearGradient></defs>
+        <path d="M0,17 H28 L40,5 L54,29 L66,17 H98 V6 H134 V28 H170 V17 H220" fill="none" stroke="url(#mixGrad)" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="pprog"><div class="pbar"><div data-pbar="c"></div></div><span class="pcnt" data-pcnt="c">0 / 0</span></div>
+  </div>
+
+  <!-- C11 -->
+  <div class="sec" data-open="true" id="c11">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C11</span>
+      <span class="stitle"><h3>The wider toolbelt &amp; community</h3><span class="ssub">Companion tools worth installing, and the wells worth drinking from</span></span>
+      <span class="lvl adv">Core</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Each of these does one job extremely well and pairs with the big two: ALM Toolkit compares and promotes models, Bravo handles date tables and quick size analysis, Measure Killer finds what's actually unused, and the community keeps publishing the playbook for free.</p>
+      <p class="gh">Learn this</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c11-1"><span>Install ALM Toolkit and diff two versions of the same model — then push one changed measure between them</span></label></li>
+        <li><label><input type="checkbox" data-k="c11-2"><span>Run Bravo's Analyze Model and Manage Dates on a sandbox model; format every measure with two clicks</span></label></li>
+        <li><label><input type="checkbox" data-k="c11-3"><span>Run Measure Killer against a report and see which measures and columns nothing actually uses</span></label></li>
+        <li><label><input type="checkbox" data-k="c11-4"><span>Bookmark DAX Formatter and make formatted DAX a habit (or automate it via B8's FormatDax script)</span></label></li>
+        <li><label><input type="checkbox" data-k="c11-5"><span>Pick two community wells and follow them properly — SQLBI and one of Data Goblins / Guy in a Cube / Elegant BI</span></label></li>
+      </ul>
+      <p class="gh">The tools</p>
+      <ul class="links">
+        <li><a href="http://alm-toolkit.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">ALM Toolkit — schema compare and selective deploy between models</span><span class="dom">alm-toolkit.com</span></a></li>
+        <li><a href="https://bravo.bi/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">Bravo for Power BI — analyze size, format DAX, build date tables, export data</span><span class="dom">bravo.bi</span></a></li>
+        <li><a href="https://www.brunner.bi/measurekiller" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">Measure Killer — find and remove unused measures and columns safely</span><span class="dom">brunner.bi</span></a></li>
+        <li><a href="https://www.daxformatter.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">DAX Formatter — paste ugly DAX, get readable DAX</span><span class="dom">daxformatter.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/tools/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">SQLBI tools index — incl. Contoso Data Generator for practice models of any size</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://github.com/microsoft/semantic-link-labs" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Semantic Link Labs — the same automation ideas in Fabric notebooks, for when your work heads that way</span><span class="dom">github.com</span></a></li>
+      </ul>
+      <p class="gh">The community</p>
+      <ul class="links">
+        <li><a href="https://www.sqlbi.com/articles/tools-in-power-bi/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Tools in Power BI — SQLBI's map of every tool across the model lifecycle</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://www.youtube.com/@GuyInACube" target="_blank" rel="noopener"><span class="tag video">Video</span><span class="lt">Guy in a Cube — weekly, practical, and current</span><span class="dom">youtube.com</span></a></li>
+        <li><a href="https://data-goblins.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins — Kurt Buhler's illustrated deep work on models and tooling</span><span class="dom">data-goblins.com</span></a></li>
+        <li><a href="https://powerbi.tips/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">PowerBI.tips — tools, layouts, and the Explicit Measures podcast</span><span class="dom">powerbi.tips</span></a></li>
+        <li><a href="https://community.fabric.microsoft.com/" target="_blank" rel="noopener"><span class="tag blog">Forum</span><span class="lt">Fabric Community — where the product team and MVPs answer</span><span class="dom">community.fabric.microsoft.com</span></a></li>
+        <li><a href="https://www.reddit.com/r/PowerBI/" target="_blank" rel="noopener"><span class="tag blog">Forum</span><span class="lt">r/PowerBI — honest war stories and quick sanity checks</span><span class="dom">reddit.com</span></a></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Rough division of labor: DAX Studio diagnoses, Tabular Editor changes, ALM Toolkit promotes, Bravo does the chores, Measure Killer takes out the trash. One job each — that's why they're all still on the ribbon.</div>
+    </div>
+  </div>
+
+  <!-- C12 -->
+  <div class="sec" data-open="true" id="c12">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C12</span>
+      <span class="stitle"><h3>Capstone — the full model tune-up</h3><span class="ssub">One real model, both tools, before-and-after receipts</span></span>
+      <span class="lvl proj">Project</span>
+      <span class="cnt">0/8</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Pick a real model you own — ideally one that's a little slow and a little messy (every shop has one). Run the full loop: measure in DAX Studio, refactor in Tabular Editor, verify in DAX Studio, and finish with a one-page before/after write-up. This is the exercise that makes both tools permanent.</p>
+      <p class="gh">The mission</p>
+      <ul class="steps">
+        <li><label><input type="checkbox" data-k="c12-1"><span><b>Baseline it.</b> Export a .vpax in DAX Studio. Record total model size, top 5 columns by size, and their cardinality.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-2"><span><b>Find the pain.</b> Run Performance Analyzer on the report, copy the two slowest visual queries into DAX Studio, and capture Server Timings for each (cold cache).</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-3"><span><b>Diagnose.</b> For each slow query, decide: storage engine problem or formula engine problem? Write the reason down in one sentence.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-4"><span><b>Fix the model.</b> In Tabular Editor: remove or fix the worst columns (Measure Killer can confirm what's unused), kill auto date/time leftovers, repair anything BPA flags as a performance issue.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-5"><span><b>Fix the DAX.</b> Rewrite the worst measure — prototype with DEFINE MEASURE in DAX Studio first, prove it with Benchmark, then save the winner via Tabular Editor.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-6"><span><b>Standardize.</b> Replace one family of repeated time-intelligence measures with a calculation group.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-7"><span><b>Automate the hygiene.</b> Run three macros from B8: hide keys, format all DAX, fill in measure descriptions. Run BPA until it's clean or every ignore is justified.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-8"><span><b>Publish the receipts.</b> Export a fresh .vpax and write the one-pager: size before/after, slowest visual before/after, what changed and why.</span></label></li>
+      </ul>
+      <p class="gh">Success looks like</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c12-9"><span>Model size down meaningfully (20%+ is common on a first pass) — with the .vpax pair to prove it</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-10"><span>Slowest visual measurably faster, with before/after Server Timings screenshots</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-11"><span>BPA clean, one calc group live, three macros saved for reuse — and the write-up shared with your team</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>No suitable model at hand? Generate one with SQLBI's Contoso Data Generator at whatever size you like, sabotage it (add a datetime key, some ugly iterators), and tune it back to health. Surgeons practice too.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Companion page to the Data Engineering and Snowflake roadmaps. Same rules apply: check things off, come back whenever, and when you outgrow it, bring it to Claude and ask for the next layer (deeper xmSQL, DirectQuery tuning, full CI/CD, TE3 mastery&hellip;).</p>
+  <p class="fp">v1 &middot; July 2026 &middot; progress stored locally in this browser &middot; <span style="color:#f2a33c">&#9632;</span> DAX Studio amber &middot; <span style="color:#41a4e8">&#9632;</span> Tabular Editor azure</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  var KEY = 'dstx_roadmap_v1';
+  var mem = {};
+  var canStore = true;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ mem = JSON.parse(raw) || {}; }
+    }catch(e){
+      canStore = false; mem = {};
+      var n = document.getElementById('persistNote');
+      if(n){ n.textContent = 'Heads up: saving is unavailable in this view — open the file in your browser and progress will stick.'; }
+    }
+  }
+  function save(){
+    if(!canStore) return;
+    try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){ canStore = false; }
+  }
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+
+  function partOf(el){
+    var p = el.closest('.part');
+    if(!p) return null;
+    if(p.id === 'parta') return 'a';
+    if(p.id === 'partb') return 'b';
+    if(p.id === 'partc') return 'c';
+    return null;
+  }
+
+  function refresh(){
+    var total = boxes.length, done = 0;
+    var pt = {a:0,b:0,c:0}, pd = {a:0,b:0,c:0};
+
+    boxes.forEach(function(b){
+      var p = partOf(b);
+      if(p){ pt[p]++; }
+      if(b.checked){ done++; if(p){ pd[p]++; } }
+    });
+
+    // sections
+    document.querySelectorAll('.sec').forEach(function(sec){
+      var sb = sec.querySelectorAll('input[type=checkbox][data-k]');
+      var sd = 0;
+      sb.forEach(function(b){ if(b.checked) sd++; });
+      var cnt = sec.querySelector('.cnt');
+      if(cnt){
+        cnt.textContent = sd + '/' + sb.length;
+        cnt.classList.toggle('full', sd === sb.length && sb.length > 0);
+      }
+      sec.classList.toggle('done', sd === sb.length && sb.length > 0);
+    });
+
+    // parts
+    ['a','b','c'].forEach(function(p){
+      var bar = document.querySelector('[data-pbar="' + p + '"]');
+      var cnt = document.querySelector('[data-pcnt="' + p + '"]');
+      var pct = pt[p] ? Math.round(pd[p] / pt[p] * 100) : 0;
+      if(bar){ bar.style.width = pct + '%'; }
+      if(cnt){ cnt.textContent = pd[p] + ' / ' + pt[p] + ' complete'; }
+    });
+
+    // overall
+    var opct = total ? Math.round(done / total * 100) : 0;
+    var ob = document.getElementById('obarFill');
+    var ot = document.getElementById('opct');
+    if(ob){ ob.style.width = opct + '%'; }
+    if(ot){ ot.textContent = opct + '% done'; }
+  }
+
+  // init checkboxes
+  load();
+  boxes.forEach(function(b){
+    var k = b.getAttribute('data-k');
+    if(mem[k]){ b.checked = true; }
+    b.addEventListener('change', function(){
+      if(b.checked){ mem[k] = 1; } else { delete mem[k]; }
+      save(); refresh();
+    });
+  });
+
+  // section collapse
+  document.querySelectorAll('.sec-head').forEach(function(h){
+    h.addEventListener('click', function(){
+      var sec = h.closest('.sec');
+      var open = sec.getAttribute('data-open') === 'true';
+      sec.setAttribute('data-open', open ? 'false' : 'true');
+      h.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+  });
+
+  // expand / collapse all
+  var tAll = document.getElementById('toggleAll');
+  var allOpen = true;
+  if(tAll){
+    tAll.addEventListener('click', function(){
+      allOpen = !allOpen;
+      document.querySelectorAll('.sec').forEach(function(sec){
+        sec.setAttribute('data-open', allOpen ? 'true' : 'false');
+        var h = sec.querySelector('.sec-head');
+        if(h){ h.setAttribute('aria-expanded', allOpen ? 'true' : 'false'); }
+      });
+      tAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  // reset
+  var rBtn = document.getElementById('resetBtn');
+  if(rBtn){
+    rBtn.addEventListener('click', function(){
+      if(!confirm('Clear all progress on this page?')) return;
+      mem = {};
+      boxes.forEach(function(b){ b.checked = false; });
+      save(); refresh();
+    });
+  }
+
+  refresh();
+})();
+</script>
+</body>
+</html>
