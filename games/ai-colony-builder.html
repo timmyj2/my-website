@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Colony Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;
+  --panel:#161b22;
+  --panel2:#12161d;
+  --line:#252c37;
+  --text:#e8ebf1;
+  --mut:#9aa4b3;
+  --dim:#6b7686;
+  --amber:#f2a33c;
+  --azure:#41a4e8;
+  --flake:#29B5E8;
+  --ok:#5fc98e;
+  --frontier:#c084fc;
+  --colony:#34d399;
+  --danger:#e5484d;
+  --disp:'Sora',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;min-height:100vh;
+  background-image:radial-gradient(1000px 460px at 15% -6%, rgba(52,211,153,.06), transparent 60%),
+                   radial-gradient(1000px 460px at 85% -6%, rgba(41,181,232,.08), transparent 60%);
+  background-attachment:fixed;}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(52,211,153,.32)}
+button{font:inherit;color:inherit;cursor:pointer}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 22px 60px}
+
+.topnav{padding:22px 0 0}
+.topnav a{font-family:var(--mono);font-size:.78rem;color:var(--mut);display:inline-flex;align-items:center;gap:6px}
+.topnav a:hover{color:var(--text)}
+
+.hero{padding:22px 0 8px}
+.hero .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.15;letter-spacing:-.02em}
+.hero h1 .accent{color:var(--colony)}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:12px;font-size:.98rem}
+
+.slabel{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:40px 0 6px}
+
+.panel{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;overflow:hidden}
+
+.statbar{display:flex;flex-wrap:wrap;gap:22px 30px;align-items:center;margin-top:18px}
+.stat-cc{min-width:180px}
+.stat-cc .big-num{font-family:var(--disp);font-weight:700;font-size:clamp(1.6rem,4vw,2.1rem);letter-spacing:-.01em}
+.stat-cc .rate{font-family:var(--mono);font-size:.8rem;color:var(--mut);margin-top:2px}
+.meterblock{flex:1;min-width:140px}
+.meterblock .mlabel{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72rem;color:var(--mut);margin-bottom:6px}
+.meter{height:9px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.meter-fill{height:100%;border-radius:5px;width:0%;transition:width .25s ease,background-color .25s ease;background:var(--ok)}
+.tp-stat{font-family:var(--mono);font-size:.85rem;color:var(--mut);white-space:nowrap}
+.tp-stat b{color:var(--text)}
+.seed-badge{font-family:var(--mono);font-size:.82rem;color:var(--colony);white-space:nowrap;border:1px solid var(--line);border-radius:99px;padding:6px 14px;background:var(--panel2)}
+.seed-badge b{font-weight:600}
+
+/* colony grid */
+.gridwrap{margin-top:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.colonygrid{display:grid;gap:4px;width:max-content;margin:0 auto}
+.cell{width:34px;height:34px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.72rem;color:var(--mut);
+  transition:border-color .15s ease,transform .1s ease;flex-shrink:0}
+.cell:hover{transform:translateY(-1px)}
+.cell.locked{opacity:.35;border-style:dashed;cursor:pointer}
+.cell.buildable{border-style:dashed;border-color:var(--dim);cursor:pointer}
+.cell.buildable:hover{border-color:var(--colony)}
+.cell.occ-solar{background:rgba(242,163,60,.18);border-color:var(--amber);color:var(--amber)}
+.cell.occ-hab{background:rgba(65,164,232,.18);border-color:var(--azure);color:var(--azure)}
+.cell.occ-fab{background:rgba(95,201,142,.18);border-color:var(--ok);color:var(--ok)}
+.cell.occ-lab{background:rgba(192,132,252,.18);border-color:var(--frontier);color:var(--frontier)}
+.cell.selected{outline:2px solid var(--text);outline-offset:1px}
+.cell.tier2::after{content:'';position:absolute}
+
+.cellpanel{margin-top:14px;padding:14px 16px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;font-size:.85rem}
+.cellpanel .empty-hint{color:var(--dim)}
+.cellpanel h4{font-family:var(--disp);font-weight:600;font-size:.98rem;margin-bottom:6px}
+.buildopt{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--line);
+  border-radius:8px;margin-top:8px;background:var(--panel)}
+.buildopt .bo-name{font-family:var(--disp);font-weight:600;font-size:.9rem}
+.buildopt .bo-desc{color:var(--mut);font-size:.76rem;margin-top:2px}
+.buildopt button{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 12px;font-family:var(--mono);font-size:.76rem}
+.buildopt button:hover:not(:disabled){border-color:var(--colony)}
+.buildopt button:disabled{opacity:.4;cursor:not-allowed}
+.cellinfo-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:4px}
+.cellactions{display:flex;gap:10px;margin-top:12px}
+.cellactions button{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:.78rem}
+.cellactions button:hover:not(:disabled){border-color:var(--colony)}
+.cellactions button.danger:hover{border-color:var(--danger)}
+.cellactions button:disabled{opacity:.4;cursor:not-allowed}
+
+/* expand panel */
+.expandrow{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.expand-btn{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-family:var(--mono);
+  font-size:.8rem;text-align:left;flex:1;min-width:200px}
+.expand-btn:hover:not(:disabled){border-color:var(--colony)}
+.expand-btn:disabled{opacity:.4;cursor:not-allowed}
+.expand-btn .eb-title{font-family:var(--disp);font-weight:600;font-size:.92rem;display:block;margin-bottom:4px;color:var(--text)}
+
+/* research panel */
+.rp-tree{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+@media (max-width:680px){.rp-tree{grid-template-columns:1fr}}
+.rp-node{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.82rem;background:var(--panel2);
+  display:flex;flex-direction:column;gap:4px;transition:border-color .15s ease}
+.rp-node .name{font-family:var(--disp);font-weight:600;font-size:.9rem}
+.rp-node .eff{color:var(--mut);font-size:.76rem}
+.rp-node .cost{font-family:var(--mono);font-size:.72rem;color:var(--ok);margin-top:2px}
+.rp-node.bought{border-color:var(--ok);opacity:.7}
+.rp-node.bought .cost{color:var(--dim)}
+.rp-node button{margin-top:6px;background:transparent;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-family:var(--mono);font-size:.72rem}
+.rp-node button:hover:not(:disabled){border-color:var(--ok)}
+.rp-node button:disabled{opacity:.4;cursor:not-allowed}
+
+/* prestige panel */
+.panel.prestige{border-color:rgba(52,211,153,.35)}
+.panel.prestige .slabel{margin:0 0 4px}
+.prestige-row{display:flex;flex-wrap:wrap;gap:22px;align-items:center;margin-top:10px}
+.prestige-stat{font-family:var(--mono);font-size:.82rem;color:var(--mut)}
+.prestige-stat b{color:var(--colony);font-weight:600}
+.prestige-btn{margin-top:14px;background:rgba(52,211,153,.12);border:1px solid var(--colony);color:var(--colony);
+  border-radius:9px;padding:11px 18px;font-family:var(--mono);font-size:.85rem;font-weight:500}
+.prestige-btn:hover{background:rgba(52,211,153,.2)}
+
+/* offline banner */
+.offline-banner{display:none;background:var(--panel2);border:1px solid var(--flake);border-radius:12px;padding:14px 18px;
+  margin-top:18px;font-size:.88rem;color:var(--text)}
+.offline-banner b{color:var(--flake)}
+.offline-banner .dismiss{margin-top:8px;background:transparent;border:1px solid var(--line);border-radius:7px;
+  padding:5px 12px;font-family:var(--mono);font-size:.72rem;color:var(--mut)}
+
+.persistNote{margin-top:14px;font-size:.8rem;color:var(--amber)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(0);background:var(--panel);
+  border:1px solid var(--colony);border-radius:12px;padding:12px 20px;font-family:var(--mono);font-size:.82rem;
+  color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:60;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+.toast b{color:var(--colony)}
+
+footer{margin:60px 0 30px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav"><a href="../index.html">&larr; Back to roadmaps</a></nav>
+
+  <header class="hero">
+    <p class="eyebrow">Idle · city-builder &middot; saves locally</p>
+    <h1>AI Colony <span class="accent">Builder</span></h1>
+    <p class="sub">Place Solar Arrays, Hab Domes, Fabricators, and Research Labs on a grid, keep power and staffing ahead of your buildings, and found the next colony generation for a permanent bonus. Check in a few times a day &mdash; it keeps running while you're away.</p>
+  </header>
+
+  <div id="offlineBanner" class="offline-banner">
+    <div id="offlineText"></div>
+    <button class="dismiss" id="offlineDismiss">Dismiss</button>
+  </div>
+
+  <p class="slabel">Colony status</p>
+  <div class="panel">
+    <div class="statbar">
+      <div class="stat-cc">
+        <div class="big-num" id="crVal">0 CR</div>
+        <div class="rate" id="crRate">0 CR/s</div>
+      </div>
+      <div class="meterblock">
+        <div class="mlabel"><span>Power</span><span id="powerLabel">0 / 0 MW</span></div>
+        <div class="meter"><div class="meter-fill" id="powerFill"></div></div>
+      </div>
+      <div class="meterblock">
+        <div class="mlabel"><span>Workforce</span><span id="workLabel">0 / 0</span></div>
+        <div class="meter"><div class="meter-fill" id="workFill"></div></div>
+      </div>
+      <div class="meterblock">
+        <div class="mlabel"><span>Housing</span><span id="housingLabel">0 / 0</span></div>
+        <div class="meter"><div class="meter-fill" id="housingFill"></div></div>
+      </div>
+      <span class="tp-stat"><b id="tpVal">0</b> Tech Points</span>
+      <span class="seed-badge">&#9670; <b id="seedVal">0</b> Colony Seeds &middot; <span id="prestigeMultVal">+0%</span> output &middot; Gen <span id="genVal">1</span></span>
+    </div>
+  </div>
+
+  <p class="slabel">Colony grid</p>
+  <div class="panel">
+    <p style="color:var(--mut);font-size:.85rem">Click a locked tile to unlock it, an empty tile to build, or a built tile to inspect or bulldoze it.</p>
+    <div class="gridwrap"><div class="colonygrid" id="colonyGrid"></div></div>
+    <div class="cellpanel" id="cellPanel"><span class="empty-hint">Select a tile above to get started.</span></div>
+  </div>
+
+  <p class="slabel">Expand colony</p>
+  <div class="panel">
+    <div class="expandrow" id="expandRow"></div>
+  </div>
+
+  <p class="slabel">Research</p>
+  <div class="panel">
+    <p style="color:var(--mut);font-size:.88rem">Research Labs generate Tech Points passively. Spend them one-way to unlock Tier-2 buildings and colony-wide upgrades — Tech Points reset when you found a new colony.</p>
+    <div class="rp-tree" id="tpTree"></div>
+  </div>
+
+  <p class="slabel">Prestige</p>
+  <div class="panel prestige">
+    <h3 style="font-family:var(--disp);font-size:1.1rem;font-weight:600">Found next colony generation</h3>
+    <p style="color:var(--mut);font-size:.88rem;margin-top:6px">Resets your grid, resources, and research — permanently banks Colony Seeds, each worth +2% output forever.</p>
+    <div class="prestige-row">
+      <span class="prestige-stat">Lifetime this run: <b id="lifetimeVal">0 CR</b></span>
+      <span class="prestige-stat">Projected gain: <b id="seedProjected">+0</b> Colony Seeds</span>
+    </div>
+    <button class="prestige-btn" id="prestigeBtn">Found next colony</button>
+  </div>
+
+  <p class="persistNote" id="persistNote" style="display:none"></p>
+
+  <footer>
+    <p>Progress saves locally in this browser. Close the tab any time &mdash; your colony keeps producing while you're away, up to an 8-hour cap.</p>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var CURRENT_VERSION = 1;
+  var KEY = 'acb_save_v1';
+  var OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
+  var TICK_MS = 250;
+  var AUTOSAVE_MS = 10000;
+  var MAX_DIM = 12;
+  var POP_K = 0.0004;
+
+  var BUILDING_TYPES = [
+    { key:'solar', name:'Solar Array', role:'power', accent:'var(--amber)', cellClass:'occ-solar',
+      desc:'Produces Power. Nothing else depends on it.',
+      tiers:[
+        { name:'Solar Array', baseCost:50, growth:1.12, power:4 },
+        { name:'Fusion Cell', baseCost:4000, growth:1.14, power:30, tpKey:'fusionCell' }
+      ]},
+    { key:'hab', name:'Hab Dome', role:'housing', accent:'var(--azure)', cellClass:'occ-hab',
+      desc:'Houses Colonists. Draws a little Power for life support.',
+      tiers:[
+        { name:'Hab Dome', baseCost:80, growth:1.12, popCap:6, draw:1 },
+        { name:'Arcology', baseCost:6000, growth:1.14, popCap:40, draw:5, tpKey:'arcology' }
+      ]},
+    { key:'fab', name:'Fabricator', role:'credits', accent:'var(--ok)', cellClass:'occ-fab',
+      desc:'Produces Credits. Needs Power and staffed Colonists to run at full rate.',
+      tiers:[
+        { name:'Fabricator', baseCost:120, growth:1.15, rate:2, draw:3, workers:2 },
+        { name:'Auto-Fabricator', baseCost:8000, growth:1.16, rate:14, draw:18, workers:10, tpKey:'autoFab' }
+      ]},
+    { key:'lab', name:'Research Lab', role:'tech', accent:'var(--frontier)', cellClass:'occ-lab',
+      desc:'Produces Tech Points. Needs Power and staffed Colonists.',
+      tiers:[
+        { name:'Research Lab', baseCost:300, growth:1.18, rate:0.1, draw:4, workers:3 },
+        { name:'Deep Lab', baseCost:12000, growth:1.2, rate:0.6, draw:20, workers:12, tpKey:'deepLab' }
+      ]}
+  ];
+
+  var TP_UPGRADES = [
+    { key:'fusionCell', name:'Fusion Cell Research', tpCost:15, type:'tier2', eff:'Unlocks Fusion Cell (Tier 2 Solar Array)' },
+    { key:'arcology',   name:'Arcology Research',    tpCost:20, type:'tier2', eff:'Unlocks Arcology (Tier 2 Hab Dome)' },
+    { key:'autoFab',    name:'Auto-Fabricator Research', tpCost:25, type:'tier2', eff:'Unlocks Auto-Fabricator (Tier 2 Fabricator)' },
+    { key:'deepLab',    name:'Deep Lab Research',    tpCost:30, type:'tier2', eff:'Unlocks Deep Lab (Tier 2 Research Lab)' },
+    { key:'gridEfficiency', name:'Grid Efficiency Protocols', tpCost:10, type:'floor', value:0.4, eff:'Throttle floor 25% → 40%' }
+  ];
+
+  var EXPANSIONS = [
+    { dim:10, cost:5000, needPop:30, label:'Expand to 10×10' },
+    { dim:12, cost:40000, needPop:80, label:'Expand to 12×12' }
+  ];
+
+  function cellIndex(r, c){ return r * MAX_DIM + c; }
+
+  function initialUnlocked(){
+    var arr = new Array(MAX_DIM * MAX_DIM).fill(false);
+    for(var r = 4; r < 8; r++){
+      for(var c = 4; c < 8; c++){ arr[cellIndex(r, c)] = true; }
+    }
+    return arr;
+  }
+
+  function freshState(){
+    return {
+      version: CURRENT_VERSION,
+      cr: 300,
+      lifetimeCR: 0,
+      tp: 0,
+      pop: 0,
+      cells: new Array(MAX_DIM * MAX_DIM).fill(null),
+      unlockedCells: initialUnlocked(),
+      gridDim: 8,
+      tpUnlocks: {},
+      seeds: 0,
+      prestigeCount: 0,
+      lastSeen: Date.now(),
+      createdAt: Date.now()
+    };
+  }
+
+  var state = freshState();
+  var canStore = true;
+  var selectedIdx = null;
+  var lastRenderedDim = null;
+
+  function migrate(raw){
+    if(!raw.version || raw.version < CURRENT_VERSION){ raw.version = CURRENT_VERSION; }
+    var fresh = freshState();
+    for(var k in fresh){ if(!(k in raw)) raw[k] = fresh[k]; }
+    if(!Array.isArray(raw.cells) || raw.cells.length !== MAX_DIM * MAX_DIM) raw.cells = fresh.cells;
+    if(!Array.isArray(raw.unlockedCells) || raw.unlockedCells.length !== MAX_DIM * MAX_DIM) raw.unlockedCells = fresh.unlockedCells;
+    raw.tpUnlocks = raw.tpUnlocks || {};
+    return raw;
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ state = migrate(JSON.parse(raw)); }
+    }catch(e){
+      canStore = false;
+      var n = document.getElementById('persistNote');
+      if(n){ n.style.display = 'block'; n.textContent = 'Heads up: saving is unavailable in this view — open the file directly in your browser and progress will stick.'; }
+    }
+  }
+
+  function save(){
+    if(!canStore) return;
+    state.lastSeen = Date.now();
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ canStore = false; }
+  }
+
+  function fmt(n){
+    if(n < 0) return '-' + fmt(-n);
+    if(n < 1000) return (n < 10 ? n.toFixed(2) : n.toFixed(1));
+    var units = ['K','M','B','T','Qa','Qi'];
+    var u = -1;
+    while(n >= 1000 && u < units.length - 1){ n /= 1000; u++; }
+    return n.toFixed(2) + units[u];
+  }
+
+  function costOf(baseCost, growth, owned){
+    return baseCost * Math.pow(growth, owned);
+  }
+
+  function findBuilding(key){
+    return BUILDING_TYPES.filter(function(b){ return b.key === key; })[0];
+  }
+
+  function countBuilt(s, key, tierIdx){
+    var n = 0;
+    for(var i = 0; i < s.cells.length; i++){
+      var c = s.cells[i];
+      if(c && c.building === key && c.tier === tierIdx) n++;
+    }
+    return n;
+  }
+
+  function tier2Unlocked(s, tpKey){
+    return !!s.tpUnlocks[tpKey];
+  }
+
+  function unlockCellCost(s){
+    var extra = s.unlockedCells.filter(Boolean).length - 16;
+    if(extra < 0) extra = 0;
+    return 25 * Math.pow(1.08, extra);
+  }
+
+  var toastTimer = null;
+  function showToast(html){
+    var t = document.getElementById('toast');
+    t.innerHTML = html;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3600);
+  }
+
+  function computeDerived(s){
+    var throttleFloor = 0.25;
+    TP_UPGRADES.forEach(function(u){
+      if(s.tpUnlocks[u.key] && u.type === 'floor') throttleFloor = Math.max(throttleFloor, u.value);
+    });
+    var prestigeMultiplier = 1 + s.seeds * 0.02;
+    return { throttleFloor:throttleFloor, prestigeMultiplier:prestigeMultiplier };
+  }
+
+  function computeStats(s){
+    var d = computeDerived(s);
+    var supply = 0, draw = 0, popCap = 0, crBase = 0, tpBase = 0, workersNeeded = 0;
+    for(var i = 0; i < s.cells.length; i++){
+      var cell = s.cells[i];
+      if(!cell) continue;
+      var def = findBuilding(cell.building);
+      var t = def.tiers[cell.tier];
+      if(def.role === 'power') supply += t.power;
+      else if(def.role === 'housing'){ popCap += t.popCap; draw += t.draw; }
+      else if(def.role === 'credits'){ crBase += t.rate; draw += t.draw; workersNeeded += t.workers; }
+      else if(def.role === 'tech'){ tpBase += t.rate; draw += t.draw; workersNeeded += t.workers; }
+    }
+    var powerRatio = draw > 0 ? Math.min(1, supply / draw) : 1;
+    var workerRatio = workersNeeded > 0 ? Math.min(1, s.pop / workersNeeded) : 1;
+    var throttle = Math.max(d.throttleFloor, Math.min(powerRatio, workerRatio));
+    return {
+      d:d, supply:supply, draw:draw, popCap:popCap, workersNeeded:workersNeeded,
+      crBase:crBase, tpBase:tpBase, powerRatio:powerRatio, workerRatio:workerRatio, throttle:throttle,
+      crPerSec: crBase * throttle * d.prestigeMultiplier,
+      tpPerSec: tpBase * throttle
+    };
+  }
+
+  function applyProduction(s, dt){
+    var stats = computeStats(s);
+    s.pop = Math.max(0, stats.popCap - (stats.popCap - s.pop) * Math.exp(-POP_K * dt));
+    var earnedCR = stats.crPerSec * dt;
+    var earnedTP = stats.tpPerSec * dt;
+    s.cr += earnedCR;
+    s.lifetimeCR += earnedCR;
+    s.tp += earnedTP;
+    return stats;
+  }
+
+  function applyOfflineProduction(s, T){
+    var stats = computeStats(s);
+    var cap = stats.popCap;
+    var pop0 = s.pop;
+    var popT = cap - (cap - pop0) * Math.exp(-POP_K * T);
+    var avgPop;
+    if(POP_K * T < 1e-6){ avgPop = pop0; }
+    else { avgPop = cap - (cap - pop0) * (1 - Math.exp(-POP_K * T)) / (POP_K * T); }
+    var workerRatioAvg = stats.workersNeeded > 0 ? Math.min(1, avgPop / stats.workersNeeded) : 1;
+    var throttleAvg = Math.max(stats.d.throttleFloor, Math.min(stats.powerRatio, workerRatioAvg));
+    var earnedCR = stats.crBase * throttleAvg * stats.d.prestigeMultiplier * T;
+    var earnedTP = stats.tpBase * throttleAvg * T;
+    s.cr += earnedCR;
+    s.lifetimeCR += earnedCR;
+    s.tp += earnedTP;
+    s.pop = popT;
+    return { earnedCR:earnedCR, earnedTP:earnedTP };
+  }
+
+  function projectedSeeds(s){
+    return Math.floor(Math.sqrt(s.lifetimeCR / 4000000));
+  }
+
+  // ---------- rendering ----------
+
+  var gridEl = document.getElementById('colonyGrid');
+  var cellPanel = document.getElementById('cellPanel');
+  var tpTree = document.getElementById('tpTree');
+  var expandRow = document.getElementById('expandRow');
+
+  function visibleOffset(dim){ return (MAX_DIM - dim) / 2; }
+
+  function buildGridDom(){
+    gridEl.innerHTML = '';
+    gridEl.style.gridTemplateColumns = 'repeat(' + state.gridDim + ', 34px)';
+    var off = visibleOffset(state.gridDim);
+    for(var r = 0; r < state.gridDim; r++){
+      for(var c = 0; c < state.gridDim; c++){
+        var idx = cellIndex(r + off, c + off);
+        var btn = document.createElement('button');
+        btn.className = 'cell';
+        btn.dataset.idx = idx;
+        gridEl.appendChild(btn);
+      }
+    }
+    lastRenderedDim = state.gridDim;
+  }
+
+  function buildTpTree(){
+    tpTree.innerHTML = '';
+    TP_UPGRADES.forEach(function(u){
+      var node = document.createElement('div');
+      node.className = 'rp-node';
+      node.dataset.key = u.key;
+      node.innerHTML =
+        '<span class="name">' + u.name + '</span>' +
+        '<span class="eff">' + u.eff + '</span>' +
+        '<span class="cost" data-f="cost">' + u.tpCost + ' TP</span>' +
+        '<button data-action="buy-tp" data-key="' + u.key + '">Research</button>';
+      tpTree.appendChild(node);
+    });
+  }
+  buildTpTree();
+
+  function buildExpandRow(){
+    expandRow.innerHTML = '';
+    EXPANSIONS.forEach(function(ex){
+      var btn = document.createElement('button');
+      btn.className = 'expand-btn';
+      btn.dataset.dim = ex.dim;
+      btn.innerHTML = '<span class="eb-title">' + ex.label + '</span><span data-f="detail"></span>';
+      expandRow.appendChild(btn);
+    });
+  }
+  buildExpandRow();
+
+  function meterColor(ratio){
+    if(ratio < 0.7) return 'var(--ok)';
+    if(ratio < 0.9) return 'var(--amber)';
+    return 'var(--danger)';
+  }
+
+  function renderCellPanel(){
+    if(selectedIdx === null){
+      cellPanel.innerHTML = '<span class="empty-hint">Select a tile above to get started.</span>';
+      return;
+    }
+    var idx = selectedIdx;
+    var cell = state.cells[idx];
+
+    if(!cell){
+      var html = '<h4>Empty tile</h4>';
+      BUILDING_TYPES.forEach(function(def){
+        var t = def.tiers[0];
+        var cost = costOf(t.baseCost, t.growth, countBuilt(state, def.key, 0));
+        var afford = state.cr >= cost;
+        html += '<div class="buildopt">' +
+          '<div><div class="bo-name">' + def.name + '</div><div class="bo-desc">' + def.desc + '</div></div>' +
+          '<button data-action="build" data-idx="' + idx + '" data-building="' + def.key + '" ' + (afford ? '' : 'disabled') + '>Build · ' + fmt(cost) + ' CR</button>' +
+          '</div>';
+      });
+      cellPanel.innerHTML = html;
+      return;
+    }
+
+    var def = findBuilding(cell.building);
+    var t = def.tiers[cell.tier];
+    var refund = costOf(t.baseCost, t.growth, Math.max(0, countBuilt(state, cell.building, cell.tier) - 1)) * 0.5;
+    var html2 = '<h4>' + t.name + '</h4>';
+    if(def.role === 'power') html2 += '<div class="cellinfo-row"><span>Power output</span><span>+' + fmt(t.power) + ' MW</span></div>';
+    if(def.role === 'housing'){
+      html2 += '<div class="cellinfo-row"><span>Housing capacity</span><span>+' + fmt(t.popCap) + '</span></div>';
+      html2 += '<div class="cellinfo-row"><span>Power draw</span><span>-' + fmt(t.draw) + ' MW</span></div>';
+    }
+    if(def.role === 'credits' || def.role === 'tech'){
+      html2 += '<div class="cellinfo-row"><span>Output</span><span>' + fmt(t.rate) + (def.role === 'credits' ? ' CR/s' : ' TP/s') + '</span></div>';
+      html2 += '<div class="cellinfo-row"><span>Power draw</span><span>-' + fmt(t.draw) + ' MW</span></div>';
+      html2 += '<div class="cellinfo-row"><span>Workers needed</span><span>' + t.workers + '</span></div>';
+    }
+    html2 += '<div class="cellactions">';
+    html2 += '<button class="danger" data-action="bulldoze" data-idx="' + idx + '">Bulldoze · +' + fmt(refund) + ' CR</button>';
+    if(cell.tier === 0 && def.tiers[1] && tier2Unlocked(state, def.tiers[1].tpKey)){
+      var tier2 = def.tiers[1];
+      var upCost = costOf(tier2.baseCost, tier2.growth, countBuilt(state, cell.building, 1));
+      html2 += '<button data-action="upgrade" data-idx="' + idx + '" ' + (state.cr >= upCost ? '' : 'disabled') + '>Upgrade to ' + tier2.name + ' · ' + fmt(upCost) + ' CR</button>';
+    }
+    html2 += '</div>';
+    cellPanel.innerHTML = html2;
+  }
+
+  function render(){
+    if(state.gridDim !== lastRenderedDim) buildGridDom();
+
+    var stats = computeStats(state);
+
+    document.getElementById('crVal').textContent = fmt(state.cr) + ' CR';
+    document.getElementById('crRate').textContent = fmt(stats.crPerSec) + ' CR/s' + (stats.throttle < 0.999 ? '  ·  ' + Math.round(stats.throttle * 100) + '% throttle' : '');
+
+    document.getElementById('powerLabel').textContent = fmt(stats.draw) + ' / ' + fmt(stats.supply) + ' MW';
+    var pf = document.getElementById('powerFill');
+    var powerFillRatio = stats.supply > 0 ? Math.min(1, stats.draw / stats.supply) : (stats.draw > 0 ? 1 : 0);
+    pf.style.width = (powerFillRatio * 100) + '%';
+    pf.style.background = meterColor(powerFillRatio);
+
+    document.getElementById('workLabel').textContent = fmt(state.pop) + ' / ' + fmt(stats.workersNeeded);
+    var wf = document.getElementById('workFill');
+    var workFillRatio = stats.workersNeeded > 0 ? Math.min(1, state.pop / stats.workersNeeded) : 0;
+    wf.style.width = (workFillRatio * 100) + '%';
+    wf.style.background = meterColor(workFillRatio);
+
+    document.getElementById('housingLabel').textContent = fmt(state.pop) + ' / ' + fmt(stats.popCap);
+    var hf = document.getElementById('housingFill');
+    var housingRatio = stats.popCap > 0 ? Math.min(1, state.pop / stats.popCap) : 0;
+    hf.style.width = (housingRatio * 100) + '%';
+    hf.style.background = 'var(--azure)';
+
+    document.getElementById('tpVal').textContent = fmt(state.tp);
+    document.getElementById('seedVal').textContent = state.seeds;
+    document.getElementById('prestigeMultVal').textContent = '+' + Math.round((stats.d.prestigeMultiplier - 1) * 100) + '%';
+    document.getElementById('genVal').textContent = state.prestigeCount + 1;
+
+    var off = visibleOffset(state.gridDim);
+    for(var r = 0; r < state.gridDim; r++){
+      for(var c = 0; c < state.gridDim; c++){
+        var idx = cellIndex(r + off, c + off);
+        var btn = gridEl.querySelector('[data-idx="' + idx + '"]');
+        if(!btn) continue;
+        btn.className = 'cell';
+        var cell = state.cells[idx];
+        if(!state.unlockedCells[idx]){
+          btn.classList.add('locked');
+          btn.textContent = '';
+          btn.title = 'Unlock · ' + fmt(unlockCellCost(state)) + ' CR';
+        } else if(cell){
+          var def = findBuilding(cell.building);
+          btn.classList.add(def.cellClass);
+          if(cell.tier === 1) btn.classList.add('tier2');
+          btn.textContent = def.name.charAt(0) + (cell.tier === 1 ? '+' : '');
+          btn.title = def.tiers[cell.tier].name;
+        } else {
+          btn.classList.add('buildable');
+          btn.textContent = '+';
+          btn.title = 'Build here';
+        }
+        if(idx === selectedIdx) btn.classList.add('selected');
+      }
+    }
+
+    TP_UPGRADES.forEach(function(u){
+      var node = tpTree.querySelector('[data-key="' + u.key + '"]');
+      var bought = !!state.tpUnlocks[u.key];
+      node.classList.toggle('bought', bought);
+      var btn = node.querySelector('button');
+      if(bought){
+        btn.textContent = 'Researched';
+        btn.disabled = true;
+      } else {
+        btn.disabled = state.tp < u.tpCost;
+        btn.textContent = 'Research · ' + u.tpCost + ' TP';
+      }
+    });
+
+    EXPANSIONS.forEach(function(ex){
+      var btn = expandRow.querySelector('[data-dim="' + ex.dim + '"]');
+      var detail = btn.querySelector('[data-f="detail"]');
+      if(state.gridDim >= ex.dim){
+        btn.disabled = true;
+        detail.textContent = 'Already expanded';
+      } else {
+        var ok = state.cr >= ex.cost && state.pop >= ex.needPop;
+        btn.disabled = !ok;
+        detail.textContent = fmt(ex.cost) + ' CR · needs ' + ex.needPop + ' Colonists';
+      }
+    });
+
+    document.getElementById('lifetimeVal').textContent = fmt(state.lifetimeCR) + ' CR';
+    document.getElementById('seedProjected').textContent = '+' + projectedSeeds(state);
+
+    renderCellPanel();
+  }
+
+  // ---------- actions ----------
+
+  function selectCell(idx){
+    selectedIdx = idx;
+    render();
+  }
+
+  function tryUnlock(idx){
+    var cost = unlockCellCost(state);
+    if(state.cr < cost) return;
+    state.cr -= cost;
+    state.unlockedCells[idx] = true;
+    render();
+    save();
+  }
+
+  function buildOn(idx, key){
+    if(!state.unlockedCells[idx] || state.cells[idx]) return;
+    var def = findBuilding(key);
+    var t = def.tiers[0];
+    var cost = costOf(t.baseCost, t.growth, countBuilt(state, key, 0));
+    if(state.cr < cost) return;
+    state.cr -= cost;
+    state.cells[idx] = { building:key, tier:0 };
+    render();
+    save();
+  }
+
+  function bulldoze(idx){
+    var cell = state.cells[idx];
+    if(!cell) return;
+    var def = findBuilding(cell.building);
+    var t = def.tiers[cell.tier];
+    var refund = costOf(t.baseCost, t.growth, Math.max(0, countBuilt(state, cell.building, cell.tier) - 1)) * 0.5;
+    state.cells[idx] = null;
+    state.cr += refund;
+    render();
+    save();
+  }
+
+  function upgradeCell(idx){
+    var cell = state.cells[idx];
+    if(!cell || cell.tier !== 0) return;
+    var def = findBuilding(cell.building);
+    var tier2 = def.tiers[1];
+    if(!tier2 || !tier2Unlocked(state, tier2.tpKey)) return;
+    var cost = costOf(tier2.baseCost, tier2.growth, countBuilt(state, cell.building, 1));
+    if(state.cr < cost) return;
+    state.cr -= cost;
+    state.cells[idx] = { building:cell.building, tier:1 };
+    render();
+    save();
+  }
+
+  function buyTp(key){
+    var def = TP_UPGRADES.filter(function(u){ return u.key === key; })[0];
+    if(!def || state.tpUnlocks[key] || state.tp < def.tpCost) return;
+    state.tp -= def.tpCost;
+    state.tpUnlocks[key] = true;
+    render();
+    save();
+    if(def.type === 'tier2') showToast('Unlocked: <b>' + def.eff.replace('Unlocks ', '') + '</b>');
+  }
+
+  function expandTo(dim){
+    var ex = EXPANSIONS.filter(function(e){ return e.dim === dim; })[0];
+    if(!ex || state.gridDim >= dim) return;
+    if(state.cr < ex.cost || state.pop < ex.needPop) return;
+    state.cr -= ex.cost;
+    state.gridDim = dim;
+    render();
+    save();
+    showToast('Colony expanded to <b>' + dim + '&times;' + dim + '</b>');
+  }
+
+  function prestige(){
+    var gain = projectedSeeds(state);
+    if(!window.confirm('Found the next colony generation? Your grid, resources, and research will reset. You will earn +' + gain + ' Colony Seed' + (gain === 1 ? '' : 's') + ' (permanent).')) return;
+    var kept = { seeds: state.seeds + gain, prestigeCount: state.prestigeCount + 1 };
+    state = freshState();
+    state.seeds = kept.seeds;
+    state.prestigeCount = kept.prestigeCount;
+    selectedIdx = null;
+    render();
+    save();
+  }
+
+  document.addEventListener('click', function(e){
+    var cellBtn = e.target.closest('.cell');
+    if(cellBtn){
+      var idx = parseInt(cellBtn.dataset.idx, 10);
+      if(!state.unlockedCells[idx]) tryUnlock(idx);
+      else selectCell(idx);
+      return;
+    }
+    var actionEl = e.target.closest('[data-action]');
+    if(!actionEl) return;
+    var action = actionEl.dataset.action;
+    if(action === 'build') buildOn(parseInt(actionEl.dataset.idx, 10), actionEl.dataset.building);
+    else if(action === 'bulldoze') bulldoze(parseInt(actionEl.dataset.idx, 10));
+    else if(action === 'upgrade') upgradeCell(parseInt(actionEl.dataset.idx, 10));
+    else if(action === 'buy-tp') buyTp(actionEl.dataset.key);
+  });
+
+  expandRow.addEventListener('click', function(e){
+    var btn = e.target.closest('.expand-btn');
+    if(!btn) return;
+    expandTo(parseInt(btn.dataset.dim, 10));
+  });
+
+  document.getElementById('prestigeBtn').addEventListener('click', prestige);
+  document.getElementById('offlineDismiss').addEventListener('click', function(){
+    document.getElementById('offlineBanner').style.display = 'none';
+  });
+
+  // ---------- offline progress ----------
+
+  function handleOffline(){
+    var elapsed = Date.now() - state.lastSeen;
+    if(elapsed < 60000) return;
+    var capped = Math.min(elapsed, OFFLINE_CAP_MS);
+    var result = applyOfflineProduction(state, capped / 1000);
+    if(result.earnedCR <= 0 && result.earnedTP <= 0) return;
+    var hrs = Math.floor(elapsed / 3600000);
+    var mins = Math.floor((elapsed % 3600000) / 60000);
+    var text = 'While you were away (' + hrs + 'h ' + mins + 'm): earned <b>+' + fmt(result.earnedCR) + ' CR</b>' +
+      (result.earnedTP > 0 ? ' and <b>+' + fmt(result.earnedTP) + ' TP</b>' : '') + ' at your last known rate.';
+    if(elapsed > OFFLINE_CAP_MS) text += ' Capped at 8 hours.';
+    document.getElementById('offlineText').innerHTML = text;
+    document.getElementById('offlineBanner').style.display = 'block';
+  }
+
+  // ---------- boot ----------
+
+  load();
+  buildGridDom();
+  handleOffline();
+  render();
+  save();
+
+  var lastTick = performance.now();
+  setInterval(function(){
+    var now = performance.now();
+    var dt = (now - lastTick) / 1000;
+    lastTick = now;
+    applyProduction(state, dt);
+    render();
+  }, TICK_MS);
+
+  setInterval(save, AUTOSAVE_MS);
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) save(); });
+  window.addEventListener('beforeunload', save);
+
+})();
+</script>
+</body>
+</html>
