@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compute Cluster Tycoon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;
+  --panel:#161b22;
+  --panel2:#12161d;
+  --line:#252c37;
+  --text:#e8ebf1;
+  --mut:#9aa4b3;
+  --dim:#6b7686;
+  --amber:#f2a33c;
+  --azure:#41a4e8;
+  --flake:#29B5E8;
+  --ok:#5fc98e;
+  --frontier:#c084fc;
+  --danger:#e5484d;
+  --disp:'Sora',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;min-height:100vh;
+  background-image:radial-gradient(1000px 460px at 15% -6%, rgba(242,163,60,.07), transparent 60%),
+                   radial-gradient(1000px 460px at 85% -6%, rgba(41,181,232,.08), transparent 60%);
+  background-attachment:fixed;}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(41,181,232,.32)}
+button{font:inherit;color:inherit;cursor:pointer}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 22px 60px}
+
+/* nav */
+.topnav{padding:22px 0 0}
+.topnav a{font-family:var(--mono);font-size:.78rem;color:var(--mut);display:inline-flex;align-items:center;gap:6px}
+.topnav a:hover{color:var(--text)}
+
+/* hero */
+.hero{padding:22px 0 8px}
+.hero .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.15;letter-spacing:-.02em}
+.hero h1 .accent{color:var(--frontier)}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:12px;font-size:.98rem}
+
+.slabel{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:40px 0 6px}
+
+/* panel base (mirrors .card) */
+.panel{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;overflow:hidden}
+
+/* stats bar */
+.statbar{display:flex;flex-wrap:wrap;gap:22px 30px;align-items:center;margin-top:18px}
+.stat-cc{min-width:200px}
+.stat-cc .big-num{font-family:var(--disp);font-weight:700;font-size:clamp(1.6rem,4vw,2.1rem);letter-spacing:-.01em}
+.stat-cc .rate{font-family:var(--mono);font-size:.8rem;color:var(--mut);margin-top:2px}
+.meterblock{flex:1;min-width:150px}
+.meterblock .mlabel{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72rem;color:var(--mut);margin-bottom:6px}
+.meter{height:9px;border-radius:5px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.meter-fill{height:100%;border-radius:5px;width:0%;transition:width .25s ease,background-color .25s ease;background:var(--ok)}
+.ft-badge{font-family:var(--mono);font-size:.82rem;color:var(--frontier);white-space:nowrap;border:1px solid var(--line);border-radius:99px;padding:6px 14px;background:var(--panel2)}
+.ft-badge b{font-weight:600}
+
+/* buy grid, reuses card look */
+.buygrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:680px){.buygrid{grid-template-columns:1fr}}
+
+.buy{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;
+  display:flex;flex-direction:column;gap:8px;transition:border-color .2s ease}
+.buy .accent{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--buyaccent,var(--azure))}
+.buy .kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--buyaccent,var(--azure))}
+.buy h3{font-family:var(--disp);font-weight:600;font-size:1.05rem}
+.buy .desc{color:var(--mut);font-size:.82rem}
+.buy .row{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:4px}
+.buy .owned{color:var(--text)}
+.buy-btn{margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;
+  font-family:var(--mono);font-size:.78rem;text-align:center;transition:border-color .15s ease,transform .15s ease}
+.buy-btn:hover:not(:disabled){border-color:var(--buyaccent,var(--azure));transform:translateY(-1px)}
+.buy-btn:disabled{opacity:.4;cursor:not-allowed}
+.buy.locked{opacity:.55;border-style:dashed}
+.buy.locked .buy-btn{display:none}
+
+/* research panel */
+.rp-tree{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+@media (max-width:680px){.rp-tree{grid-template-columns:1fr}}
+.rp-node{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.82rem;background:var(--panel2);
+  display:flex;flex-direction:column;gap:4px;transition:border-color .15s ease}
+.rp-node .name{font-family:var(--disp);font-weight:600;font-size:.9rem}
+.rp-node .eff{color:var(--mut);font-size:.76rem}
+.rp-node .cost{font-family:var(--mono);font-size:.72rem;color:var(--ok);margin-top:2px}
+.rp-node.bought{border-color:var(--ok);opacity:.7}
+.rp-node.bought .cost{color:var(--dim)}
+.rp-node.locked{opacity:.45}
+.rp-node button{margin-top:6px;background:transparent;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-family:var(--mono);font-size:.72rem}
+.rp-node button:hover:not(:disabled){border-color:var(--ok)}
+.rp-node button:disabled{opacity:.4;cursor:not-allowed}
+
+.trainbtn{margin-top:14px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:11px 16px;
+  font-family:var(--mono);font-size:.85rem;display:inline-flex;gap:10px;align-items:center}
+.trainbtn:hover:not(:disabled){border-color:var(--ok)}
+.trainbtn:disabled{opacity:.4;cursor:not-allowed}
+
+/* prestige panel */
+.panel.prestige{border-color:rgba(192,132,252,.35)}
+.panel.prestige .slabel{margin:0 0 4px}
+.prestige-row{display:flex;flex-wrap:wrap;gap:22px;align-items:center;margin-top:10px}
+.prestige-stat{font-family:var(--mono);font-size:.82rem;color:var(--mut)}
+.prestige-stat b{color:var(--frontier);font-weight:600}
+.prestige-btn{margin-top:14px;background:rgba(192,132,252,.12);border:1px solid var(--frontier);color:var(--frontier);
+  border-radius:9px;padding:11px 18px;font-family:var(--mono);font-size:.85rem;font-weight:500}
+.prestige-btn:hover{background:rgba(192,132,252,.2)}
+
+/* offline banner */
+.offline-banner{display:none;background:var(--panel2);border:1px solid var(--flake);border-radius:12px;padding:14px 18px;
+  margin-top:18px;font-size:.88rem;color:var(--text)}
+.offline-banner b{color:var(--flake)}
+.offline-banner .dismiss{margin-top:8px;background:transparent;border:1px solid var(--line);border-radius:7px;
+  padding:5px 12px;font-family:var(--mono);font-size:.72rem;color:var(--mut)}
+
+.persistNote{margin-top:14px;font-size:.8rem;color:var(--amber)}
+
+/* buy quantity toggle */
+.qtytoggle{display:flex;align-items:center;gap:8px;margin-top:16px;font-family:var(--mono);font-size:.76rem;color:var(--mut)}
+.qtytoggle button{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 12px;font-family:var(--mono);font-size:.76rem;color:var(--mut)}
+.qtytoggle button:hover{border-color:var(--azure)}
+.qtytoggle button.active{border-color:var(--azure);color:var(--text);background:rgba(65,164,232,.12)}
+
+/* unlock toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(0);background:var(--panel);
+  border:1px solid var(--frontier);border-radius:12px;padding:12px 20px;font-family:var(--mono);font-size:.82rem;
+  color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:60;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+.toast b{color:var(--frontier)}
+
+footer{margin:60px 0 30px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav"><a href="../index.html">&larr; Back to roadmaps</a></nav>
+
+  <header class="hero">
+    <p class="eyebrow">Idle · incremental &middot; saves locally</p>
+    <h1>Compute Cluster <span class="accent">Tycoon</span></h1>
+    <p class="sub">Buy GPUs, keep power and cooling ahead of your fleet, spend research on a small upgrade tree, and deploy the next model generation to bank a permanent multiplier. Five minutes to learn, a long game to optimize.</p>
+  </header>
+
+  <div id="offlineBanner" class="offline-banner">
+    <div id="offlineText"></div>
+    <button class="dismiss" id="offlineDismiss">Dismiss</button>
+  </div>
+
+  <p class="slabel">Cluster status</p>
+  <div class="panel">
+    <div class="statbar">
+      <div class="stat-cc">
+        <div class="big-num" id="ccVal">0 CC</div>
+        <div class="rate" id="ccRate">0 CC/s</div>
+      </div>
+      <div class="meterblock">
+        <div class="mlabel"><span>Power</span><span id="powerLabel">0 / 20 MW</span></div>
+        <div class="meter"><div class="meter-fill" id="powerFill"></div></div>
+      </div>
+      <div class="meterblock">
+        <div class="mlabel"><span>Cooling</span><span id="coolLabel">0 / 15</span></div>
+        <div class="meter"><div class="meter-fill" id="coolFill"></div></div>
+      </div>
+      <div class="ft-badge">&#9670; <b id="ftVal">0</b> Frontier Tokens &middot; <span id="prestigeMultVal">+0%</span> output</div>
+    </div>
+  </div>
+
+  <div class="qtytoggle" id="qtyToggle">
+    <span>Buy</span>
+    <button data-qty="1" class="active">x1</button>
+    <button data-qty="10">x10</button>
+    <button data-qty="25">x25</button>
+  </div>
+
+  <p class="slabel">GPU fleet</p>
+  <div class="buygrid" id="gpuGrid"></div>
+
+  <p class="slabel">Infrastructure</p>
+  <div class="buygrid" id="infraGrid"></div>
+
+  <p class="slabel">Research</p>
+  <div class="panel">
+    <p style="color:var(--mut);font-size:.88rem">Run a training pass to earn Research Points, then spend them one-way on efficiency upgrades. Research Points reset on prestige — each generation, you re-optimize.</p>
+    <button class="trainbtn" id="trainBtn">Run Training &middot; <span id="trainCost"></span> &middot; <span id="rpVal">0 RP</span></button>
+    <div class="rp-tree" id="rpTree"></div>
+  </div>
+
+  <p class="slabel">Prestige</p>
+  <div class="panel prestige">
+    <h3 style="font-family:var(--disp);font-size:1.1rem;font-weight:600">Deploy next model generation</h3>
+    <p style="color:var(--mut);font-size:.88rem;margin-top:6px">Resets your fleet, infrastructure, and research — permanently banks Frontier Tokens, each worth +2% output forever.</p>
+    <div class="prestige-row">
+      <span class="prestige-stat">Lifetime this run: <b id="lifetimeVal">0 CC</b></span>
+      <span class="prestige-stat">Projected gain: <b id="ftProjected">+0</b> Frontier Tokens</span>
+    </div>
+    <button class="prestige-btn" id="prestigeBtn">Deploy next generation</button>
+  </div>
+
+  <p class="persistNote" id="persistNote" style="display:none"></p>
+
+  <footer>
+    <p>Progress saves locally in this browser. Close the tab any time &mdash; compute keeps accruing while you're away, up to an 8-hour cap.</p>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var CURRENT_VERSION = 1;
+  var KEY = 'cct_save_v1';
+  var OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
+  var TICK_MS = 250;
+  var AUTOSAVE_MS = 10000;
+
+  var GPU_TIERS = [
+    { key:'consumer',    name:'Consumer GPUs',   accent:'var(--azure)', baseCost:10,   growth:1.15, rate:0.5, power:1,  heat:1,
+      desc:'Everyday silicon. Cheap, always available.', unlocked:function(s){ return true; } },
+    { key:'datacenter',  name:'Datacenter GPUs', accent:'var(--amber)', baseCost:250,  growth:1.15, rate:4,   power:6,  heat:5,
+      desc:'Rack-mount cards, real throughput.', unlocked:function(s){ return s.gpus.consumer >= 10; } },
+    { key:'accelerator', name:'AI Accelerators', accent:'var(--frontier)', baseCost:5000, growth:1.15, rate:30,  power:30, heat:20,
+      desc:'Custom silicon, unlocked after your first deployment.', unlocked:function(s){ return s.prestigeCount >= 1; } }
+  ];
+
+  var INFRA = [
+    { key:'substations',   name:'Substations',    accent:'var(--ok)',  baseCost:500, growth:1.15, gain:15, appliesTo:'power',
+      desc:'+15 MW of power capacity each.' },
+    { key:'coolingTowers',  name:'Cooling Towers', accent:'var(--flake)', baseCost:400, growth:1.15, gain:12, appliesTo:'cooling',
+      desc:'+12 cooling capacity each.' }
+  ];
+
+  var RP_UPGRADES = [
+    { key:'mixedPrecision', name:'Mixed Precision Training', rpCost:1, type:'ccMult', value:1.20, eff:'+20% compute output' },
+    { key:'betterAirflow',  name:'Better Airflow Design',    rpCost:1, type:'coolCap', value:1.25, eff:'+25% cooling capacity' },
+    { key:'gridContract',   name:'Grid Contract',            rpCost:2, type:'powerCap', value:1.25, eff:'+25% power capacity' },
+    { key:'kernelFusion',   name:'Kernel Fusion',            rpCost:3, type:'ccMult', value:1.30, eff:'+30% compute output' },
+    { key:'liquidCooling',  name:'Liquid Cooling',           rpCost:5, type:'floor', value:0.35, eff:'Throttle floor 20% → 35%' }
+  ];
+
+  function freshState(){
+    return {
+      version: CURRENT_VERSION,
+      cc: 10,
+      lifetimeCC: 0,
+      gpus: { consumer:0, datacenter:0, accelerator:0 },
+      infra: { substations:0, coolingTowers:0 },
+      rp: 0,
+      rpUpgrades: {},
+      frontierTokens: 0,
+      prestigeCount: 0,
+      lastSeen: Date.now(),
+      createdAt: Date.now()
+    };
+  }
+
+  var state = freshState();
+  var canStore = true;
+
+  function migrate(raw){
+    if(!raw.version || raw.version < CURRENT_VERSION){ raw.version = CURRENT_VERSION; }
+    var fresh = freshState();
+    for(var k in fresh){ if(!(k in raw)) raw[k] = fresh[k]; }
+    raw.gpus = Object.assign(fresh.gpus, raw.gpus || {});
+    raw.infra = Object.assign(fresh.infra, raw.infra || {});
+    raw.rpUpgrades = raw.rpUpgrades || {};
+    return raw;
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ state = migrate(JSON.parse(raw)); }
+    }catch(e){
+      canStore = false;
+      var n = document.getElementById('persistNote');
+      if(n){ n.style.display = 'block'; n.textContent = 'Heads up: saving is unavailable in this view — open the file directly in your browser and progress will stick.'; }
+    }
+  }
+
+  function save(){
+    if(!canStore) return;
+    state.lastSeen = Date.now();
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ canStore = false; }
+  }
+
+  function fmt(n){
+    if(n < 0) return '-' + fmt(-n);
+    if(n < 1000) return (n < 10 ? n.toFixed(2) : n.toFixed(1));
+    var units = ['K','M','B','T','Qa','Qi'];
+    var u = -1;
+    while(n >= 1000 && u < units.length - 1){ n /= 1000; u++; }
+    return n.toFixed(2) + units[u];
+  }
+
+  function costOf(baseCost, growth, owned){
+    return baseCost * Math.pow(growth, owned);
+  }
+
+  var buyQty = 1;
+  var unlockSeen = {};
+
+  function bulkCost(baseCost, growth, owned, qty){
+    if(qty === 1) return costOf(baseCost, growth, owned);
+    return baseCost * Math.pow(growth, owned) * (Math.pow(growth, qty) - 1) / (growth - 1);
+  }
+
+  var toastTimer = null;
+  function showToast(html){
+    var t = document.getElementById('toast');
+    t.innerHTML = html;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3600);
+  }
+
+  function computeDerived(s){
+    var ccMult = 1, powerCapMult = 1, coolCapMult = 1, throttleFloor = 0.2;
+    RP_UPGRADES.forEach(function(u){
+      if(s.rpUpgrades[u.key]){
+        if(u.type === 'ccMult') ccMult *= u.value;
+        if(u.type === 'powerCap') powerCapMult *= u.value;
+        if(u.type === 'coolCap') coolCapMult *= u.value;
+        if(u.type === 'floor') throttleFloor = Math.max(throttleFloor, u.value);
+      }
+    });
+    var prestigeMultiplier = 1 + s.frontierTokens * 0.02;
+    return { ccMult:ccMult, powerCapMult:powerCapMult, coolCapMult:coolCapMult, throttleFloor:throttleFloor, prestigeMultiplier:prestigeMultiplier };
+  }
+
+  function computeStats(s){
+    var d = computeDerived(s);
+    var powerCap = (20 + s.infra.substations * 15) * d.powerCapMult;
+    var coolCap = (15 + s.infra.coolingTowers * 12) * d.coolCapMult;
+    var powerDraw = 0, heatLoad = 0, baseRate = 0;
+    GPU_TIERS.forEach(function(t){
+      var n = s.gpus[t.key];
+      powerDraw += n * t.power;
+      heatLoad += n * t.heat;
+      baseRate += n * t.rate;
+    });
+    var powerRatio = powerDraw > 0 ? powerCap / powerDraw : 1;
+    var coolRatio = heatLoad > 0 ? coolCap / heatLoad : 1;
+    var throttle = Math.min(powerRatio, coolRatio, 1);
+    throttle = Math.max(throttle, d.throttleFloor);
+    var ccPerSec = baseRate * throttle * d.ccMult * d.prestigeMultiplier;
+    return { d:d, powerCap:powerCap, coolCap:coolCap, powerDraw:powerDraw, heatLoad:heatLoad, throttle:throttle, ccPerSec:ccPerSec };
+  }
+
+  function applyProduction(s, dt){
+    var stats = computeStats(s);
+    var earned = stats.ccPerSec * dt;
+    s.cc += earned;
+    s.lifetimeCC += earned;
+    return stats;
+  }
+
+  function trainingCost(s){
+    return 1000 * Math.pow(3, s.prestigeCount);
+  }
+
+  function projectedFT(s){
+    return Math.floor(Math.sqrt(s.lifetimeCC / 1000000));
+  }
+
+  // ---------- rendering ----------
+
+  var gpuGrid = document.getElementById('gpuGrid');
+  var infraGrid = document.getElementById('infraGrid');
+  var rpTree = document.getElementById('rpTree');
+
+  function buildBuyCards(container, defs, kind){
+    container.innerHTML = '';
+    defs.forEach(function(def){
+      var card = document.createElement('div');
+      card.className = 'buy';
+      card.style.setProperty('--buyaccent', def.accent);
+      card.dataset.key = def.key;
+      card.innerHTML =
+        '<span class="accent"></span>' +
+        '<p class="kicker">' + (kind === 'gpu' ? 'GPU tier' : 'Infrastructure') + '</p>' +
+        '<h3>' + def.name + '</h3>' +
+        '<p class="desc">' + def.desc + '</p>' +
+        '<div class="row"><span>Owned</span><span class="owned" data-f="owned">0</span></div>' +
+        '<div class="row"><span>Cost</span><span data-f="cost">0</span></div>' +
+        (kind === 'gpu' ? '<div class="row"><span>Output</span><span data-f="output">0</span></div>' : '') +
+        '<button class="buy-btn" data-action="buy-' + kind + '" data-key="' + def.key + '">Buy</button>';
+      container.appendChild(card);
+    });
+  }
+  buildBuyCards(gpuGrid, GPU_TIERS, 'gpu');
+  buildBuyCards(infraGrid, INFRA, 'infra');
+
+  function buildRpTree(){
+    rpTree.innerHTML = '';
+    RP_UPGRADES.forEach(function(u){
+      var node = document.createElement('div');
+      node.className = 'rp-node';
+      node.dataset.key = u.key;
+      node.innerHTML =
+        '<span class="name">' + u.name + '</span>' +
+        '<span class="eff">' + u.eff + '</span>' +
+        '<span class="cost" data-f="cost">' + u.rpCost + ' RP</span>' +
+        '<button data-action="buy-rp" data-key="' + u.key + '">Research</button>';
+      rpTree.appendChild(node);
+    });
+  }
+  buildRpTree();
+
+  function meterColor(ratio){
+    if(ratio < 0.7) return 'var(--ok)';
+    if(ratio < 0.9) return 'var(--amber)';
+    return 'var(--danger)';
+  }
+
+  function render(){
+    var stats = computeStats(state);
+
+    document.getElementById('ccVal').textContent = fmt(state.cc) + ' CC';
+    document.getElementById('ccRate').textContent = fmt(stats.ccPerSec) + ' CC/s' + (stats.throttle < 0.999 ? '  ·  ' + Math.round(stats.throttle * 100) + '% throttle' : '');
+
+    var powerRatio = stats.powerCap > 0 ? stats.powerDraw / stats.powerCap : 0;
+    document.getElementById('powerLabel').textContent = fmt(stats.powerDraw) + ' / ' + fmt(stats.powerCap) + ' MW';
+    var pf = document.getElementById('powerFill');
+    pf.style.width = Math.min(100, powerRatio * 100) + '%';
+    pf.style.background = meterColor(powerRatio);
+
+    var coolRatio = stats.coolCap > 0 ? stats.heatLoad / stats.coolCap : 0;
+    document.getElementById('coolLabel').textContent = fmt(stats.heatLoad) + ' / ' + fmt(stats.coolCap);
+    var cf = document.getElementById('coolFill');
+    cf.style.width = Math.min(100, coolRatio * 100) + '%';
+    cf.style.background = meterColor(coolRatio);
+
+    document.getElementById('ftVal').textContent = state.frontierTokens;
+    document.getElementById('prestigeMultVal').textContent = '+' + Math.round((stats.d.prestigeMultiplier - 1) * 100) + '%';
+
+    GPU_TIERS.forEach(function(def){
+      var card = gpuGrid.querySelector('[data-key="' + def.key + '"]');
+      var unlocked = def.unlocked(state);
+      card.classList.toggle('locked', !unlocked);
+      if(unlocked && !unlockSeen[def.key]){
+        unlockSeen[def.key] = true;
+        if(unlockSeen._booted) showToast('Unlocked: <b>' + def.name + '</b>');
+      }
+      if(!unlocked){
+        card.querySelector('[data-f="cost"]').textContent = lockHint(def);
+        return;
+      }
+      var owned = state.gpus[def.key];
+      var cost = bulkCost(def.baseCost, def.growth, owned, buyQty);
+      card.querySelector('[data-f="owned"]').textContent = owned;
+      card.querySelector('[data-f="cost"]').textContent = fmt(cost) + ' CC';
+      card.querySelector('[data-f="output"]').textContent = def.rate + ' CC/s each';
+      var btn = card.querySelector('button');
+      btn.disabled = state.cc < cost;
+      btn.textContent = 'Buy x' + buyQty + ' · ' + fmt(cost) + ' CC';
+    });
+
+    INFRA.forEach(function(def){
+      var card = infraGrid.querySelector('[data-key="' + def.key + '"]');
+      var owned = state.infra[def.key];
+      var cost = bulkCost(def.baseCost, def.growth, owned, buyQty);
+      card.querySelector('[data-f="owned"]').textContent = owned;
+      card.querySelector('[data-f="cost"]').textContent = fmt(cost) + ' CC';
+      var btn = card.querySelector('button');
+      btn.disabled = state.cc < cost;
+      btn.textContent = 'Buy x' + buyQty + ' · ' + fmt(cost) + ' CC';
+    });
+
+    var tCost = trainingCost(state);
+    document.getElementById('trainCost').textContent = fmt(tCost) + ' CC';
+    document.getElementById('rpVal').textContent = state.rp + ' RP';
+    var trainBtn = document.getElementById('trainBtn');
+    trainBtn.disabled = state.cc < tCost;
+
+    RP_UPGRADES.forEach(function(u){
+      var node = rpTree.querySelector('[data-key="' + u.key + '"]');
+      var bought = !!state.rpUpgrades[u.key];
+      node.classList.toggle('bought', bought);
+      var btn = node.querySelector('button');
+      if(bought){
+        btn.textContent = 'Researched';
+        btn.disabled = true;
+      } else {
+        btn.disabled = state.rp < u.rpCost;
+        btn.textContent = 'Research · ' + u.rpCost + ' RP';
+      }
+    });
+
+    document.getElementById('lifetimeVal').textContent = fmt(state.lifetimeCC) + ' CC';
+    document.getElementById('ftProjected').textContent = '+' + projectedFT(state);
+  }
+
+  function lockHint(def){
+    if(def.key === 'datacenter') return 'Locked — owns 10 Consumer GPUs to unlock';
+    if(def.key === 'accelerator') return 'Locked — deploy your first model generation to unlock';
+    return 'Locked';
+  }
+
+  // ---------- actions ----------
+
+  function buyGpu(key){
+    var def = GPU_TIERS.filter(function(t){ return t.key === key; })[0];
+    if(!def || !def.unlocked(state)) return;
+    var cost = bulkCost(def.baseCost, def.growth, state.gpus[key], buyQty);
+    if(state.cc < cost) return;
+    state.cc -= cost;
+    state.gpus[key] += buyQty;
+    render();
+    save();
+  }
+
+  function buyInfra(key){
+    var def = INFRA.filter(function(t){ return t.key === key; })[0];
+    if(!def) return;
+    var cost = bulkCost(def.baseCost, def.growth, state.infra[key], buyQty);
+    if(state.cc < cost) return;
+    state.cc -= cost;
+    state.infra[key] += buyQty;
+    render();
+    save();
+  }
+
+  function runTraining(){
+    var cost = trainingCost(state);
+    if(state.cc < cost) return;
+    state.cc -= cost;
+    state.rp += 1;
+    render();
+    save();
+  }
+
+  function buyRp(key){
+    var def = RP_UPGRADES.filter(function(u){ return u.key === key; })[0];
+    if(!def || state.rpUpgrades[key] || state.rp < def.rpCost) return;
+    state.rp -= def.rpCost;
+    state.rpUpgrades[key] = true;
+    render();
+    save();
+  }
+
+  function prestige(){
+    var gain = projectedFT(state);
+    if(!window.confirm('Deploy the next model generation? Your fleet, infrastructure, and research will reset. You will earn +' + gain + ' Frontier Token' + (gain === 1 ? '' : 's') + ' (permanent).')) return;
+    var kept = { frontierTokens: state.frontierTokens + gain, prestigeCount: state.prestigeCount + 1 };
+    state = freshState();
+    state.frontierTokens = kept.frontierTokens;
+    state.prestigeCount = kept.prestigeCount;
+    unlockSeen = { _booted: true };
+    render();
+    save();
+  }
+
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('[data-action]');
+    if(!el) return;
+    var action = el.dataset.action;
+    if(action === 'buy-gpu') buyGpu(el.dataset.key);
+    else if(action === 'buy-infra') buyInfra(el.dataset.key);
+    else if(action === 'buy-rp') buyRp(el.dataset.key);
+  });
+  document.getElementById('trainBtn').addEventListener('click', runTraining);
+  document.getElementById('prestigeBtn').addEventListener('click', prestige);
+  document.getElementById('qtyToggle').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-qty]');
+    if(!btn) return;
+    buyQty = parseInt(btn.dataset.qty, 10);
+    document.querySelectorAll('#qtyToggle button').forEach(function(b){ b.classList.toggle('active', b === btn); });
+    render();
+  });
+  document.getElementById('offlineDismiss').addEventListener('click', function(){
+    document.getElementById('offlineBanner').style.display = 'none';
+  });
+
+  // ---------- offline progress ----------
+
+  function handleOffline(){
+    var elapsed = Date.now() - state.lastSeen;
+    if(elapsed < 60000) return;
+    var capped = Math.min(elapsed, OFFLINE_CAP_MS);
+    var stats = applyProduction(state, capped / 1000);
+    var earned = stats.ccPerSec * (capped / 1000);
+    if(earned <= 0) return;
+    var hrs = Math.floor(elapsed / 3600000);
+    var mins = Math.floor((elapsed % 3600000) / 60000);
+    var text = 'While you were away (' + hrs + 'h ' + mins + 'm): earned +' + fmt(earned) + ' CC at your last known rate.';
+    if(elapsed > OFFLINE_CAP_MS) text += ' Capped at 8 hours.';
+    document.getElementById('offlineText').innerHTML = text.replace(/\+([0-9.]+[A-Za-z]* CC)/, '<b>+$1</b>');
+    document.getElementById('offlineBanner').style.display = 'block';
+  }
+
+  // ---------- boot ----------
+
+  load();
+  handleOffline();
+  render();
+  unlockSeen._booted = true;
+  save();
+
+  var lastTick = performance.now();
+  setInterval(function(){
+    var now = performance.now();
+    var dt = (now - lastTick) / 1000;
+    lastTick = now;
+    applyProduction(state, dt);
+    render();
+  }, TICK_MS);
+
+  setInterval(save, AUTOSAVE_MS);
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) save(); });
+  window.addEventListener('beforeunload', save);
+
+})();
+</script>
+</body>
+</html>
