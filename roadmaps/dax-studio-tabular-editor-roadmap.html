@@ -787,6 +787,15 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
     });
   });
 
+  // restore saved collapse state
+  document.querySelectorAll('.sec').forEach(function(sec){
+    if(sec.id && mem['open:' + sec.id] === 0){
+      sec.setAttribute('data-open', 'false');
+      var hh = sec.querySelector('.sec-head');
+      if(hh){ hh.setAttribute('aria-expanded', 'false'); }
+    }
+  });
+
   // section collapse
   document.querySelectorAll('.sec-head').forEach(function(h){
     h.addEventListener('click', function(){
@@ -794,6 +803,10 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
       var open = sec.getAttribute('data-open') === 'true';
       sec.setAttribute('data-open', open ? 'false' : 'true');
       h.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if(sec.id){
+        if(open){ mem['open:' + sec.id] = 0; } else { delete mem['open:' + sec.id]; }
+        save();
+      }
     });
   });
 
@@ -807,7 +820,11 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
         sec.setAttribute('data-open', allOpen ? 'true' : 'false');
         var h = sec.querySelector('.sec-head');
         if(h){ h.setAttribute('aria-expanded', allOpen ? 'true' : 'false'); }
+        if(sec.id){
+          if(allOpen){ delete mem['open:' + sec.id]; } else { mem['open:' + sec.id] = 0; }
+        }
       });
+      save();
       tAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
     });
   }
