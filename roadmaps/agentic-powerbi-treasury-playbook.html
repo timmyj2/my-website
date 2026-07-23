@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Power BI for Treasury — Model Cleanup &amp; Report Modernization Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c1016;
+  --panel:#141a24;
+  --panel2:#0f141d;
+  --line:#232c3a;
+  --ink:#e8ecf4;
+  --mut:#9fa9bd;
+  --dim:#66718a;
+  --violet:#8b5cf6;
+  --violet-hi:#a78bfa;
+  --violet-soft:rgba(139,92,246,.14);
+  --cyan:#38bdf8;
+  --cyan-hi:#7dd3fc;
+  --cyan-soft:rgba(56,189,248,.13);
+  --pbi:#F2C811;
+  --pbi-hi:#f7d94a;
+  --pbi-soft:rgba(242,200,17,.12);
+  --magenta:#d946ef;
+  --magenta-hi:#e879f9;
+  --magenta-soft:rgba(217,70,239,.13);
+  --teal:#2dd4bf;
+  --ok:#4ade80;
+  --ok-soft:rgba(74,222,128,.13);
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.62;min-height:100vh;
+  background-image:radial-gradient(900px 440px at 84% -6%, rgba(45,212,191,.10), transparent 62%),
+                   radial-gradient(900px 440px at 8% -4%, rgba(56,189,248,.12), transparent 62%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(56,189,248,.32)}
+
+/* ---------- part theming ---------- */
+.pa{--acc:var(--violet);--acc-hi:var(--violet-hi);--soft:var(--violet-soft)}
+.pb{--acc:var(--cyan);--acc-hi:var(--cyan-hi);--soft:var(--cyan-soft)}
+.pc{--acc:var(--pbi);--acc-hi:var(--pbi-hi);--soft:var(--pbi-soft)}
+.pd{--acc:var(--magenta);--acc-hi:var(--magenta-hi);--soft:var(--magenta-soft)}
+
+/* ---------- sticky progress bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(12,16,22,.86);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;color:var(--ink)}
+.brand .fl{color:var(--teal)}
+.obar{flex:1;min-width:130px;height:8px;border-radius:99px;background:#161c27;border:1px solid var(--line);overflow:hidden}
+.obar>div{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--teal));transition:width .35s ease}
+.opct{font-family:var(--mono);font-size:.78rem;color:var(--mut);min-width:8.5ch;text-align:right}
+.chip{font-family:var(--mono);font-size:.7rem;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mut);text-decoration:none;white-space:nowrap;background:var(--panel)}
+.chip b{font-weight:600}
+.chip.ca b{color:var(--violet)} .chip.cb b{color:var(--cyan)} .chip.cc b{color:var(--pbi)} .chip.cd b{color:var(--magenta)}
+.chip:hover{border-color:var(--dim)}
+.tbtn{font-family:var(--mono);font-size:.7rem;background:var(--panel);border:1px solid var(--line);color:var(--mut);
+  padding:3px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{color:var(--ink);border-color:var(--dim)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:880px;margin:0 auto;padding:0 22px}
+
+/* ---------- hero ---------- */
+.hero{padding:62px 0 28px}
+.hero .eyebrow{font-family:var(--mono);font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.85rem,5vw,2.9rem);line-height:1.13;letter-spacing:-.015em;color:var(--ink)}
+.hero h1 .cyan{color:var(--cyan-hi)}
+.hero h1 .teal{color:var(--teal)}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:16px;font-size:1.02rem}
+
+/* signature: pipeline */
+.flow-wrap{margin:34px 0 8px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px 14px;
+  box-shadow:0 2px 16px rgba(0,0,0,.34)}
+.flow-wrap svg{display:block;width:100%;height:auto}
+.flow-cap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:8px}
+.flow-cap .g{color:var(--teal)}
+
+/* ---------- how to use ---------- */
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:28px 0 8px;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.howto h2{font-family:var(--disp);font-size:.92rem;letter-spacing:.05em;text-transform:uppercase;color:var(--cyan-hi);margin-bottom:10px}
+.howto p{color:var(--mut);font-size:.95rem;margin-bottom:8px}
+.howto p:last-child{margin-bottom:0}
+.howto b{color:var(--ink);font-weight:600}
+#persistNote{font-family:var(--mono);font-size:.77rem;color:var(--dim)}
+
+/* ---------- part banners ---------- */
+.part{margin-top:60px}
+.pbanner{border:1px solid var(--line);border-radius:16px;padding:26px 26px 22px;background:linear-gradient(180deg,var(--soft),var(--panel) 82%);position:relative;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.28)}
+.pbanner .pk{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:8px}
+.pbanner h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.35rem,3.3vw,1.8rem);line-height:1.16;color:var(--ink)}
+.pbanner .pdesc{color:var(--mut);margin-top:10px;max-width:66ch;font-size:.96rem}
+.pprog{display:flex;align-items:center;gap:12px;margin-top:16px}
+.pbar{flex:1;height:6px;border-radius:99px;background:#161c27;border:1px solid var(--line);overflow:hidden;max-width:340px}
+.pbar>div{height:100%;width:0%;background:var(--acc);transition:width .35s ease}
+.pcnt{font-family:var(--mono);font-size:.74rem;color:var(--mut)}
+.pmark{position:absolute;right:18px;top:14px;opacity:.16;color:var(--acc)}
+
+/* ---------- sections ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:18px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.22)}
+.sec.done{border-color:var(--acc)}
+.sec-head{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;background:none;border:none;color:inherit;
+  font-family:inherit;text-align:left;cursor:pointer}
+.sec-head:hover{background:var(--panel2)}
+.sec-head:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:14px}
+.snum{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--acc);border:1.5px solid var(--acc);background:var(--soft);
+  border-radius:8px;padding:5px 9px;min-width:44px;text-align:center;flex-shrink:0}
+.stitle{flex:1;min-width:0}
+.stitle h3{font-family:var(--disp);font-weight:600;font-size:1.04rem;line-height:1.3;color:var(--ink)}
+.stitle .ssub{color:var(--dim);font-size:.83rem;margin-top:2px}
+.lvl{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:99px;
+  border:1px solid var(--line);color:var(--mut);flex-shrink:0;background:var(--panel)}
+.lvl.adv{color:var(--acc);border-color:var(--acc)}
+.lvl.proj{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.cnt{font-family:var(--mono);font-size:.74rem;color:var(--dim);flex-shrink:0;min-width:4ch;text-align:right}
+.cnt.full{color:var(--ok)}
+.chev{flex-shrink:0;transition:transform .25s ease;color:var(--dim)}
+.sec[data-open="true"] .chev{transform:rotate(180deg)}
+.sec-body{display:none;padding:4px 20px 22px;border-top:1px solid var(--line)}
+.sec[data-open="true"] .sec-body{display:block}
+.blurb{color:var(--mut);font-size:.95rem;margin:16px 0 6px;max-width:70ch}
+
+.gh{font-family:var(--mono);font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);font-weight:600;margin:20px 0 10px}
+ul.checks{list-style:none}
+ul.checks li{margin-bottom:2px}
+ul.checks label{display:flex;gap:12px;align-items:flex-start;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.95rem}
+ul.checks label:hover{background:var(--panel2)}
+ul.checks input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;margin-top:3px;border-radius:5px;
+  border:1.5px solid var(--dim);background:var(--panel2);cursor:pointer;position:relative}
+ul.checks input:checked{background:var(--acc);border-color:var(--acc)}
+ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #0c1016;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.checks input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(232,236,244,.28)}
+ul.checks b{color:var(--ink);font-weight:600}
+
+.tip{margin-top:18px;border-left:3px solid var(--acc);background:var(--soft);border-radius:0 10px 10px 0;padding:12px 16px;font-size:.9rem;color:var(--mut)}
+.tip b{color:var(--acc);font-weight:600;font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+
+pre{background:#0a0e15;border:1px solid #1f2735;border-radius:10px;padding:14px 16px;overflow-x:auto;margin-top:14px}
+code{font-family:var(--mono);font-size:.82rem;line-height:1.55;color:#cfd6e8;white-space:pre-wrap;word-break:break-word}
+p code, li code{background:var(--cyan-soft);color:var(--cyan-hi);border-radius:5px;padding:1px 6px;font-size:.85em;white-space:normal}
+
+/* ---------- footer ---------- */
+footer{margin:66px 0 40px;padding-top:24px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer .fp{font-family:var(--mono);font-size:.74rem;margin-top:8px}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  .topbar{gap:8px;padding:9px 14px}
+  .opct{display:none}
+  .hero{padding:44px 0 22px}
+  .sec-head{padding:14px 14px;gap:10px}
+  .stitle .ssub{display:none}
+  .sec-body{padding:4px 14px 18px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+  html{scroll-behavior:auto}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .topbar,.chev,.tbtn{display:none}
+  .sec-body{display:block!important}
+  .sec,.pbanner,.howto,.flow-wrap{border-color:#bbb;background:#fff;box-shadow:none}
+  pre{background:#f5f5f5}
+  code{color:#111}
+  a{color:#111}
+}
+</style>
+</head>
+<body class="pa">
+
+<!-- ============ STICKY PROGRESS ============ -->
+<div class="topbar">
+  <span class="brand"><span class="fl">&#9673;</span> Agentic Power BI &middot; Treasury</span>
+  <div class="obar"><div id="obarFill"></div></div>
+  <span class="opct" id="opct">0% done</span>
+  <a class="chip ca" href="#parta"><b>A</b> Strategy</a>
+  <a class="chip cb" href="#partb"><b>B</b> Model</a>
+  <a class="chip cc" href="#partc"><b>C</b> Reports</a>
+  <a class="chip cd" href="#partd"><b>D</b> Treasury</a>
+  <button class="tbtn" id="toggleAll" type="button">Collapse all</button>
+  <button class="tbtn" id="resetBtn" type="button">Reset progress</button>
+</div>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Playbook &middot; Copilot &amp; Claude &times; Power BI</p>
+  <h1>Clean the model, modernize the reports &mdash;<br>drive it all with an <span class="cyan">agent</span>, and win it for <span class="teal">Treasury</span>.</h1>
+  <p class="sub">A working plan for optimizing a Power BI semantic model and rebuilding its reports with agentic AI &mdash; without breaking things. Start from a defensible baseline, let VertiPaq Analyzer point at the weight, delete only what is provably dead, then turn a lean model into reports Treasury actually opens. Check items off as you go; every section, part, and the top bar tracks progress, and collapsed sections stay collapsed the next time you open this file.</p>
+
+  <div class="flow-wrap" aria-hidden="true">
+    <svg viewBox="0 0 860 176" xmlns="http://www.w3.org/2000/svg">
+      <!-- inputs -->
+      <rect x="6" y="40" width="176" height="96" rx="12" fill="#141a24" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="22" y="64" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing="1.4" fill="#7dd3fc">WHAT YOU FEED IT</text>
+      <g font-family="JetBrains Mono,monospace" font-size="11" fill="#9fa9bd">
+        <text x="22" y="88">.vpax &middot; metrics</text>
+        <text x="22" y="108">TMDL &middot; model</text>
+        <text x="22" y="128">PBIR &middot; report</text>
+      </g>
+      <!-- arrow -->
+      <path d="M186,88 H236" stroke="#3a465c" stroke-width="2"/>
+      <path d="M236,88 l-8,-5 v10 z" fill="#3a465c"/>
+      <!-- agent -->
+      <rect x="244" y="52" width="150" height="72" rx="12" fill="#141a24" stroke="#2dd4bf" stroke-width="1.5"/>
+      <text x="319" y="82" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="600" fill="#5eead4">Agent</text>
+      <text x="319" y="102" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#66718a">explain &middot; stage &middot; verify</text>
+      <!-- arrow -->
+      <path d="M398,88 H448" stroke="#3a465c" stroke-width="2"/>
+      <path d="M448,88 l-8,-5 v10 z" fill="#3a465c"/>
+      <!-- outcomes -->
+      <rect x="456" y="34" width="212" height="40" rx="10" fill="none" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="562" y="59" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600" fill="#a78bfa">Leaner semantic model</text>
+      <rect x="456" y="102" width="212" height="40" rx="10" fill="none" stroke="#f7d94a" stroke-width="1.5"/>
+      <text x="562" y="127" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600" fill="#f7d94a">Modernized reports</text>
+      <!-- arrow -->
+      <path d="M672,88 H716" stroke="#3a465c" stroke-width="2"/>
+      <path d="M716,88 l-8,-5 v10 z" fill="#3a465c"/>
+      <!-- value -->
+      <rect x="724" y="46" width="130" height="84" rx="12" fill="#141a24" stroke="#e879f9" stroke-width="1.5"/>
+      <text x="789" y="82" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600" fill="#e879f9">Treasury</text>
+      <text x="789" y="101" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="600" fill="#e879f9">value</text>
+    </svg>
+    <div class="flow-cap"><span>inputs</span><span class="g">the safe-change loop</span><span>the win</span></div>
+  </div>
+
+  <div class="howto">
+    <h2>How to use this page</h2>
+    <p>This is a review-and-do playbook, built to be read the way you work: top to bottom. <b>Part A</b> pressure-tests your plan and locks in the safety setup, <b>Part B</b> is the VertiPaq-driven model cleanup, <b>Part C</b> modernizes the reports, and <b>Part D</b> turns it into Treasury value and a way to out-deliver the outside vendor. Check items off as you complete them &mdash; sections, parts, and the top bar all track progress.</p>
+    <p>The prompts assume you have the <b>PBIP folder open in VS Code with GitHub Copilot in agent mode</b> (or Claude), referencing files with <code>#file</code> / <code>#folder</code> and the whole project with <code>@workspace</code>. <span id="persistNote">Progress and collapsed-section state save automatically in this browser on this device; they reset if you clear browser data or open the file elsewhere.</span></p>
+    <p>When a new situation comes up that this page doesn't cover, bring it back to Claude and ask for another section &mdash; it's built to be extended like the rest of the tool belt.</p>
+  </div>
+</header>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART A ================================ -->
+<!-- ==================================================================== -->
+<section class="part pa" id="parta">
+  <div class="pbanner">
+    <p class="pk">Part A &middot; Strategy &amp; safe change</p>
+    <h2>Are you thinking about this right?</h2>
+    <p class="pdesc">Your instinct is sound &mdash; but the order of operations is everything. Lock in a defensible baseline and a safe-change loop before you delete a single table, so every cut is provable and reversible.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="a"></div></div><span class="pcnt" data-pcnt="a">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="a1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A1</span>
+      <span class="stitle"><h3>Is this the right approach?</h3><span class="ssub">affirm the plan, fix the ordering risk</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Yes &mdash; feeding the VPAX into Copilot and letting it point at bloated tables and measures is exactly the right raw material. The VertiPaq Analyzer view tells you where the bytes and cardinality actually live, which is far better than guessing. The one risk in your plan is sequencing: &ldquo;identify and delete tables not used at all&rdquo; is the last step, not an early one. VPAX shows you what is <em>expensive</em>; it does not prove what is <em>unused</em>. A table can be tiny and still feed a critical measure, an RLS rule, or a downstream report. Prove it is orphaned <b>and</b> check what consumes it before it goes.</p>
+      <p class="gh">Reframe the effort into phases</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a1-1"><span>Phase 1 &mdash; Baseline &amp; safety: source control, a known-good backup, and metrics you can defend (A2&ndash;A3).</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-2"><span>Phase 2 &mdash; Find waste: use VPAX to rank tables/columns by size &amp; cardinality; flag candidates, decide nothing yet.</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-3"><span>Phase 3 &mdash; Remove/shrink safely: drop high-cardinality unused columns first, then orphaned tables &mdash; only after dependency checks.</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-4"><span>Phase 4 &mdash; Optimize measures: fix the DAX and relationships that VPAX and query traces flag as costly.</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-5"><span>Phase 5 &mdash; Re-verify against baseline, capture a fresh VPAX, then move on to the reports.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Deleting last is not slower &mdash; it is what lets you delete confidently. Every phase before it is what turns a scary delete into a boring one.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="a2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A2</span>
+      <span class="stitle"><h3>Source control &amp; the safe-change loop</h3><span class="ssub">PBIP + Git, one change per commit</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The whole reason PBIP exists is that it saves the model as plain-text TMDL and the report as PBIR &mdash; both diffable, both Git-friendly. That is your safety net. The agent edits text files; Git records every change; you review before anything is committed or opened in Desktop. Never let the agent operate against the published/live dataset in the Service &mdash; work only against the local PBIP folder on a branch.</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a2-1"><span>Save as a <code>.pbip</code> project (TMDL + PBIR enabled) and commit the whole folder to Git as your starting point.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-2"><span>Cut a working branch (e.g. <code>model-cleanup</code>); never edit the published/live model directly.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-3"><span>One logical change per commit &mdash; &ldquo;remove column X&rdquo;, not &ldquo;cleaned up model&rdquo; &mdash; so any single change can be reverted in isolation.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-4"><span>Review the TMDL diff before you save/open in Desktop; if a change touched files you did not expect, stop and read them.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-5"><span>Keep a rollback: a known-good <code>.pbix</code> (or clean commit) plus a saved <code>.vpax</code> snapshot of the starting model.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-6"><span>Add a <code>.gitignore</code> for cache/local artifacts (e.g. <code>.pbi/localSettings.json</code>, <code>cache.abf</code>) so diffs stay meaningful.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>The TMDL diff is your real review surface &mdash; a clean delete shows as removed lines in one table&rsquo;s <code>.tmdl</code> file. If a &ldquo;small&rdquo; change rewrites half the model, that is the model warning you.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="a3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A3</span>
+      <span class="stitle"><h3>Set a baseline you can defend</h3><span class="ssub">capture the numbers before you touch anything</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">You cannot claim an improvement you never measured. Before the first edit, capture the current state and write down where you intend to land. This does double duty: it protects you (regressions are obvious) and it is your scoreboard against the external vendor &mdash; when Treasury asks who delivered more, you have hard numbers, not a story.</p>
+      <p class="gh">Capture &amp; record</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a3-1"><span>Save the current <code>.vpax</code> and note total model size, plus the largest tables/columns by size and cardinality.</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-2"><span>Record refresh duration (full and, if used, incremental) from the current dataset.</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-3"><span>Time report/page load for the two or three heaviest report pages Treasury actually uses.</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-4"><span>Write down target metrics &mdash; e.g. &ldquo;model &minus;30%, refresh under N min, page load under N s&rdquo; &mdash; before you start.</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-5"><span>Keep the baseline in the repo (a short markdown scoreboard) so before/after is one glance away.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Capture the baseline VPAX on the same refreshed data you will re-measure against &mdash; comparing a stale model to a fresh one invents savings you did not earn and hides regressions you did.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="a4">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A4</span>
+      <span class="stitle"><h3>Drive the agent without breaking things</h3><span class="ssub">explain &rarr; stage &rarr; observe &rarr; delete</span></span>
+      <span class="lvl adv">Careful</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The agent is fast and confident &mdash; which is exactly why you gate it. Make it justify a change before it makes it, and never accept a bulk delete on faith. For anything destructive, stage it: hide the object first, watch it survive a refresh and a report render, then delete. Keep a decision log so every removal has a reason attached &mdash; future-you (and the audit) will need it.</p>
+      <p class="gh">Prompt to try</p>
+      <pre><code>@workspace Using #file:model.vpax and the TMDL in #folder:Model,
+list every table &amp; column that is NOT referenced by any measure,
+relationship, RLS role, calc group, or report visual.
+For each candidate: show what DOES reference it (or state "none"),
+its size &amp; cardinality, and a risk rating.
+Do NOT edit anything yet &mdash; output the analysis as a table.</code></pre>
+      <p class="gh">Verification loop</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a4-1"><span>Before any delete, make the agent explain what references the object and why it believes it is safe to remove.</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-2"><span>Never accept a bulk delete blindly &mdash; require a per-object list with dependencies, and approve them one at a time.</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-3"><span>Stage risky changes: hide the object &rarr; observe a full refresh cycle and a report render &rarr; then delete in a later commit.</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-4"><span>Keep a decision log (object, size, what referenced it, decision, date) committed alongside the change.</span></label></li>
+        <li><label><input type="checkbox" data-k="a4-5"><span>After each destructive commit, refresh and re-render before moving on &mdash; catch breakage while the change is still small.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Treat &ldquo;the agent said it was unused&rdquo; as a hypothesis, not a verdict. Hiding first costs you one refresh cycle; a wrong delete costs you a broken Treasury report and your credibility against the vendor.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART B ================================ -->
+<!-- ==================================================================== -->
+<section class="part pb" id="partb">
+  <div class="pbanner">
+    <p class="pk">Part B &middot; VertiPaq-driven cleanup</p>
+    <h2>Data model cleanup &mdash; the VertiPaq-driven sequence</h2>
+    <p class="pdesc">Feed the agent the metrics, not just the model. VertiPaq Analyzer tells you where the weight is; the report layer and model metadata tell you what is safe to cut. Work top-down: triage with data, delete what is provably dead, shrink what stays, then prove the gain.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="b"></div></div><span class="pcnt" data-pcnt="b">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="b1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B1</span>
+      <span class="stitle"><h3>Give the agent the right context</h3><span class="ssub">VPAX + TMDL + a triage prompt</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The agent can only triage what it can see. Give it the measured cost (the exported <code>.vpax</code>), the full model definition (the TMDL), and the constraints it must respect (star schema, what has already changed). Precise file references keep it grounded instead of guessing.</p>
+      <p class="gh">Context to load</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b1-1"><span>Export the model with VertiPaq Analyzer (DAX Studio &rarr; Advanced &rarr; Export Metrics, or Tabular Editor) and add the <code>.vpax</code> to the workspace so Copilot can read Cardinality, Total Size, Dictionary/Data Size and % of model per column.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-2"><span>Point the agent at the model TMDL folder so it reads every table, column, relationship, role and measure definition &mdash; the source of truth, not a screenshot.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-3"><span>State the design intent: this is a star schema (fact tables + conformed dimensions) for the Treasury group, so it does not propose changes that break the grain or the dimensional model.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-4"><span>Tell it hidden report pages were already deleted, so &ldquo;no longer referenced&rdquo; findings account for that and it does not re-flag them as risk.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-5"><span>Use <code>#file</code> for a single file, <code>#folder</code> for the TMDL/PBIR tree, and <code>@workspace</code> when you want it to reason across the whole project.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>@workspace You are helping me clean up a Power BI semantic model (PBIP/TMDL) for
+our Treasury group. Attached is the VertiPaq Analyzer export #file:model.vpax and
+the model definition in #folder:Model.SemanticModel/definition.
+
+It is a star schema &mdash; fact tables plus conformed dimensions; preserve the grain.
+Hidden report pages have already been deleted.
+
+Triage, do not change anything yet. Produce a ranked table of the heaviest columns
+and tables by Total Size and % of model, note Cardinality for each, and flag
+obvious optimization or deletion candidates. Ask me before assuming anything is unused.</code></pre>
+      <div class="tip"><b>Field note</b>Attach the <code>.vpax</code> and the TMDL together in the first message &mdash; the agent triages far better with measured size next to the definition than with either alone.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B2</span>
+      <span class="stitle"><h3>Find unused tables &amp; columns</h3><span class="ssub">Cost from VPAX, usage from everywhere</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Two separate questions: what costs the most (VertiPaq), and what is actually referenced (dependency analysis + the report layer). A deletion candidate must be expensive-or-irrelevant <em>and</em> unreferenced everywhere. DAX dependencies alone are not enough.</p>
+      <p class="gh">Surface the cost, then prove non-use</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b2-1"><span>Rank columns by Total Size, Dictionary Size and % of model from the VPAX; the long tail of tiny columns rarely matters, the top handful is where the model lives.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-2"><span>Use dependency analysis &mdash; <code>INFO.CALCDEPENDENCY()</code>, <code>INFO.MEASURES()</code>, <code>INFO.COLUMNS()</code>, <code>INFO.RELATIONSHIPS()</code> &mdash; to list which columns feed measures, calculated columns and relationships.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-3"><span>Cross-check the report layer (PBIR <code>report.json</code> / visual JSON): a column can be invisible to DAX yet bound to a visual field, slicer, tooltip or drillthrough.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-4"><span>Check model metadata that DAX dependency misses: relationship columns, RLS filter expressions, field parameters, sort-by-column, and any incremental-refresh RangeStart/RangeEnd partitioning column.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-5"><span>Have the agent classify each candidate: <em>confirmed unreferenced</em> (delete), <em>referenced somewhere</em> (keep), or <em>uncertain</em> (needs a human look) &mdash; never a blanket &ldquo;unused&rdquo; verdict.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-6"><span>Give priority to high-cost + confirmed-unreferenced; a huge column that IS used goes to B4 (shrink), not to the delete list.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>Using #file:model.vpax and #folder:definition, list every column with Total Size
+&gt; 1% of the model. For each, tell me whether it is referenced by: any measure or
+calculated column (via dependencies), a relationship, an RLS role expression, a
+field parameter, a sort-by-column, or the incremental refresh policy. Then scan
+#folder:Report/definition for any visual, slicer, tooltip or filter binding.
+
+Return three buckets: confirmed-unreferenced-everywhere, referenced, and uncertain.
+Do not call anything unused unless it is clear in all of those places.</code></pre>
+      <div class="tip"><b>Field note</b>&ldquo;Not used in any measure&rdquo; is not &ldquo;not used.&rdquo; The classic false positive is a column dragged straight onto a visual axis &mdash; it never touches DAX but breaks the report the moment you delete it.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B3</span>
+      <span class="stitle"><h3>Remove dead tables safely</h3><span class="ssub">Hide, survive a refresh, then delete</span></span>
+      <span class="lvl adv">Careful</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Deletion is destructive and version control is your safety net. Move in stages, one table at a time, so every removal is an isolated, reversible commit with a readable diff.</p>
+      <p class="gh">Staged removal</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b3-1"><span>Confirm zero references first: measures, calculated columns, relationships, RLS role filters, incremental-refresh policy, and report visuals &mdash; the full B2 sweep, not a subset.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-2"><span>Hide the table first (<code>isHidden: true</code>) rather than deleting; leave it hidden through at least one full refresh + report open to flush out anything that quietly breaks.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-3"><span>If nothing breaks, delete the table&rsquo;s TMDL and any relationships referencing it in a single change.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-4"><span>Commit one table per commit with a message naming the table and the evidence (&ldquo;no refs in measures/visuals/RLS/refresh&rdquo;) so a rollback is surgical.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-5"><span>Review the TMDL diff before committing &mdash; confirm only the intended table and its relationships changed, and no measure or role was silently edited.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-6"><span>Refresh and open the report after each delete; a green refresh plus intact visuals is the go/no-go before the next table.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Never batch-delete tables. One-table commits mean that if a refresh fails three tables later, you revert one clean commit instead of unpicking a tangle.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b4">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B4</span>
+      <span class="stitle"><h3>Shrink what stays: cardinality &amp; encoding</h3><span class="ssub">Uniqueness is the tax, not row count</span></span>
+      <span class="lvl">High impact</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">VertiPaq compresses column by column, and compression works by building a dictionary of distinct values. So size is driven by <em>cardinality</em> (number of distinct values), not the number of rows. A 50M-row table with a low-cardinality column stays tiny; a few million rows of unique GUIDs or full-precision timestamps dominate the model. Attack the highest-cardinality columns first.</p>
+      <p class="gh">Cut cardinality</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b4-1"><span>Split datetime into a Date column + a separate Time column &mdash; one datetime to the second can be ~86k&times; more unique than a date; two lower-cardinality columns compress far better.</span></label></li>
+        <li><label><input type="checkbox" data-k="b4-2"><span>Reduce decimal precision where the business does not need it (round rates/amounts); trailing-digit noise inflates distinct counts. Prefer Fixed Decimal (currency) over floating Decimal.</span></label></li>
+        <li><label><input type="checkbox" data-k="b4-3"><span>Drop high-cardinality keys that no relationship or visual uses &mdash; surrogate IDs, transaction GUIDs, hashes carried in from staging.</span></label></li>
+        <li><label><input type="checkbox" data-k="b4-4"><span>Turn off Auto Date/Time (options and per-model) &mdash; it silently generates a hidden date table per date column and can bloat the model; use your one shared Date dimension.</span></label></li>
+        <li><label><input type="checkbox" data-k="b4-5"><span>Prefer integers over strings for keys and codes; integer columns encode and scan cheaper than text with the same distinct count.</span></label></li>
+        <li><label><input type="checkbox" data-k="b4-6"><span>Reduce string uniqueness &mdash; trim free-text, normalize casing, move rarely-used descriptive text out of large fact tables into a dimension.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>From #file:model.vpax, list the 10 highest-cardinality columns with their Total
+Size and data type. For each, recommend a cardinality reduction (datetime split,
+precision/rounding, integer key, move-to-dimension, or drop) and note which
+requires a Power Query / source change vs. a model change. Rank by expected
+size saving, and flag any that participate in a relationship before proposing a drop.</code></pre>
+      <div class="tip"><b>Field note</b>If you only remember one thing: sort by Cardinality, not Rows. The biggest single win is almost always splitting a full-precision datetime out of a fact table.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b5">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B5</span>
+      <span class="stitle"><h3>Optimize measures &amp; DAX</h3><span class="ssub">Understand intent, rewrite, verify parity</span></span>
+      <span class="lvl adv">Careful</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Measures change results, so correctness comes before speed. Find the expensive ones with real timings, have the agent explain what a measure is supposed to do before touching it, then rewrite and confirm the numbers match.</p>
+      <p class="gh">Rewrite with proof</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b5-1"><span>Identify expensive measures with DAX Studio Server Timings (SE vs FE, scan counts) and Performance Analyzer in the report &mdash; optimize what the users actually wait on.</span></label></li>
+        <li><label><input type="checkbox" data-k="b5-2"><span>Replace <code>FILTER()</code> over an entire table with a boolean column predicate in <code>CALCULATE</code> where possible; iterating a whole fact table is the most common slow pattern.</span></label></li>
+        <li><label><input type="checkbox" data-k="b5-3"><span>Introduce variables (<code>VAR</code>) to compute a value once instead of repeating a subexpression, and to make the logic readable.</span></label></li>
+        <li><label><input type="checkbox" data-k="b5-4"><span>Swap iterators (<code>SUMX</code>/<code>AVERAGEX</code>) for a plain aggregation (<code>SUM</code>/<code>AVERAGE</code>) when there is no row-by-row expression that requires the iterator.</span></label></li>
+        <li><label><input type="checkbox" data-k="b5-5"><span>Watch for bidirectional-filter surprises; ambiguous or bidi relationships can make a measure both slow and wrong &mdash; prefer single-direction filtering plus explicit <code>CROSSFILTER</code> where truly needed.</span></label></li>
+        <li><label><input type="checkbox" data-k="b5-6"><span>Consolidate duplicate / near-duplicate measures into one canonical definition, then repoint references; verify each rewrite returns identical results across key filter contexts before committing.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>Look at the measure [Treasury Net Position] in #folder:definition. First, explain
+in plain English what it computes and its filter context &mdash; do not rewrite yet.
+
+Then propose an optimized version: remove any FILTER over the full fact table, use
+variables, and drop unnecessary iterators. Keep semantics identical. Show old vs new
+side by side, list the filter contexts I should test, and give me a DAX query that
+returns both versions so I can confirm they match before I replace anything.</code></pre>
+      <div class="tip"><b>Field note</b>Make the agent restate the measure&rsquo;s intent before it rewrites. If its plain-English summary is wrong, its &ldquo;faster&rdquo; version will be confidently wrong too.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b6">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B6</span>
+      <span class="stitle"><h3>Re-verify and lock the gain</h3><span class="ssub">Measure the before/after, log the delta</span></span>
+      <span class="lvl">Prove it</span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The cleanup is only real if you can quantify it. Re-run the same instruments you started with and record the deltas &mdash; that decision log is your evidence for stakeholders and your scorecard against the outside vendor.</p>
+      <p class="gh">Close the loop</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b6-1"><span>Re-export the VPAX after the changes and diff it against the baseline: total model size, the largest columns, and their new cardinality.</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-2"><span>Re-capture the optimized measures&rsquo; timings in DAX Studio / Performance Analyzer and confirm both faster <em>and</em> identical results.</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-3"><span>Run Best Practice Analyzer (Tabular Editor) and clear or consciously waive the remaining findings.</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-4"><span>Record the deltas in the decision log: what was deleted/shrunk/rewritten, why, and the before&rarr;after numbers (MB saved, % smaller, ms faster).</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-5"><span>Do a final refresh + full report open to confirm nothing regressed, then tag the commit as the cleaned baseline.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>A one-line summary &mdash; &ldquo;model down from X&nbsp;MB to Y&nbsp;MB, N dead tables removed, slowest measure Z&rarr;Z&prime;&nbsp;ms&rdquo; &mdash; is the single most persuasive artifact you can put in front of Treasury and next to the vendor&rsquo;s pitch.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART C ================================ -->
+<!-- ==================================================================== -->
+<section class="part pc" id="partc">
+  <div class="pbanner">
+    <p class="pk">Part C &middot; Report layer</p>
+    <h2>Modernize the reports &mdash; audit, redesign, build</h2>
+    <p class="pdesc">The model is clean; now the visual layer earns the win. Inventory what exists, modernize the look, and let the agent build new visuals against the PBIR JSON &mdash; one reviewed change at a time.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="c"></div></div><span class="pcnt" data-pcnt="c">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="c1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C1</span>
+      <span class="stitle"><h3>Audit the current reports first</h3><span class="ssub">Know what you have before you touch anything</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">You can't modernize what you haven't measured. Hidden pages were already removed &mdash; good. Now take stock of what remains: every page, every visual, and every place the reports contradict themselves. PBIR stores each page, visual, and bookmark as its own JSON file, so the agent can read the whole report and hand you a structured inventory in minutes.</p>
+      <p class="gh">Baseline the reports</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c1-1"><span>Inventory every page and count visuals per page &mdash; flag pages carrying more than roughly 8&ndash;10 visuals as redesign candidates.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-2"><span>Find redundant or duplicate visuals &mdash; same measure shown two ways, near-identical cards, charts no one reads.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-3"><span>List bookmarks and check each is still wired to a button or action; note orphaned or unused ones for removal.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-4"><span>Catalog inconsistent formatting &mdash; mixed number/date formats, ad-hoc colors, off-theme fonts, vague titles like &ldquo;Chart 1&rdquo;.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-5"><span>Note accessibility gaps &mdash; low-contrast text, color-only encoding, missing alt text, no tab order set.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-6"><span>Run Performance Analyzer in Power BI Desktop, interact with each page, and record the slowest visuals by query &amp; render time.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>Read every visual.json under #folder /definition/pages in this .Report.
+Build a Markdown inventory table with one row per visual:
+page name, visual name/title, visual type, fields/measures used,
+and whether the title is meaningful or a default placeholder.
+Add a second table listing bookmarks and, for each, whether any
+button or visual action references it. Flag likely duplicates
+(same measure, same or similar visual type on the same page).
+Do not edit anything &mdash; read and report only.</code></pre>
+      <div class="tip"><b>Field note</b>Performance Analyzer lives in Power BI Desktop under View &rarr; Performance Analyzer; the agent can't run it, so capture the timings yourself and paste them back in as context for the redesign.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="c2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C2</span>
+      <span class="stitle"><h3>Modernize the look</h3><span class="ssub">One theme, restrained color, clear hierarchy</span></span>
+      <span class="lvl">Do first</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Modern doesn't mean flashy &mdash; it means disciplined. A single theme JSON sets colors, fonts, and default formatting once, so every visual inherits consistency instead of being styled by hand. Aim for restrained color (a neutral base plus one or two accents), clear visual hierarchy, generous spacing, and fewer visuals per page. Drive the changes through the agent, keep them small, and review every diff.</p>
+      <p class="gh">Set the design foundation</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c2-1"><span>Define one theme JSON &mdash; palette, fonts, default text sizes, and standard number/date formats &mdash; and register it in the report's resource package.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-2"><span>Restrain color: neutral background, one primary accent, a second for emphasis; reserve red/green strictly for variance and status.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-3"><span>Establish hierarchy &mdash; a clear page title, KPI row up top, supporting detail below; consistent visual heights and gutters.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-4"><span>Give every visual a meaningful, plain-language title that states the takeaway, not the field name.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-5"><span>Standardize number and date formatting through the theme so currency, percentages, and dates read the same everywhere.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-6"><span>Keep changes reversible &mdash; work on a branch, commit the theme separately, and review each PBIR diff before applying the next.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>Here is our Treasury theme JSON (attached). Update it to a modern,
+restrained scheme: neutral canvas, one primary accent (#hex),
+one emphasis accent, and semantic red/green reserved for variance.
+Set default fonts, title sizes, and card/label formatting.
+Add dataColors, and set default formatString for currency
+("\$#,0;(\$#,0)") and percentage where applicable.
+Return the full valid theme JSON only &mdash; do not modify any
+visual.json yet. I'll load it in Desktop and confirm before we
+apply it across pages.</code></pre>
+      <div class="tip"><b>Field note</b>Let the theme do the heavy lifting before editing individual visuals &mdash; a good theme JSON restyles the whole report at once and is trivial to roll back if the palette misses.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="c3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C3</span>
+      <span class="stitle"><h3>Build new visuals with the agent</h3><span class="ssub">Edit PBIR JSON, validate in Desktop, commit</span></span>
+      <span class="lvl adv">Careful</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">This is where the agent shines &mdash; and where it can bite. Each visual is a JSON file with a public schema, so the agent can add or reshape visuals directly. But PBIR is newer and less forgiving than the model layer: a malformed visual.json can make Desktop drop the visual or refuse to open the report. Move one visual at a time, validate in Power BI Desktop after every edit, and commit only what opens cleanly.</p>
+      <p class="gh">Iterate safely on visuals</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c3-1"><span>Prefer core visuals &mdash; they honor the theme, stay accessible, and don't add tenant-approval or certification overhead the way custom visuals do.</span></label></li>
+        <li><label><input type="checkbox" data-k="c3-2"><span>Reserve custom/marketplace visuals for genuine gaps, and confirm the org allows them before building around one.</span></label></li>
+        <li><label><input type="checkbox" data-k="c3-3"><span>Use small multiples for many-entity comparisons (accounts, currencies, entities) instead of one crowded chart.</span></label></li>
+        <li><label><input type="checkbox" data-k="c3-4"><span>Add field parameters so users swap measures or dimensions in a single visual rather than duplicating pages.</span></label></li>
+        <li><label><input type="checkbox" data-k="c3-5"><span>Change one visual per iteration, then open the report in Power BI Desktop to confirm it renders and the JSON is valid.</span></label></li>
+        <li><label><input type="checkbox" data-k="c3-6"><span>Commit each validated visual on its own so a bad edit is a one-line revert, never a lost afternoon.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>On the Liquidity page, replace the crowded per-currency line chart
+with a small-multiples line chart: one small chart per currency,
+measure = [Closing Cash], axis = Date, sorted by currency.
+Create/modify only that one visual.json, follow the PBIR visual
+schema exactly, keep the existing visual's position/size, and
+inherit the theme (no hard-coded colors). Show me the JSON diff
+and stop &mdash; I'll validate in Desktop before you touch anything else.</code></pre>
+      <div class="tip"><b>Field note</b>Field parameters are defined as a table in the semantic model, then dropped into a slicer &mdash; so a new parameter touches both layers; add it in the model first, then reference it from the report visual. After every agent edit, the real test is a clean open in Power BI Desktop.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="c4">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C4</span>
+      <span class="stitle"><h3>Performance &amp; UX polish</h3><span class="ssub">Fast pages, guided navigation, mobile-ready</span></span>
+      <span class="lvl">Polish</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">A modern report is fast and easy to move through. Fewer visuals per page cuts query load and cognitive load at once. Use bookmarks and navigation for clean page flow, tooltips and drill-through for detail on demand, and field parameters to let users shape their own view. Finish with a mobile layout, then re-run Performance Analyzer to prove the redesign is actually faster.</p>
+      <p class="gh">Tighten performance and flow</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c4-1"><span>Reduce visuals per page &mdash; every visual is a query; move secondary detail to drill-through or tooltip pages.</span></label></li>
+        <li><label><input type="checkbox" data-k="c4-2"><span>Add bookmark-driven navigation and buttons so users move between views without hunting through the page tabs.</span></label></li>
+        <li><label><input type="checkbox" data-k="c4-3"><span>Build report-page tooltips and drill-through so headline visuals stay clean while detail is one hover or right-click away.</span></label></li>
+        <li><label><input type="checkbox" data-k="c4-4"><span>Expose field parameters as slicers so a single page serves multiple stakeholder questions.</span></label></li>
+        <li><label><input type="checkbox" data-k="c4-5"><span>Author a mobile layout for the key pages so Treasury can check positions from a phone.</span></label></li>
+        <li><label><input type="checkbox" data-k="c4-6"><span>Re-run Performance Analyzer after the changes and compare against your C1 baseline to confirm the wins.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Chase the slowest visual from your baseline first &mdash; often one over-scoped table or an unfiltered visual dominates the page's render time, and fixing it beats a dozen cosmetic tweaks.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART D ================================ -->
+<!-- ==================================================================== -->
+<section class="part pd" id="partd">
+  <div class="pbanner">
+    <p class="pk">Part D &middot; Treasury value &amp; the bake-off</p>
+    <h2>Make it matter to Treasury &mdash; and win the room</h2>
+    <p class="pdesc">A clean model and modern reports are the means, not the win. This part translates your work into the language Treasury speaks, points you at the visuals worth building, and gives you a plan to out-deliver the outside vendor on trust, speed, and fit.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="d"></div></div><span class="pcnt" data-pcnt="d">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="d1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">D1</span>
+      <span class="stitle"><h3>Speak Treasury</h3><span class="ssub">the questions the team actually asks</span></span>
+      <span class="lvl">Value</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Treasury does not want dashboards &mdash; it wants answers to a short list of recurring questions about cash, liquidity, and risk. Frame every report around the question, not the visual, and your work will land with the people who fund it.</p>
+      <p class="gh">Anchor each report to a real Treasury question</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="d1-1"><span><b>Cash position &amp; visibility</b> &mdash; &ldquo;How much cash do we have right now, in which banks, accounts, and currencies, and how much is actually available today?&rdquo;</span></label></li>
+        <li><label><input type="checkbox" data-k="d1-2"><span><b>Liquidity</b> &mdash; &ldquo;Can we cover near-term obligations, and how much headroom sits in cash plus committed facilities?&rdquo;</span></label></li>
+        <li><label><input type="checkbox" data-k="d1-3"><span><b>Short-term cash forecast</b> &mdash; &ldquo;What will our cash position be over the next 13 weeks, and where did last week&rsquo;s forecast miss?&rdquo;</span></label></li>
+        <li><label><input type="checkbox" data-k="d1-4"><span><b>Bank account &amp; bank fee analysis</b> &mdash; &ldquo;How many accounts do we run, are they all needed, and what are we paying each bank in fees?&rdquo;</span></label></li>
+        <li><label><input type="checkbox" data-k="d1-5"><span><b>FX exposure</b> &mdash; &ldquo;Where are we exposed by currency, and how much is that moving our reported cash and results?&rdquo;</span></label></li>
+        <li><label><input type="checkbox" data-k="d1-6"><span><b>Debt, investment &amp; counterparty risk</b> &mdash; &ldquo;When does debt mature, what are we earning on investments, and how concentrated is our exposure to any one bank or counterparty?&rdquo;</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Sit with a treasury analyst for 30 minutes and write down the exact phrasing they use for these questions. Your report titles should echo their words back to them.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="d2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">D2</span>
+      <span class="stitle"><h3>High-value report &amp; visual ideas</h3><span class="ssub">what to build, and the decision it drives</span></span>
+      <span class="lvl">Value</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Concrete builds, each mapped to a core visual type and the decision it unlocks. Pick one, ship it end-to-end, then expand &mdash; a working artifact beats a backlog of ideas.</p>
+      <p class="gh">Candidate reports &mdash; visual &times; decision</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="d2-1"><span><b>Daily cash position dashboard</b> &mdash; KPI cards plus a by-bank/by-currency matrix and a trend line. Drives the morning decision: sweep, fund, or invest today&rsquo;s balances.</span></label></li>
+        <li><label><input type="checkbox" data-k="d2-2"><span><b>Rolling short-term cash forecast</b> &mdash; a 13-week line/area chart with an actual-vs-forecast variance bar. Drives borrowing and investment timing, and exposes forecast bias.</span></label></li>
+        <li><label><input type="checkbox" data-k="d2-3"><span><b>Liquidity / cash waterfall</b> &mdash; a waterfall from opening cash through inflows and outflows to closing available liquidity. Drives the &ldquo;what moved our cash&rdquo; conversation.</span></label></li>
+        <li><label><input type="checkbox" data-k="d2-4"><span><b>Bank fee analysis</b> &mdash; a ranked bar by bank/service with a fee-per-account trend. Drives account rationalization and fee negotiations.</span></label></li>
+        <li><label><input type="checkbox" data-k="d2-5"><span><b>FX exposure view</b> &mdash; a stacked/diverging bar of net exposure by currency with a concentration measure. Drives where hedging attention is needed (reporting the exposure, not advising the trade).</span></label></li>
+        <li><label><input type="checkbox" data-k="d2-6"><span><b>Debt maturity ladder</b> &mdash; a bar chart of principal due by time bucket with a cumulative overlay. Drives refinancing planning and refunding timing.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>Act as a senior Power BI developer for a corporate treasury team.
+Draft a DAX measure for a 13-week rolling cash forecast that returns
+forecast-vs-actual variance by week. Assumptions:
+- Fact table 'CashFlow'[Amount], [Date], [Scenario] = "Actual" | "Forecast"
+- A marked Date table 'Calendar'[Date]
+Return: (1) the measure, (2) a short comment on each step,
+(3) how to guard against blanks in weeks with no actuals yet.
+Do NOT give financial advice &mdash; reporting logic only.</code></pre>
+      <div class="tip"><b>Field note</b>Start with the daily cash position dashboard. It is the report Treasury opens every morning, so it earns trust fastest and becomes your demo centerpiece.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="d3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">D3</span>
+      <span class="stitle"><h3>Win vs the external vendor</h3><span class="ssub">compete on trust, speed, and fit</span></span>
+      <span class="lvl proj">Demo</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The vendor may bring polish and scale &mdash; be candid about that. But you own advantages a vendor structurally cannot match. Do not try to boil the ocean; build one polished dashboard on real data that is undeniable, and let it argue for you.</p>
+      <p class="gh">Differentiators you own &mdash; lean into them</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="d3-1"><span><b>Internal context &amp; relationships</b> &mdash; you know the accounts, the quirks, and the people; a vendor spends weeks learning what you already carry.</span></label></li>
+        <li><label><input type="checkbox" data-k="d3-2"><span><b>Faster iteration</b> &mdash; you can turn feedback in hours, not change-order cycles.</span></label></li>
+        <li><label><input type="checkbox" data-k="d3-3"><span><b>Lower / no incremental cost</b> &mdash; no license, SOW, or per-seat markup on top of tooling you already run.</span></label></li>
+        <li><label><input type="checkbox" data-k="d3-4"><span><b>Ownership &amp; maintainability</b> &mdash; the model and measures stay legible and fixable in-house instead of a black box.</span></label></li>
+        <li><label><input type="checkbox" data-k="d3-5"><span><b>Governance &amp; security in-house</b> &mdash; sensitive cash and bank data never leaves your tenant or its access controls.</span></label></li>
+        <li><label><input type="checkbox" data-k="d3-6"><span><b>No vendor lock-in</b> &mdash; no dependency on an outside roadmap, renewal, or their staffing to keep the lights on.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Concede polish gracefully &mdash; then out-fit them. One real dashboard on live company data, delivered next week, beats a glossy vendor demo on sample data delivered next quarter.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="d4">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">D4</span>
+      <span class="stitle"><h3>Show progress like a pro</h3><span class="ssub">turn effort into visible, business-framed momentum</span></span>
+      <span class="lvl proj">Roadmap</span>
+      <span class="cnt">0/6</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Stakeholders fund momentum they can see. Package your model cleanup and new reports as a scoreboard, a rhythm, and a simple roadmap &mdash; framed in business outcomes, not technical effort.</p>
+      <p class="gh">Make the work legible to decision-makers</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="d4-1"><span><b>Before/after scoreboard</b> &mdash; put the model metrics side by side: model size, refresh time, report count, broken visuals fixed. Concrete numbers read as progress.</span></label></li>
+        <li><label><input type="checkbox" data-k="d4-2"><span><b>Short demo cadence</b> &mdash; a standing 15-minute biweekly showing one new thing that works, on real data, every time.</span></label></li>
+        <li><label><input type="checkbox" data-k="d4-3"><span><b>One-pager of wins</b> &mdash; a single page a sponsor can forward: what shipped, what it saves, what&rsquo;s next.</span></label></li>
+        <li><label><input type="checkbox" data-k="d4-4"><span><b>Simple phased roadmap</b> &mdash; now / next / later, with the daily cash dashboard as the flagship &ldquo;now&rdquo; item.</span></label></li>
+        <li><label><input type="checkbox" data-k="d4-5"><span><b>Business framing</b> &mdash; translate every item into a Treasury outcome (&ldquo;faster morning cash decision,&rdquo; not &ldquo;optimized DAX&rdquo;).</span></label></li>
+        <li><label><input type="checkbox" data-k="d4-6"><span><b>Name a sponsor</b> &mdash; recruit one Treasury stakeholder who wants this to win and will say so in the room.</span></label></li>
+      </ul>
+      <p class="gh">Prompt to try</p>
+      <pre><code>You are my analytics-engineering mentor. Draft a one-page
+stakeholder update for a corporate Treasury audience.
+Inputs I'll paste: before/after model metrics, reports shipped
+this sprint, and next-sprint plan.
+Rules:
+- Lead with business outcomes, not technical detail.
+- Include a small before &amp; after scoreboard table.
+- End with a 3-item now/next/later roadmap.
+- Tone: confident, concise, no jargon, no financial advice.</code></pre>
+      <div class="tip"><b>Field note</b>Keep a running before/after scoreboard from day one &mdash; the numbers you capture cleaning the model are the same numbers that win the bake-off later.</div>
+    </div>
+  </div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; Back to all roadmaps</a>
+
+<footer>
+  <p>Part of the tool-belt series, alongside the DAX Studio &times; Tabular Editor, Snowflake, and Prompt Engineering roadmaps. When a new situation comes up, bring it to Claude and ask for the next section.</p>
+  <p class="fp">v1 &middot; July 2026 &middot; progress &amp; collapse state stored locally in this browser &middot; <span style="color:#8b5cf6">&#9632;</span> strategy &middot; <span style="color:#38bdf8">&#9632;</span> model &middot; <span style="color:#F2C811">&#9632;</span> reports &middot; <span style="color:#d946ef">&#9632;</span> treasury</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  var KEY = 'agentic_pbi_treasury_v1';
+  var mem = {};
+  var canStore = true;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ mem = JSON.parse(raw) || {}; }
+    }catch(e){
+      canStore = false; mem = {};
+      var n = document.getElementById('persistNote');
+      if(n){ n.textContent = 'Heads up: saving is unavailable in this view — open the file in your browser and progress will stick.'; }
+    }
+  }
+  function save(){
+    if(!canStore) return;
+    try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){ canStore = false; }
+  }
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+
+  function partOf(el){
+    var p = el.closest('.part');
+    if(!p) return null;
+    if(p.id === 'parta') return 'a';
+    if(p.id === 'partb') return 'b';
+    if(p.id === 'partc') return 'c';
+    if(p.id === 'partd') return 'd';
+    return null;
+  }
+
+  function refresh(){
+    var total = boxes.length, done = 0;
+    var pt = {a:0,b:0,c:0,d:0}, pd = {a:0,b:0,c:0,d:0};
+
+    boxes.forEach(function(b){
+      var p = partOf(b);
+      if(p){ pt[p]++; }
+      if(b.checked){ done++; if(p){ pd[p]++; } }
+    });
+
+    document.querySelectorAll('.sec').forEach(function(sec){
+      var sb = sec.querySelectorAll('input[type=checkbox][data-k]');
+      var sd = 0;
+      sb.forEach(function(b){ if(b.checked) sd++; });
+      var cnt = sec.querySelector('.cnt');
+      if(cnt){
+        cnt.textContent = sd + '/' + sb.length;
+        cnt.classList.toggle('full', sd === sb.length && sb.length > 0);
+      }
+      sec.classList.toggle('done', sd === sb.length && sb.length > 0);
+    });
+
+    ['a','b','c','d'].forEach(function(p){
+      var bar = document.querySelector('[data-pbar="' + p + '"]');
+      var cnt = document.querySelector('[data-pcnt="' + p + '"]');
+      var pct = pt[p] ? Math.round(pd[p] / pt[p] * 100) : 0;
+      if(bar){ bar.style.width = pct + '%'; }
+      if(cnt){ cnt.textContent = pd[p] + ' / ' + pt[p] + ' complete'; }
+    });
+
+    var opct = total ? Math.round(done / total * 100) : 0;
+    var ob = document.getElementById('obarFill');
+    var ot = document.getElementById('opct');
+    if(ob){ ob.style.width = opct + '%'; }
+    if(ot){ ot.textContent = opct + '% done'; }
+  }
+
+  load();
+  boxes.forEach(function(b){
+    var k = b.getAttribute('data-k');
+    if(mem[k]){ b.checked = true; }
+    b.addEventListener('change', function(){
+      if(b.checked){ mem[k] = 1; } else { delete mem[k]; }
+      save(); refresh();
+    });
+  });
+
+  // restore saved collapse state
+  document.querySelectorAll('.sec').forEach(function(sec){
+    if(sec.id && mem['open:' + sec.id] === 0){
+      sec.setAttribute('data-open', 'false');
+      var hh = sec.querySelector('.sec-head');
+      if(hh){ hh.setAttribute('aria-expanded', 'false'); }
+    }
+  });
+
+  document.querySelectorAll('.sec-head').forEach(function(h){
+    h.addEventListener('click', function(){
+      var sec = h.closest('.sec');
+      var open = sec.getAttribute('data-open') === 'true';
+      sec.setAttribute('data-open', open ? 'false' : 'true');
+      h.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if(sec.id){
+        if(open){ mem['open:' + sec.id] = 0; } else { delete mem['open:' + sec.id]; }
+        save();
+      }
+    });
+  });
+
+  var tAll = document.getElementById('toggleAll');
+  var allOpen = true;
+  if(tAll){
+    tAll.addEventListener('click', function(){
+      allOpen = !allOpen;
+      document.querySelectorAll('.sec').forEach(function(sec){
+        sec.setAttribute('data-open', allOpen ? 'true' : 'false');
+        var h = sec.querySelector('.sec-head');
+        if(h){ h.setAttribute('aria-expanded', allOpen ? 'true' : 'false'); }
+        if(sec.id){
+          if(allOpen){ delete mem['open:' + sec.id]; } else { mem['open:' + sec.id] = 0; }
+        }
+      });
+      save();
+      tAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  var rBtn = document.getElementById('resetBtn');
+  if(rBtn){
+    rBtn.addEventListener('click', function(){
+      if(!confirm('Clear all progress on this page?')) return;
+      mem = {};
+      boxes.forEach(function(b){ b.checked = false; });
+      save(); refresh();
+    });
+  }
+
+  refresh();
+})();
+</script>
+</body>
+</html>
