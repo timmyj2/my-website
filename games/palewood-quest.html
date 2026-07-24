@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Palewood Quest</title>
+<style>
+  :root{
+    --gb0:#0f380f; --gb1:#306230; --gb2:#8bac0f; --gb3:#9bbc0f;
+    --bg:#0d1117; --panel:#161b22; --line:#252c37; --text:#e8ebf1; --mut:#9aa4b3; --dim:#6b7686;
+    --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:var(--mono);
+    display:flex;flex-direction:column;align-items:center;
+    background-image:radial-gradient(900px 420px at 15% -8%, rgba(155,188,15,.06), transparent 60%),
+                     radial-gradient(900px 420px at 85% -8%, rgba(48,98,48,.10), transparent 60%);
+    touch-action:none;user-select:none;-webkit-user-select:none;
+  }
+  a{color:inherit;text-decoration:none}
+
+  .topbar{width:100%;max-width:520px;display:flex;justify-content:space-between;align-items:center;
+    padding:8px 12px;flex:0 0 auto}
+  .topbar a{font-size:.72rem;color:var(--mut)}
+  .topbar a:hover{color:var(--text)}
+  .topbar .ttl{font-size:.72rem;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+
+  .stage{flex:1 1 auto;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:2px 6px;min-height:0}
+
+  .screenwrap{
+    background:#0a0d0a;border:3px solid #1b2a12;border-radius:10px;padding:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,.5), inset 0 0 0 2px #24361a;
+    line-height:0;
+  }
+  canvas#game{
+    display:block;image-rendering:pixelated;image-rendering:crisp-edges;
+    background:var(--gb3);border-radius:3px;
+    width:min(96vw, 460px);height:auto;aspect-ratio:160/144;
+  }
+
+  /* touch controls */
+  .pad{width:100%;max-width:520px;flex:0 0 auto;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+    padding:8px 14px 16px}
+  .dpad{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(3,46px);gap:2px;justify-content:center}
+  .dbtn{background:#20281c;border:1px solid #384a2b;border-radius:8px;color:var(--gb2);
+    display:flex;align-items:center;justify-content:center;font-size:1.1rem;touch-action:none;user-select:none}
+  .dbtn:active,.dbtn.on{background:#38512a;color:var(--gb3)}
+  .dbtn.blank{background:transparent;border:none}
+  .du{grid-column:2;grid-row:1}.dl{grid-column:1;grid-row:2}.dr{grid-column:3;grid-row:2}.dd{grid-column:2;grid-row:3}
+  .dc{grid-column:2;grid-row:2;background:#161b13;border-color:#2a3a1f;border-radius:4px}
+  .mid{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .sysbtns{display:flex;gap:10px}
+  .sysbtn{background:#20281c;border:1px solid #384a2b;border-radius:20px;color:var(--gb2);
+    font-size:.58rem;letter-spacing:.08em;padding:5px 12px;font-family:var(--mono)}
+  .sysbtn:active{background:#38512a}
+  .abbtns{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .abrow{display:flex;gap:14px;align-items:center}
+  .abtn{width:58px;height:58px;border-radius:50%;background:#3a2230;border:1px solid #6b3a52;color:#f0c4d8;
+    font-size:1.15rem;font-weight:700;display:flex;align-items:center;justify-content:center;touch-action:none;font-family:var(--mono)}
+  .abtn.b{background:#22303a;border-color:#3a566b;color:#c4dcf0}
+  .abtn:active,.abtn.on{filter:brightness(1.4)}
+  .abtn .lab{position:absolute}
+
+  .hint{max-width:520px;text-align:center;font-size:.64rem;color:var(--dim);padding:0 16px 10px;line-height:1.5}
+  @media (min-width:760px){ .hint .touch{display:none} }
+  @media (max-width:759px){ .hint .keys{display:none} }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html">&larr; Back</a>
+    <span class="ttl">Palewood Quest</span>
+    <span style="width:44px"></span>
+  </div>
+
+  <div class="stage">
+    <div class="screenwrap">
+      <canvas id="game" width="160" height="144"></canvas>
+    </div>
+  </div>
+
+  <div class="pad">
+    <div class="dpad">
+      <div class="dbtn blank"></div>
+      <div class="dbtn du" data-dir="up">▲</div>
+      <div class="dbtn blank"></div>
+      <div class="dbtn dl" data-dir="left">◀</div>
+      <div class="dbtn dc"></div>
+      <div class="dbtn dr" data-dir="right">▶</div>
+      <div class="dbtn blank"></div>
+      <div class="dbtn dd" data-dir="down">▼</div>
+      <div class="dbtn blank"></div>
+    </div>
+    <div class="mid">
+      <div class="sysbtns">
+        <div class="sysbtn" data-btn="start">START</div>
+        <div class="sysbtn" data-btn="select">SELECT</div>
+      </div>
+    </div>
+    <div class="abbtns">
+      <div class="abrow">
+        <div class="abtn b" data-btn="b">B</div>
+        <div class="abtn" data-btn="a">A</div>
+      </div>
+    </div>
+  </div>
+  <div class="hint">
+    <span class="keys">Arrows/WASD move · Z = A (talk / confirm) · X = B (cancel / run) · Enter = START menu</span>
+    <span class="touch">Tap the D-pad to move · A to talk &amp; confirm · B to cancel · START for menu</span>
+  </div>
+
+<script>
+window.addEventListener('error', function(e){
+  try{ document.documentElement.setAttribute('data-fatal', e.message+' @'+(e.lineno||'?')+':'+(e.colno||'?')); }catch(_){}
+  try{ console.error('FATAL', e.message, e.lineno+':'+e.colno); }catch(_){}
+});
+</script>
+<script>
+"use strict";
+(function(){
+/* ============================================================================
+   PALEWOOD QUEST — an original creature-collector in the Game Boy style.
+   Single-file, self-contained. Saves to localStorage; auto-saves when you
+   leave the tab so you can hop out any time and pick up where you left off.
+   All creatures, characters, and places are original.
+============================================================================ */
+
+const SCREEN_W = 160, SCREEN_H = 144, TILE = 16;
+const SAVE_KEY = "palewood_save_v1";
+const PAL = ["#0f380f","#306230","#8bac0f","#9bbc0f"]; // 0 dark .. 3 light
+
+const cv = document.getElementById("game");
+const ctx = cv.getContext("2d");
+ctx.imageSmoothingEnabled = false;
+
+/* ------------------------------------------------------------------ FONT */
+// 5x7 glyphs, rows separated by "/", 1=ink 0=blank.
+const FONT_SRC = {
+  "A":"01110/10001/10001/11111/10001/10001/10001",
+  "B":"11110/10001/11110/10001/10001/10001/11110",
+  "C":"01111/10000/10000/10000/10000/10000/01111",
+  "D":"11110/10001/10001/10001/10001/10001/11110",
+  "E":"11111/10000/10000/11110/10000/10000/11111",
+  "F":"11111/10000/10000/11110/10000/10000/10000",
+  "G":"01111/10000/10000/10011/10001/10001/01111",
+  "H":"10001/10001/10001/11111/10001/10001/10001",
+  "I":"11111/00100/00100/00100/00100/00100/11111",
+  "J":"11111/00010/00010/00010/00010/10010/01100",
+  "K":"10001/10010/10100/11000/10100/10010/10001",
+  "L":"10000/10000/10000/10000/10000/10000/11111",
+  "M":"10001/11011/10101/10001/10001/10001/10001",
+  "N":"10001/11001/10101/10011/10001/10001/10001",
+  "O":"01110/10001/10001/10001/10001/10001/01110",
+  "P":"11110/10001/10001/11110/10000/10000/10000",
+  "Q":"01110/10001/10001/10001/10101/10010/01101",
+  "R":"11110/10001/10001/11110/10100/10010/10001",
+  "S":"01111/10000/10000/01110/00001/00001/11110",
+  "T":"11111/00100/00100/00100/00100/00100/00100",
+  "U":"10001/10001/10001/10001/10001/10001/01110",
+  "V":"10001/10001/10001/10001/10001/01010/00100",
+  "W":"10001/10001/10001/10101/10101/11011/10001",
+  "X":"10001/10001/01010/00100/01010/10001/10001",
+  "Y":"10001/10001/01010/00100/00100/00100/00100",
+  "Z":"11111/00001/00010/00100/01000/10000/11111",
+  "0":"01110/10001/10011/10101/11001/10001/01110",
+  "1":"00100/01100/00100/00100/00100/00100/01110",
+  "2":"01110/10001/00001/00010/00100/01000/11111",
+  "3":"11111/00010/00100/00010/00001/10001/01110",
+  "4":"00010/00110/01010/10010/11111/00010/00010",
+  "5":"11111/10000/11110/00001/00001/10001/01110",
+  "6":"01110/10000/10000/11110/10001/10001/01110",
+  "7":"11111/00001/00010/00100/01000/01000/01000",
+  "8":"01110/10001/10001/01110/10001/10001/01110",
+  "9":"01110/10001/10001/01111/00001/00001/01110",
+  " ":"00000/00000/00000/00000/00000/00000/00000",
+  ".":"00000/00000/00000/00000/00000/00110/00110",
+  ",":"00000/00000/00000/00000/00110/00110/01000",
+  "!":"00100/00100/00100/00100/00100/00000/00100",
+  "?":"01110/10001/00001/00110/00100/00000/00100",
+  "'":"00100/00100/01000/00000/00000/00000/00000",
+  "-":"00000/00000/00000/11111/00000/00000/00000",
+  ":":"00000/00110/00110/00000/00110/00110/00000",
+  "/":"00001/00001/00010/00100/01000/10000/10000",
+  "(":"00010/00100/01000/01000/01000/00100/00010",
+  ")":"01000/00100/00010/00010/00010/00100/01000",
+  "x":"00000/10001/01010/00100/01010/10001/00000",
+  "$":"00100/01111/10100/01110/00101/11110/00100",
+  "~":"01000/01100/01110/01111/01110/01100/01000", // right-triangle cursor
+  "+":"00000/00100/00100/11111/00100/00100/00000",
+  "%":"11001/11010/00100/01000/01011/10011/00000",
+  "*":"00000/10101/01110/11111/01110/10101/00000"  // sparkle / ball
+};
+const GLYPHS = {};
+for (const k in FONT_SRC){ GLYPHS[k] = FONT_SRC[k].split("/"); }
+
+// Draw one character at pixel x,y with palette index color. Returns advance.
+function drawChar(c, x, y, color){
+  let g = GLYPHS[c];
+  if (!g){ c = c.toUpperCase(); g = GLYPHS[c]; }
+  if (!g) return 6;
+  ctx.fillStyle = PAL[color];
+  for (let r=0;r<7;r++){
+    const row = g[r];
+    for (let cx=0;cx<5;cx++){
+      if (row.charCodeAt(cx)===49) ctx.fillRect(x+cx, y+r, 1, 1);
+    }
+  }
+  return 6;
+}
+function drawText(str, x, y, color){
+  color = (color===undefined)?0:color;
+  str = String(str);
+  let cx = x;
+  for (let i=0;i<str.length;i++){
+    const ch = str[i];
+    if (ch === "\n"){ cx = x; y += 9; continue; }
+    cx += drawChar(ch, cx, y, color);
+  }
+}
+function textWidth(str){ return String(str).length*6; }
+
+/* --------------------------------------------------- offscreen tile cache */
+function makeCanvas(w,h){ const c=document.createElement("canvas"); c.width=w; c.height=h; return c; }
+function px(g,x,y,w,h){ g.fillRect(x,y,w===undefined?1:w,h===undefined?1:h); }
+
+// Build a 16x16 tile canvas for each tile character, drawn procedurally.
+const TILEC = {};
+function buildTiles(){
+  function T(ch, fn){ const c=makeCanvas(16,16); const g=c.getContext("2d"); fn(g); TILEC[ch]=c; }
+  const c0=PAL[0], c1=PAL[1], c2=PAL[2], c3=PAL[3];
+
+  // grass ground
+  T(".", g=>{ g.fillStyle=c2; g.fillRect(0,0,16,16);
+    g.fillStyle=c1; [[3,4],[4,4],[10,7],[11,7],[6,12],[7,12],[13,2]].forEach(p=>g.fillRect(p[0],p[1],1,1)); });
+  // path / dirt
+  T(",", g=>{ g.fillStyle=c3; g.fillRect(0,0,16,16);
+    g.fillStyle=c2; [[2,3],[9,5],[5,10],[12,12],[7,7]].forEach(p=>g.fillRect(p[0],p[1],1,1)); });
+  // tall grass (encounter)
+  T("g", g=>{ g.fillStyle=c2; g.fillRect(0,0,16,16);
+    g.fillStyle=c0;
+    for (let i=0;i<16;i+=4){ g.fillRect(i+1,10,1,4); g.fillRect(i,12,1,3); g.fillRect(i+2,12,1,3); }
+    g.fillStyle=c1; for (let i=0;i<16;i+=4){ g.fillRect(i+1,7,1,3); } });
+  // flower deco (walkable)
+  T("F", g=>{ TILEC["."].getContext&&0; g.drawImage(TILEC["."],0,0);
+    g.fillStyle=c3; g.fillRect(6,6,1,1); g.fillRect(8,6,1,1); g.fillRect(7,5,1,1); g.fillRect(7,7,1,1);
+    g.fillStyle=c0; g.fillRect(7,6,1,1); });
+  // tree (solid)
+  T("T", g=>{ g.drawImage(TILEC["."],0,0);
+    g.fillStyle=c0; g.fillRect(3,1,10,11);
+    g.fillStyle=c1; g.fillRect(4,2,8,3); g.fillRect(9,6,3,4);
+    g.fillStyle=c0; g.fillRect(7,12,2,4); });
+  // water (solid)
+  T("W", g=>{ g.fillStyle=c1; g.fillRect(0,0,16,16);
+    g.fillStyle=c2; for (let y=2;y<16;y+=5){ g.fillRect(1,y,5,1); g.fillRect(9,y+2,5,1); }
+    g.fillStyle=c0; g.fillRect(0,15,16,1); });
+  // building wall (solid)
+  T("#", g=>{ g.fillStyle=c1; g.fillRect(0,0,16,16);
+    g.fillStyle=c0; for (let y=0;y<16;y+=4){ g.fillRect(0,y,16,1); }
+    for (let x=0;x<16;x+=8){ g.fillRect(x,0,1,16); }
+    g.fillStyle=c2; g.fillRect(1,1,6,2); });
+  // roof (solid)
+  T("R", g=>{ g.fillStyle=c0; g.fillRect(0,0,16,16);
+    g.fillStyle=c1; for (let y=2;y<16;y+=4){ g.fillRect(0,y,16,2); }
+    g.fillStyle=c2; g.fillRect(0,0,16,1); });
+  // door (walkable warp)
+  T("D", g=>{ g.fillStyle=c1; g.fillRect(0,0,16,16);
+    g.fillStyle=c0; g.fillRect(3,2,10,14);
+    g.fillStyle=c2; g.fillRect(5,4,6,10); g.fillStyle=c0; g.fillRect(9,9,1,2); });
+  // sign (solid, readable)
+  T("S", g=>{ g.drawImage(TILEC["."],0,0);
+    g.fillStyle=c0; g.fillRect(7,9,2,6);
+    g.fillStyle=c1; g.fillRect(2,2,12,7); g.fillStyle=c0; g.strokeStyle=c0;
+    g.fillRect(2,2,12,1); g.fillRect(2,8,12,1); g.fillRect(2,2,1,7); g.fillRect(13,2,1,7);
+    g.fillStyle=c3; g.fillRect(4,4,8,1); g.fillRect(4,6,6,1); });
+  // indoor floor (walkable)
+  T("=", g=>{ g.fillStyle=c3; g.fillRect(0,0,16,16);
+    g.fillStyle=c2; g.fillRect(0,15,16,1); g.fillRect(15,0,1,16);
+    g.fillStyle=c2; g.fillRect(7,7,2,2); });
+  // counter/table (solid)
+  T("C", g=>{ g.fillStyle=c2; g.fillRect(0,0,16,16);
+    g.fillStyle=c1; g.fillRect(0,0,16,4); g.fillStyle=c0; g.fillRect(0,4,16,1); g.fillRect(0,12,16,1); });
+  // bookshelf / furniture (solid)
+  T("B", g=>{ g.fillStyle=c1; g.fillRect(0,0,16,16);
+    g.fillStyle=c0; g.fillRect(0,0,16,1);g.fillRect(0,5,16,1);g.fillRect(0,10,16,1);g.fillRect(0,15,16,1);
+    g.fillStyle=c3; g.fillRect(2,2,2,2);g.fillRect(6,2,2,2);g.fillRect(10,2,2,2);
+    g.fillRect(3,7,2,2);g.fillRect(9,7,2,2);g.fillRect(2,12,2,2);g.fillRect(11,12,2,2); });
+  // mat / rug (walkable warp-out)
+  T("M", g=>{ g.fillStyle=c1; g.fillRect(0,0,16,16);
+    g.fillStyle=c2; g.fillRect(2,2,12,12); g.fillStyle=c0; g.fillRect(6,6,4,4); });
+  // healing machine (solid, interact)
+  T("P", g=>{ g.fillStyle=c3; g.fillRect(0,0,16,16);
+    g.fillStyle=c1; g.fillRect(2,3,12,10); g.fillStyle=c0; g.fillRect(2,3,12,1);g.fillRect(2,12,12,1);
+    g.fillStyle=c2; g.fillRect(4,6,2,2);g.fillRect(7,6,2,2);g.fillRect(10,6,2,2); });
+  // ledge (walkable only jumping down)
+  T("L", g=>{ g.drawImage(TILEC["."],0,0);
+    g.fillStyle=c0; g.fillRect(0,10,16,2); g.fillStyle=c1; g.fillRect(0,12,16,4);
+    g.fillStyle=c3; for (let x=1;x<16;x+=4) g.fillRect(x,13,2,1); });
+  // shop shelf (solid)
+  T("H", g=>{ g.fillStyle=c2; g.fillRect(0,0,16,16);
+    g.fillStyle=c0; g.fillRect(0,0,16,1);g.fillRect(0,7,16,1);g.fillRect(0,15,16,1);
+    g.fillStyle=c1; g.fillRect(2,2,3,4);g.fillRect(7,2,3,4);g.fillRect(11,3,3,3);
+    g.fillRect(3,9,3,5);g.fillRect(9,9,4,5); });
+}
+
+/* --------------------------------------------------------- overworld sprites */
+// 16x16 sprites as arrays of 16 strings; chars: '.'=clear, 0-3 palette index.
+function buildSprite(rows){
+  const c = makeCanvas(16,16), g=c.getContext("2d");
+  for (let y=0;y<rows.length;y++){
+    const row = rows[y];
+    for (let x=0;x<row.length;x++){
+      const ch = row[x];
+      if (ch===".") continue;
+      g.fillStyle = PAL[+ch];
+      g.fillRect(x,y,1,1);
+    }
+  }
+  return c;
+}
+// Player character (cap + tunic). 4 directions x 2 frames.
+const PLYR = {};
+(function(){
+  const down_a=[
+    "................",
+    ".....00000......",
+    "....0111110.....",
+    "....0122210.....",
+    "...01222221 ....".replace(" ",""),
+    "...0.....0......",
+    "....03333330....",
+    "...031333313....",
+    "...031333313....",
+    "...031333313....",
+    "....0333330.....",
+    "....01111.0.....",
+    "....01..110.....",
+    "....00..00......",
+    "...000..000.....",
+    "................"];
+  const down_b=[
+    "................",
+    ".....00000......",
+    "....0111110.....",
+    "....0122210.....",
+    "...012222210....",
+    "...0.....0......",
+    "....03333330....",
+    "...031333313....",
+    "...031333313....",
+    "...031333313....",
+    "....0333330.....",
+    "....01111.0.....",
+    "...001..110.....",
+    "..000....00.....",
+    "..0......000....",
+    "................"];
+  const up_a=[
+    "................",
+    ".....00000......",
+    "....0111110.....",
+    "....0111110.....",
+    "...011111110....",
+    "...0.....0......",
+    "....03333330....",
+    "...031333313....",
+    "...031333313....",
+    "...031333313....",
+    "....0333330.....",
+    "....01111.0.....",
+    "....01..110.....",
+    "....00..00......",
+    "...000..000.....",
+    "................"];
+  const up_b=[
+    "................",
+    ".....00000......",
+    "....0111110.....",
+    "....0111110.....",
+    "...011111110....",
+    "...0.....0......",
+    "....03333330....",
+    "...031333313....",
+    "...031333313....",
+    "...031333313....",
+    "....0333330.....",
+    "....01111.0.....",
+    "...001..110.....",
+    "..000....00.....",
+    "..000......0....",
+    "................"];
+  const rt_a=[
+    "................",
+    ".....00000......",
+    "....0111110.....",
+    "....0122110.....",
+    "...012222110....",
+    "...0.....0......",
+    "....03333330....",
+    "....0133331 ....".replace(" ",""),
+    "...0313333.0....",
+    "....0333330.....",
+    "....0333330.....",
+    "....01111.0.....",
+    "....011.110.....",
+    "....000.000.....",
+    "...000...00.....",
+    "................"];
+  const rt_b=[
+    "................",
+    ".....00000......",
+    "....0111110.....",
+    "....0122110.....",
+    "...012222110....",
+    "...0.....0......",
+    "....03333330....",
+    "....01333310....",
+    "...0313333.0....",
+    "....0333330.....",
+    "....0333330.....",
+    "....01111.0.....",
+    "...0011.110.....",
+    "..000...000.....",
+    "..0.......00....",
+    "................"];
+  function mirror(rows){ return rows.map(r=>{ let s=""; for(let i=r.length-1;i>=0;i--)s+=r[i]; return s.padEnd(16,"."); }); }
+  PLYR.down=[buildSprite(down_a),buildSprite(down_b)];
+  PLYR.up=[buildSprite(up_a),buildSprite(up_b)];
+  PLYR.right=[buildSprite(rt_a),buildSprite(rt_b)];
+  PLYR.left=[buildSprite(mirror(rt_a)),buildSprite(mirror(rt_b))];
+})();
+
+// Simple NPC sprites (down-facing, 1-2 frames).
+function npcSprite(hair, body){
+  return buildSprite([
+    "................",
+    ".....HHHHH......".replace(/H/g,hair),
+    "....HHHHHHH.....".replace(/H/g,hair),
+    "....H22222H.....".replace(/H/g,hair).replace(/2/g,"2"),
+    "....022220......",
+    "....0....0......",
+    "....0BBBBB0.....".replace(/B/g,body),
+    "...0B0BBB0B0....".replace(/B/g,body),
+    "...0BBBBBBB0....".replace(/B/g,body),
+    "...0BBBBBBB0....".replace(/B/g,body),
+    "....0BBBBB0.....".replace(/B/g,body),
+    "....01111.0.....",
+    "....01...10.....",
+    "....00...00.....",
+    "...000...000....",
+    "................"]);
+}
+const NPC = {
+  prof:  npcSprite("3","3"),   // Professor (light coat)
+  rival: npcSprite("0","1"),   // Rival
+  leader:npcSprite("1","0"),   // Gym leader
+  nurse: npcSprite("2","3"),   // Nurse
+  clerk: npcSprite("0","2"),   // Shop clerk
+  person:npcSprite("1","2"),   // Townsfolk
+  youth: npcSprite("0","1")    // Route trainer
+};
+// ball object on the lab table
+const BALLSPR = buildSprite([
+  "................","................","................",
+  ".....00000......",
+  "....0111110.....",
+  "...011111110....",
+  "...0111.1110....",
+  "...00000000.0...".replace("0.","00"),
+  "...011111110....",
+  "....0111110.....",
+  ".....00000......",
+  "................","................","................","................","................"]);
+
+/* ------------------------------------------------------- creature sprites */
+// Creature sprites drawn at up to 40x40. Stored as string rows using 0-3, '.'=clear.
+function buildBig(rows,size){
+  const c=makeCanvas(size,size), g=c.getContext("2d");
+  for (let y=0;y<rows.length;y++){
+    const row=rows[y];
+    for (let x=0;x<row.length;x++){
+      const ch=row[x]; if(ch===".")continue;
+      g.fillStyle=PAL[+ch]; g.fillRect(x,y,1,1);
+    }
+  }
+  return c;
+}
+// Compact 24x24 front sprites for each creature (silhouette style, GB-ish).
+const CRSPR = {};
+function CR(id, rows){ CRSPR[id]=buildBig(rows,24); }
+
+CR("embercub",[
+  "........................",
+  "..........000...........",
+  ".........01110..........",
+  "........0122210.........",
+  ".......012222210........",
+  ".......01222210.0.......",
+  "......0122222210........",
+  "......0122002210........",
+  "......01203302210.......",
+  ".....012200332210.......",
+  ".....0122222222100......",
+  ".....01222222221000.....",
+  ".....012211112221000....",
+  "......0122112221000.....",
+  "......01222222210.......",
+  ".......012222210........",
+  ".......01200002210......",
+  "......0120....0210......",
+  "......020......020......",
+  ".....000........000.....",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("aquapup",[
+  "........................",
+  "........................",
+  ".........00000..........",
+  "........0111110.........",
+  ".......011111110........",
+  ".......0122122110.......",
+  "......011211211110......",
+  "......0121001210110.....",
+  "......0120330210110.....",
+  "......0121001210110.....",
+  ".......01211121110......",
+  ".......011111111100.....",
+  "......01111111111100....",
+  ".....0111111111111100...",
+  ".....01111111111100.....",
+  "......011111111110......",
+  ".......0110000110.......",
+  "......0110...0110.......",
+  "......010.....010.......",
+  ".....000.......000......",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("leafawn",[
+  "........................",
+  ".......0........0.......",
+  "......010......010......",
+  ".......010....010.......",
+  "........01100110........",
+  ".........011110.........",
+  "........01222210........",
+  ".......0122222210.......",
+  ".......0120220210.......",
+  ".......0120330210.......",
+  ".......0122222210.......",
+  "........01222210........",
+  ".........011110.........",
+  "........011111110.......",
+  ".......01111111110......",
+  "......011111111110......",
+  "......011111111110......",
+  "......0110..0110........",
+  "......010....010........",
+  "......00......00........",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("nibblet",[
+  "........................",
+  "........................",
+  "........................",
+  ".........0....0.........",
+  "........010..010........",
+  "........01011010........",
+  ".......0111111110.......",
+  "......011211112110......",
+  "......012103301210......",
+  "......011100011110......",
+  "......011111111110......",
+  ".......0111111110.......",
+  "......01111111111.0.....",
+  ".....011111111111100....",
+  ".....01111111111110.....",
+  "......0110000001100.....",
+  ".....0110......0110.....",
+  ".....010........010.....",
+  "....000..........000....",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("skylark",[
+  "........................",
+  "..............000.......",
+  ".............01110......",
+  "............011110......",
+  "...........0122110......",
+  "..........01221110......",
+  ".......000012221100.....",
+  "......011111222110......",
+  ".....0122222221100......",
+  ".....01222222110........",
+  "....012222221100........",
+  "....0122222110..........",
+  "....01222110............",
+  ".....011100.....0.......",
+  "......0100......00......",
+  ".......0.........0......",
+  "........0.......00......",
+  ".........0000000........",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("thistle",[
+  "........................",
+  ".........0....0.........",
+  ".....0...0....0...0.....",
+  ".....00.010..010.00.....",
+  "......010101101010......",
+  ".......0011111100.......",
+  "......0111111111 0......".replace(" ","1"),
+  ".....012111111112 0.....".replace(" ","1"),
+  ".....01031111130110.....",
+  ".....01100111001110.....",
+  ".....011111111111 0.....".replace(" ","1"),
+  "......0111111111100.....",
+  ".......01111111110......",
+  ".......0.0.00.0.0.......",
+  "......00.0.00.0.00......",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("cinderfly",[
+  "........................",
+  "...00..........00.......",
+  "..0110........0110......",
+  ".012210......012210.....",
+  ".0122210....0122210.....",
+  ".01222100..0012210......",
+  "..0122100000012100......",
+  "...0110011110011000.....",
+  ".....012133312100.......",
+  ".....012303032100.......",
+  ".....012133312100.......",
+  "......0121111210........",
+  "......0011111100........",
+  ".......01000010........",
+  "........0....0.........",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("driptad",[
+  "........................",
+  "........................",
+  "..........00000.........",
+  ".........0111110........",
+  "........011111110.......",
+  ".......01210012110......",
+  ".......0130030 3110.....".replace(" ","1"),
+  ".......0110011 1110.....".replace(" ","1"),
+  "........011111110.......",
+  ".........0111110........",
+  "..........01110.0.......",
+  "...........010.010......",
+  "..........010...010.....",
+  ".........010...010......",
+  ".........01...010.......",
+  "..........000000........",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("pebblin",[
+  "........................",
+  "........................",
+  "........................",
+  ".........000000.........",
+  ".......0011111100.......",
+  "......011111111110......",
+  ".....01111211121110.....",
+  ".....01110330033110.....".replace("33","33"),
+  "....0111103300331110....",
+  "....0111110330011110....",
+  "....0111111111111110....",
+  "....0111111111111110....",
+  ".....011111111111100....",
+  ".....0011111111110......",
+  "......0011111110........",
+  "........00000000........",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("emberwolf",[
+  "........................",
+  ".......0........0.......",
+  "......010......010......",
+  "......0120....0210......",
+  ".....012210..012210.....",
+  ".....0122100012221 0....".replace(" ","0"),
+  "....01222222222222100...",
+  "....0122200222002210....",
+  "....0122033220330 210...".replace(" ","2"),
+  "....0122222222222 100...".replace(" ","2"),
+  "....01221111111122100...",
+  "....012211....112210....",
+  ".....01222222222210.....",
+  "......012222222210......",
+  ".....0122002200210......",
+  ".....010..0..0.010......",
+  "....000..00.00..000.....",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("aquadon",[
+  "........................",
+  "........................",
+  ".......00000000.........",
+  "......0111111110........",
+  ".....011111111110.......",
+  ".....0121121121110......",
+  "....0121001210 1110.....".replace(" ","1"),
+  "....0120330210 110......".replace(" ","0"),
+  "....0121001210110.......",
+  ".....01211121110........",
+  ".....0111111111100......",
+  "....011111111111100.....",
+  "...01111111111111100....",
+  "...0111111111111100.....",
+  "....01111111111100......",
+  ".....011100011100.......",
+  "....0110.....0110.......",
+  "....010.......010.......",
+  "...000.........000......",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+CR("leafstag",[
+  "........................",
+  "....0..0......0..0......",
+  "...010010....010010.....",
+  "....01010......01010....",
+  ".....0110......0110.....",
+  "......01102222011 0.....".replace(" ","0"),
+  ".......0122222210.......",
+  "......012222222210......",
+  "......0122022220210.....",
+  "......0120330222210.....",
+  "......0122002222210.....",
+  ".......01222222210......",
+  "........01222210........",
+  ".......0122222210.......",
+  "......012200022210......",
+  "......010...0.0210......",
+  ".....010....0..010......",
+  ".....00.....0...00......",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................",
+  "........................"]);
+
+/* ------------------------------------------------------------- game data */
+// Type effectiveness. Types: NORMAL, FIRE, WATER, GRASS.
+const TYPES = ["NORMAL","FIRE","WATER","GRASS"];
+const EFF = {
+  FIRE:{GRASS:2, WATER:.5, FIRE:.5},
+  WATER:{FIRE:2, GRASS:.5, WATER:.5},
+  GRASS:{WATER:2, FIRE:.5, GRASS:.5},
+  NORMAL:{}
+};
+function effMult(atkType, defType){
+  const row = EFF[atkType]; if(!row) return 1;
+  return (row[defType]!==undefined)?row[defType]:1;
+}
+// Physical types use ATK/DEF, special types use SPC/SPC (Gen-1 style).
+function isPhysical(t){ return t==="NORMAL"; }
+
+// Moves: {name,type,power,acc,pp,cat, effect}
+const MOVES = {
+  tackle:   {name:"TACKLE",  type:"NORMAL", power:40, acc:100, pp:35},
+  scratch:  {name:"SCRATCH", type:"NORMAL", power:40, acc:100, pp:35},
+  quickjab: {name:"QUICK JAB",type:"NORMAL",power:40, acc:100, pp:30, priority:1},
+  bodyslam: {name:"BODY SLAM",type:"NORMAL",power:75, acc:100, pp:15},
+  growl:    {name:"GROWL",   type:"NORMAL", power:0,  acc:100, pp:40, effect:"atk-"},
+  tailwhip: {name:"TAIL WHIP",type:"NORMAL",power:0,  acc:100, pp:30, effect:"def-"},
+  headbutt: {name:"HEADBUTT",type:"NORMAL", power:55, acc:100, pp:20},
+  ember:    {name:"EMBER",   type:"FIRE",   power:40, acc:100, pp:25},
+  flamewhirl:{name:"FLAMEWHIRL",type:"FIRE",power:60, acc:95,  pp:15},
+  bubble:   {name:"BUBBLE",  type:"WATER",  power:40, acc:100, pp:30},
+  watergun: {name:"WATER GUN",type:"WATER", power:55, acc:100, pp:20},
+  vinewhip: {name:"VINE WHIP",type:"GRASS", power:45, acc:100, pp:25},
+  razorleaf:{name:"RAZORLEAF",type:"GRASS", power:55, acc:95,  pp:20},
+  leafjab:  {name:"LEAF JAB", type:"GRASS", power:40, acc:100, pp:30},
+  struggle: {name:"STRUGGLE",type:"NORMAL", power:50, acc:100, pp:1} // used when out of PP
+};
+
+// Creature species. base stats {hp,atk,def,spc,spd}, learnset [[lvl,move]...]
+const SPECIES = {
+  embercub:  {name:"EMBERCUB", type:"FIRE",  base:{hp:39,atk:52,def:43,spc:60,spd:65}, exp:65, catch:45,
+              learn:[[1,"scratch"],[1,"growl"],[7,"ember"],[13,"quickjab"],[19,"flamewhirl"]], evolve:{lvl:16,into:"emberwolf"}},
+  aquapup:   {name:"AQUAPUP", type:"WATER",  base:{hp:44,atk:48,def:65,spc:50,spd:43}, exp:66, catch:45,
+              learn:[[1,"tackle"],[1,"tailwhip"],[7,"bubble"],[13,"headbutt"],[19,"watergun"]], evolve:{lvl:16,into:"aquadon"}},
+  leafawn:   {name:"LEAFAWN", type:"GRASS",  base:{hp:45,atk:49,def:49,spc:65,spd:45}, exp:64, catch:45,
+              learn:[[1,"tackle"],[1,"growl"],[7,"vinewhip"],[13,"leafjab"],[19,"razorleaf"]], evolve:{lvl:16,into:"leafstag"}},
+  emberwolf: {name:"EMBERWOLF",type:"FIRE",  base:{hp:58,atk:64,def:58,spc:80,spd:80}, exp:142, catch:45,
+              learn:[[1,"scratch"],[1,"ember"],[16,"quickjab"],[22,"flamewhirl"],[28,"bodyslam"]]},
+  aquadon:   {name:"AQUADON", type:"WATER",  base:{hp:59,atk:63,def:80,spc:65,spd:58}, exp:143, catch:45,
+              learn:[[1,"tackle"],[1,"bubble"],[16,"headbutt"],[22,"watergun"],[28,"bodyslam"]]},
+  leafstag:  {name:"LEAFSTAG",type:"GRASS",  base:{hp:60,atk:62,def:63,spc:80,spd:60}, exp:141, catch:45,
+              learn:[[1,"tackle"],[1,"vinewhip"],[16,"leafjab"],[22,"razorleaf"],[28,"bodyslam"]]},
+  nibblet:   {name:"NIBBLET", type:"NORMAL", base:{hp:40,atk:45,def:40,spc:35,spd:56}, exp:56, catch:200,
+              learn:[[1,"tackle"],[1,"tailwhip"],[6,"quickjab"],[12,"headbutt"]]},
+  skylark:   {name:"SKYLARK", type:"NORMAL", base:{hp:40,atk:45,def:40,spc:35,spd:70}, exp:58, catch:180,
+              learn:[[1,"scratch"],[1,"growl"],[8,"quickjab"],[14,"headbutt"]]},
+  thistle:   {name:"THISTLE", type:"GRASS",  base:{hp:45,atk:50,def:55,spc:45,spd:30}, exp:60, catch:150,
+              learn:[[1,"tackle"],[1,"vinewhip"],[10,"leafjab"],[16,"razorleaf"]]},
+  cinderfly: {name:"CINDERFLY",type:"FIRE",  base:{hp:38,atk:40,def:35,spc:55,spd:65}, exp:60, catch:150,
+              learn:[[1,"scratch"],[1,"ember"],[10,"quickjab"],[16,"flamewhirl"]]},
+  driptad:   {name:"DRIPTAD", type:"WATER",  base:{hp:45,atk:40,def:45,spc:50,spd:40}, exp:60, catch:150,
+              learn:[[1,"tackle"],[1,"bubble"],[10,"headbutt"],[16,"watergun"]]},
+  pebblin:   {name:"PEBBLIN", type:"NORMAL", base:{hp:50,atk:55,def:70,spc:30,spd:25}, exp:65, catch:120,
+              learn:[[1,"tackle"],[1,"tailwhip"],[10,"headbutt"],[16,"bodyslam"]]}
+};
+
+/* -------------------------------------------------------------- creature obj */
+function xpForLevel(l){ return l*l*l; } // medium-fast style
+function statCalc(base, level, isHP){
+  if (isHP) return Math.floor((base*2*level)/100) + level + 10;
+  return Math.floor((base*2*level)/100) + 5;
+}
+function makeCreature(speciesId, level){
+  const sp = SPECIES[speciesId];
+  const cr = {
+    id: speciesId, name: sp.name, level: level,
+    xp: xpForLevel(level),
+    max:{}, stats:{}, moves:[], hp:0
+  };
+  recomputeStats(cr);
+  cr.hp = cr.max.hp;
+  // learn up to 4 most-recent moves at/under level
+  const known=[];
+  for (const [lv,mv] of sp.learn){ if (lv<=level) known.push(mv); }
+  cr.moves = known.slice(-4).map(m=>({id:m, pp:MOVES[m].pp, max:MOVES[m].pp}));
+  if (cr.moves.length===0) cr.moves=[{id:"tackle",pp:35,max:35}];
+  return cr;
+}
+function recomputeStats(cr){
+  const sp = SPECIES[cr.id], b=sp.base, l=cr.level;
+  cr.max = {
+    hp: statCalc(b.hp,l,true),
+    atk:statCalc(b.atk,l), def:statCalc(b.def,l),
+    spc:statCalc(b.spc,l), spd:statCalc(b.spd,l)
+  };
+}
+
+/* ---------------------------------------------------------------- maps */
+// tile chars: '.'grass ','path 'g'tallgrass 'F'flower 'T'tree 'W'water
+//   '#'wall 'R'roof 'D'door 'S'sign '='floor 'C'counter 'B'furniture
+//   'M'mat 'P'healmachine 'L'ledge 'H'shelf
+const SOLID = new Set(["T","W","#","R","S","C","B","P","H"]);
+const MAPS = {
+  town:{ name:"PALEWOOD TOWN", indoor:false, w:20, h:18, rows:[
+    "TTTTTTTTT..TTTTTTTTT",
+    "T..................T",
+    "T.RRRR.....RRRR....T",
+    "T.#D##.....#D##....T",
+    "T.................FT",
+    "T...S.............FT",
+    "T..................T",
+    "T......RRRRRR......T",
+    "T......RRRRRR......T",
+    "T......##D###......T",
+    "T..................T",
+    "T.......,,,,.......T",
+    "T.RRRR..,,,,.RRRR..T",
+    "T.#D##..,,,,.#D##..T",
+    "T.......,S,,.......T",
+    "TF................FT",
+    "TF................FT",
+    "TTTTTTTTTTTTTTTTTTTT"],
+    warps:[
+      {x:3,y:3,to:"house",tx:4,ty:6},
+      {x:12,y:3,to:"rivalhouse",tx:4,ty:6},
+      {x:9,y:9,to:"lab",tx:4,ty:7},
+      {x:3,y:13,to:"center",tx:4,ty:6},
+      {x:14,y:13,to:"mart",tx:4,ty:6},
+      {x:9,y:0,to:"route1",tx:5,ty:22},{x:10,y:0,to:"route1",tx:5,ty:22}
+    ],
+    npcs:[
+      {x:14,y:6,dir:"down",spr:"person",text:["PALEWOOD is a quiet town.","The tall grass north is full of","wild creatures!"]}
+    ],
+    signs:{ "4,5":["PALEWOOD TOWN","'A quiet place to begin.'"], "8,14":["NORTH: ROUTE 1","Watch for wild creatures!"] },
+    enc:null
+  },
+  house:{ name:"YOUR HOUSE", indoor:true, w:9, h:8, rows:[
+    "#########",
+    "#B=====B#",
+    "#=======#",
+    "#==B=B==#",
+    "#=======#",
+    "#=======#",
+    "#===MM==#",
+    "#########"],
+    warps:[{x:4,y:6,to:"town",tx:3,ty:4},{x:5,y:6,to:"town",tx:3,ty:4}],
+    npcs:[{x:2,y:3,dir:"down",spr:"person",text:["Feeling rested?","Go see PROF. CEDAR at the lab -","he had something for you!"]}],
+    signs:{}, enc:null
+  },
+  rivalhouse:{ name:"HOUSE", indoor:true, w:9, h:8, rows:[
+    "#########",
+    "#B=====B#",
+    "#=======#",
+    "#==C=C==#",
+    "#=======#",
+    "#=======#",
+    "#===MM==#",
+    "#########"],
+    warps:[{x:4,y:6,to:"town",tx:12,ty:4},{x:5,y:6,to:"town",tx:12,ty:4}],
+    npcs:[{x:6,y:3,dir:"down",spr:"person",text:["My grandchild GARETH ran off to","the lab already. Always in such","a hurry to be the best!"]}],
+    signs:{}, enc:null
+  },
+  lab:{ name:"CEDAR'S LAB", indoor:true, w:9, h:9, rows:[
+    "#########",
+    "#B#####B#",
+    "#=======#",
+    "#==CCC==#",
+    "#=======#",
+    "#=======#",
+    "#=======#",
+    "#===MM==#",
+    "#########"],
+    warps:[{x:4,y:7,to:"town",tx:9,ty:10},{x:5,y:7,to:"town",tx:9,ty:10}],
+    npcs:[
+      {x:4,y:2,dir:"down",spr:"prof",id:"prof",text:null},
+      {x:2,y:5,dir:"down",spr:"rival",id:"rival",text:null},
+      {x:3,y:3,dir:"down",spr:"ball",id:"ball_embercub",obj:true},
+      {x:4,y:3,dir:"down",spr:"ball",id:"ball_aquapup",obj:true},
+      {x:5,y:3,dir:"down",spr:"ball",id:"ball_leafawn",obj:true}
+    ],
+    signs:{}, enc:null
+  },
+  center:{ name:"RECOVERY CENTER", indoor:true, w:9, h:8, rows:[
+    "#########",
+    "#PC====H#",
+    "#=======#",
+    "#=======#",
+    "#=======#",
+    "#=======#",
+    "#===MM==#",
+    "#########"],
+    warps:[{x:4,y:6,to:"town",tx:3,ty:14},{x:5,y:6,to:"town",tx:3,ty:14}],
+    npcs:[{x:2,y:1,dir:"down",spr:"nurse",id:"nurse",text:null}],
+    signs:{}, enc:null
+  },
+  mart:{ name:"PALEWOOD MART", indoor:true, w:9, h:8, rows:[
+    "#########",
+    "#HHHHHHH#",
+    "#=======#",
+    "#=C=====#",
+    "#=======#",
+    "#=======#",
+    "#===MM==#",
+    "#########"],
+    warps:[{x:4,y:6,to:"town",tx:14,ty:14},{x:5,y:6,to:"town",tx:14,ty:14}],
+    npcs:[{x:2,y:3,dir:"down",spr:"clerk",id:"clerk",text:null}],
+    signs:{}, enc:null
+  },
+  route1:{ name:"ROUTE 1", indoor:false, w:11, h:24, rows:[
+    "TTTTT..TTTT",
+    "TTTTT..TTTT",
+    "T....,,...T",
+    "T.gg.,,.gg.".replace(/.$/,"T"),
+    "T.gg.,,.ggT",
+    "T.gg.,,.ggT",
+    "T....,,...T",
+    "T.,,,,,,,.T",
+    "T.,......TT",
+    "T.,.ggg..TT",
+    "T.,.ggg..TT",
+    "T.,.ggg..TT",
+    "T.,......TT",
+    "T.,,,,,,,.T",
+    "T......,..T",
+    "T.gg...,..T",
+    "T.gg...,..T",
+    "T.gg...,..T",
+    "T......,..T",
+    "T....,,,..T",
+    "T....,,...T",
+    "T....,,...T",
+    "TTTT.,,.TTT",
+    "TTTT.,,.TTT"],
+    warps:[
+      {x:5,y:23,to:"town",tx:9,ty:1},{x:6,y:23,to:"town",tx:9,ty:1},
+      {x:5,y:0,to:"stonevale",tx:6,ty:14},{x:6,y:0,to:"stonevale",tx:6,ty:14}
+    ],
+    npcs:[
+      {x:7,y:10,dir:"left",spr:"youth",id:"trainer_route",text:null,
+       team:[["nibblet",6],["skylark",7]], intro:["Hey! You there!","Let's have a battle!"], win:["Aww, you got me.","Take ROUTE 1 north to STONEVALE."], money:180}
+    ],
+    signs:{ "5,2":["ROUTE 1","STONEVALE - NORTH","PALEWOOD - SOUTH"] },
+    enc:{ rate:0.12, list:[["nibblet",3,5],["skylark",3,6],["thistle",4,6],["cinderfly",4,6],["driptad",3,5]] }
+  },
+  stonevale:{ name:"STONEVALE", indoor:false, w:13, h:16, rows:[
+    "TTTTTTTTTTTTT",
+    "T...........T",
+    "T..RRRRRRR..T",
+    "T..RRRRRRR..T",
+    "T..RR###RR..T",
+    "T..##D####..T",
+    "T...........T",
+    "T....S......T",
+    "T...........T",
+    "T.F.......F.T",
+    "T...........T",
+    "T....,,.....T",
+    "T....,,.....T",
+    "T....,,.....T",
+    "TTTTT..TTTTTT",
+    "TTTTT..TTTTTT"],
+    warps:[
+      {x:5,y:5,to:"gym",tx:5,ty:11},
+      {x:5,y:15,to:"route1",tx:5,ty:1},{x:6,y:15,to:"route1",tx:5,ty:1}
+    ],
+    npcs:[
+      {x:8,y:9,dir:"down",spr:"person",text:["This is STONEVALE.","LEADER BRONWYN runs the gym.","Her creatures are tough as rock!"]}
+    ],
+    signs:{ "5,7":["STONEVALE GYM","LEADER: BRONWYN","'The Stone Wall'"] },
+    enc:null
+  },
+  gym:{ name:"STONEVALE GYM", indoor:true, w:11, h:13, rows:[
+    "###########",
+    "#=========#",
+    "#=========#",
+    "#=========#",
+    "#==B===B==#",
+    "#=========#",
+    "#====B====#",
+    "#=========#",
+    "#==B===B==#",
+    "#=========#",
+    "#====MM===#",
+    "#=========#",
+    "###########"],
+    warps:[{x:5,y:10,to:"stonevale",tx:5,ty:6},{x:6,y:10,to:"stonevale",tx:5,ty:6}],
+    npcs:[
+      {x:5,y:2,dir:"down",spr:"leader",id:"leader",text:null,
+       team:[["pebblin",10],["thistle",10],["pebblin",12]],
+       intro:["I am BRONWYN, the STONE WALL!","My creatures will not crack.","Show me your resolve!"],
+       win:["...You broke through my wall.","Take the STONE BADGE. You've","earned it, trainer."], money:1200, badge:true}
+    ],
+    signs:{}, enc:null
+  }
+};
+// Validate map widths (dev aid; logs to console if a row is malformed).
+for (const k in MAPS){ const m=MAPS[k][0]||MAPS[k]; const mm=Array.isArray(MAPS[k])?MAPS[k][0]:MAPS[k];
+  mm.rows.forEach((r,i)=>{ if(r.length!==mm.w) console.warn("MAP",k,"row",i,"len",r.length,"!=",mm.w,JSON.stringify(r)); }); }
+function getMap(id){ return Array.isArray(MAPS[id])?MAPS[id][0]:MAPS[id]; }
+
+/* --------------------------------------------------------------- state */
+const G = {
+  mode:"title",        // title, world, dialog, menu, battle, shop, starterpick
+  sub:null,
+  player:{ map:"town", x:9, y:11, dir:"down", px:0, py:0, moving:false, frame:0, animT:0 },
+  party:[], box:[],
+  bag:{ capsule:5, potion:3 },
+  money:3000,
+  flags:{ starter:null, rival1:false, gymDone:false, trainerRoute:false },
+  seen:{}, caught:{},
+  ticks:0
+};
+let dialog = null;   // {pages:[...], page:0, cb, question, onYes,onNo}
+let menu = null;     // start menu state
+let shop = null;
+let battle = null;
+let fade = null;     // {t, dir, cb}
+let flash = 0;
+
+/* --------------------------------------------------------------- input */
+const held = { up:false, down:false, left:false, right:false };
+const pressed = {}; // edge-triggered actions this frame: a,b,start,select,up,down,left,right
+function edge(name){ if (pressed[name]){ pressed[name]=false; return true; } return false; }
+const KEYMAP = {
+  ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",
+  KeyW:"up",KeyS:"down",KeyA:"left",KeyD:"right",
+  KeyZ:"a",Enter:"start",KeyX:"b",Space:"a",Backspace:"b",ShiftLeft:"select"
+};
+window.addEventListener("keydown", e=>{
+  const k = KEYMAP[e.code]; if(!k) return;
+  e.preventDefault();
+  if (["up","down","left","right"].includes(k)){ if(!held[k]) pressed[k]=true; held[k]=true; }
+  else pressed[k]=true;
+});
+window.addEventListener("keyup", e=>{
+  const k = KEYMAP[e.code]; if(!k) return;
+  if (held[k]!==undefined) held[k]=false;
+});
+// touch/mouse controls
+function bindDir(el){
+  const dir = el.getAttribute("data-dir");
+  const on = e=>{ e.preventDefault(); if(!held[dir]) pressed[dir]=true; held[dir]=true; el.classList.add("on"); };
+  const off = e=>{ e.preventDefault(); held[dir]=false; el.classList.remove("on"); };
+  el.addEventListener("touchstart",on,{passive:false});
+  el.addEventListener("touchend",off,{passive:false});
+  el.addEventListener("touchcancel",off,{passive:false});
+  el.addEventListener("mousedown",on); el.addEventListener("mouseup",off); el.addEventListener("mouseleave",off);
+}
+document.querySelectorAll(".dbtn[data-dir]").forEach(bindDir);
+function bindBtn(el){
+  const b = el.getAttribute("data-btn");
+  const on = e=>{ e.preventDefault(); pressed[b]=true; el.classList.add("on"); };
+  const off = e=>{ e.preventDefault(); el.classList.remove("on"); };
+  el.addEventListener("touchstart",on,{passive:false});
+  el.addEventListener("touchend",off,{passive:false});
+  el.addEventListener("touchcancel",off,{passive:false});
+  el.addEventListener("mousedown",on); el.addEventListener("mouseup",off); el.addEventListener("mouseleave",off);
+}
+document.querySelectorAll("[data-btn]").forEach(bindBtn);
+
+/* --------------------------------------------------------------- helpers */
+function rnd(n){ return Math.floor(Math.random()*n); }
+function rndRange(a,b){ return a + rnd(b-a+1); }
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+function tileAt(map, x, y){
+  if (y<0||y>=map.h||x<0||x>=map.w) return "T";
+  return map.rows[y][x];
+}
+function isSolid(map, x, y){
+  const t = tileAt(map,x,y);
+  // check NPC blocking
+  for (const n of map.npcs){ if (n.x===x && n.y===y && !n._gone) return true; }
+  return SOLID.has(t);
+}
+function warpAt(map, x, y){
+  for (const w of map.warps){ if (w.x===x && w.y===y) return w; }
+  return null;
+}
+
+const DLG_CHARS = 22; // fits the dialogue box width
+function wrapParagraphs(src){
+  const arr = Array.isArray(src)?src:[src];
+  const lines=[];
+  for (const p of arr){
+    if (p===""){ lines.push(""); continue; }
+    for (const l of wrapLines(String(p), DLG_CHARS)) lines.push(l);
+  }
+  return lines;
+}
+function startDialog(pages, cb){
+  dialog = { lines: wrapParagraphs(pages), page:0, cb:cb||null };
+  G.mode = "dialog";
+}
+function askQuestion(pages, onYes, onNo){
+  dialog = { lines: wrapParagraphs(pages), page:0, question:true, sel:0, onYes:onYes, onNo:onNo };
+  G.mode = "dialog";
+}
+
+/* --------------------------------------------------------------- save/load */
+function collectSave(){
+  return {
+    v:1,
+    player:{ map:G.player.map, x:G.player.x, y:G.player.y, dir:G.player.dir },
+    party:G.party, box:G.box, bag:G.bag, money:G.money, flags:G.flags,
+    seen:G.seen, caught:G.caught, ticks:G.ticks
+  };
+}
+function saveGame(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(collectSave())); }catch(e){}
+}
+function hasSave(){ try{ return !!localStorage.getItem(SAVE_KEY); }catch(e){ return false; } }
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY); if(!raw) return false;
+    const s = JSON.parse(raw);
+    G.player.map=s.player.map; G.player.x=s.player.x; G.player.y=s.player.y; G.player.dir=s.player.dir;
+    G.player.px=0; G.player.py=0; G.player.moving=false;
+    G.party=s.party||[]; G.box=s.box||[]; G.bag=s.bag||{capsule:5,potion:3};
+    G.money=s.money||0; G.flags=Object.assign({starter:null,rival1:false,gymDone:false,trainerRoute:false}, s.flags||{});
+    G.seen=s.seen||{}; G.caught=s.caught||{}; G.ticks=s.ticks||0;
+    applyGoneFlags();
+    return true;
+  }catch(e){ return false; }
+}
+// Hide NPCs/objects that have been consumed (starter balls, beaten trainers).
+function applyGoneFlags(){
+  for (const k in MAPS){ const m=getMap(k);
+    for (const n of m.npcs){
+      n._gone=false;
+      if (n.obj && G.flags.starter) n._gone=true;                       // balls gone after choosing
+      if (n.id==="rival" && G.flags.rival1) n._gone=true;               // rival leaves lab
+      if (n.id==="trainer_route" && G.flags.trainerRoute) n._battled=true;
+      if (n.id==="leader" && G.flags.gymDone) n._battled=true;
+    }
+  }
+}
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden && G.flags.starter) saveGame(); });
+window.addEventListener("beforeunload", ()=>{ if(G.flags.starter) saveGame(); });
+
+/* --------------------------------------------------------------- new game */
+function newGame(){
+  G.mode="world";
+  G.player={ map:"town", x:9, y:11, dir:"down", px:0, py:0, moving:false, frame:0, animT:0 };
+  G.party=[]; G.box=[]; G.bag={capsule:5,potion:3}; G.money=3000;
+  G.flags={ starter:null, rival1:false, gymDone:false, trainerRoute:false };
+  G.seen={}; G.caught={}; G.ticks=0;
+  applyGoneFlags();
+  startDialog([
+    "PALEWOOD QUEST","","Welcome! PROF. CEDAR is waiting","in his lab with your very first","creature. Head there to begin!"
+  ]);
+}
+
+/* --------------------------------------------------------------- movement */
+function tryMove(dir){
+  const p = G.player;
+  p.dir = dir;
+  const map = getMap(p.map);
+  let nx=p.x, ny=p.y;
+  if (dir==="up") ny--; else if(dir==="down") ny++; else if(dir==="left") nx--; else nx++;
+  // ledge: allow only jumping down over ledge tile
+  const dest = tileAt(map,nx,ny);
+  if (dest==="L" && dir!=="down"){ return; }
+  if (isSolid(map,nx,ny)){ p.bump=6; return; } // bump: face wall, brief pause
+  p.moving=true; p.tx=nx; p.ty=ny; p.animT=0;
+}
+function finishMove(){
+  const p = G.player;
+  p.x=p.tx; p.y=p.ty; p.px=0; p.py=0; p.moving=false; p.animT=0;
+  p.frame = p.frame^1;
+  const map = getMap(p.map);
+  const w = warpAt(map, p.x, p.y);
+  if (w){
+    // Prof. Cedar stops you from leaving town before you have a creature.
+    if (w.to==="route1" && p.map==="town" && !G.flags.starter){
+      p.y = Math.min(p.y+1, map.h-1);
+      startDialog(["Wait! It's dangerous to go out","without a creature of your own.","See PROF. CEDAR at the lab first!"]);
+      return;
+    }
+    doWarp(w); return;
+  }
+  // encounters (only if you actually have a creature able to fight)
+  if (tileAt(map,p.x,p.y)==="g" && map.enc && firstAlive()>=0){
+    if (Math.random() < map.enc.rate) startWildEncounter(map.enc);
+  }
+  if (G.flags.starter) saveGame();
+}
+function doWarp(w){
+  fade = { t:0, dir:1, cb:()=>{
+    G.player.map = w.to; G.player.x=w.tx; G.player.y=w.ty;
+    G.player.px=0; G.player.py=0; G.player.moving=false;
+    if (G.flags.starter) saveGame();
+    fade = { t:8, dir:-1, cb:null };
+  }};
+}
+
+/* --------------------------------------------------------------- interaction */
+function faceTile(){
+  const p=G.player; let x=p.x,y=p.y;
+  if (p.dir==="up")y--; else if(p.dir==="down")y++; else if(p.dir==="left")x--; else x++;
+  return {x,y};
+}
+function interact(){
+  const p=G.player, map=getMap(p.map);
+  const f=faceTile();
+  // npc?
+  for (const n of map.npcs){
+    if (n.x===f.x && n.y===f.y && !n._gone){ activateNPC(n); return; }
+  }
+  // sign?
+  const key = f.x+","+f.y;
+  if (map.signs[key]){ startDialog(map.signs[key]); return; }
+}
+function activateNPC(n){
+  // starter ball
+  if (n.obj){
+    if (G.flags.starter){ startDialog(["The other creatures went with","GARETH and the PROF."]); return; }
+    const sp = n.id.replace("ball_","");
+    const nm = SPECIES[sp].name, ty=SPECIES[sp].type;
+    askQuestion([SPECIES[sp].name+" - the "+ty+" type.","Take this one?"],
+      ()=>chooseStarter(sp), ()=>{});
+    return;
+  }
+  if (n.id==="prof"){
+    if (!G.flags.starter){
+      startDialog(["PROF. CEDAR: Ah, "+"there you are!","Three creatures rest on that","table. Step up and choose one","to be your partner!"]);
+    } else if (!G.flags.rival1){
+      startDialog(["PROF. CEDAR: GARETH wants to","test your new partner. Go on!"]);
+    } else {
+      startDialog(["PROF. CEDAR: A fine partner!","Fill the CREATURE-DEX by","catching all you can find."]);
+    }
+    return;
+  }
+  if (n.id==="rival"){
+    if (!G.flags.starter){ startDialog(["GARETH: You're finally here!","Pick your creature already - I","want to test mine on it!"]); return; }
+    if (!G.flags.rival1){
+      const mine = G.party[0].id;
+      const counter = mine==="embercub"?"aquapup":(mine==="aquapup"?"leafawn":"embercub");
+      startTrainerBattle({
+        name:"GARETH", team:[[counter,5]], money:0,
+        intro:["GARETH: I chose the one that","beats yours! Let's go!"],
+        win:["GARETH: What?! Beginner's luck.","...I'll be waiting up north.","Don't keep me waiting!"],
+        after:()=>{ G.flags.rival1=true; applyGoneFlags(); saveGame(); }
+      });
+    }
+    return;
+  }
+  if (n.id==="nurse"){
+    askQuestion(["Welcome to the RECOVERY CENTER.","Shall I heal your creatures?"],
+      ()=>{ healParty(); startDialog(["Your creatures are fully","healed. Come again!"]); saveGame(); },
+      ()=>{ startDialog(["We hope to see you again!"]); });
+    return;
+  }
+  if (n.id==="clerk"){ openShop(); return; }
+  // trainer with a team
+  if (n.team){
+    if (n._battled){ startDialog(n.win || ["...Good luck out there!"]); return; }
+    startTrainerBattle({
+      name:n.id==="leader"?"LEADER BRONWYN":"TRAINER", team:n.team, money:n.money||100,
+      intro:n.intro, win:n.win,
+      badge:n.badge,
+      after:()=>{
+        n._battled=true;
+        if (n.id==="trainer_route") G.flags.trainerRoute=true;
+        if (n.badge){ G.flags.gymDone=true; }
+        saveGame();
+      }
+    });
+    return;
+  }
+  if (n.text){ startDialog(n.text); }
+}
+function chooseStarter(sp){
+  const c = makeCreature(sp, 5);
+  G.party=[c]; G.flags.starter=sp; G.caught[sp]=true; G.seen[sp]=true;
+  applyGoneFlags();
+  startDialog(["You received "+SPECIES[sp].name+"!","","PROF. CEDAR: Excellent choice!","Now - GARETH wishes to battle.","Talk to him when you're ready."]);
+  saveGame();
+}
+function healParty(){
+  for (const c of G.party){ c.hp=c.max.hp; for (const m of c.moves) m.pp=m.max; }
+}
+
+/* --------------------------------------------------------------- shop */
+const SHOP_ITEMS = [
+  {id:"capsule", name:"CAPSULE", price:200, desc:"Catches wild creatures."},
+  {id:"potion",  name:"POTION",  price:150, desc:"Heals 20 HP."}
+];
+function openShop(){ shop={ mode:"buy", sel:0, msg:"Welcome! What'll it be?" }; G.mode="shop"; }
+
+/* --------------------------------------------------------------- battle */
+function startWildEncounter(enc){
+  const roll = enc.list[rnd(enc.list.length)];
+  const lvl = rndRange(roll[1], roll[2]);
+  const wild = makeCreature(roll[0], lvl);
+  G.seen[roll[0]]=true;
+  beginBattle({ wild: wild });
+}
+function startTrainerBattle(cfg){
+  if (cfg.intro){ startDialog(cfg.intro, ()=>beginBattle({ trainer:cfg })); }
+  else beginBattle({ trainer:cfg });
+}
+function firstAlive(){ for (let i=0;i<G.party.length;i++){ if (G.party[i].hp>0) return i; } return -1; }
+function beginBattle(cfg){
+  const activeIdx = firstAlive();
+  if (activeIdx<0){ return; }
+  battle = {
+    wild: cfg.wild||null,
+    trainer: cfg.trainer||null,
+    enemyTeam: cfg.trainer? cfg.trainer.team.map(t=>makeCreature(t[0],t[1])) : [cfg.wild],
+    enemyIdx: 0,
+    enemy: null,
+    meIdx: activeIdx, me:null,
+    state:"intro",
+    msg:"", msgQ:[],
+    menuSel:0, moveSel:0, itemSel:0, switchSel:0,
+    runCount:0, catchStage:0, playerActedFirst:false,
+    stages:{}, // stat stages per side handled inline
+    cb:null, afterWin: cfg.trainer? cfg.trainer.after : (cfg.after||null),
+    trainerWinText: cfg.trainer? cfg.trainer.win : null,
+    trainerMoney: cfg.trainer? cfg.trainer.money : 0,
+    badge: cfg.trainer? cfg.trainer.badge : false,
+    xpGiven:false
+  };
+  battle.enemy = battle.enemyTeam[0];
+  battle.enemy.stage = {atk:0,def:0,spc:0,spd:0};
+  battle.me = G.party[activeIdx];
+  battle.me.stage = {atk:0,def:0,spc:0,spd:0};
+  G.mode="battle";
+  const who = battle.wild ? "A wild "+battle.enemy.name+" appeared!"
+                          : (battle.trainer.name)+" wants to battle!";
+  battle.msgQ = [who];
+  if (!battle.wild) battle.msgQ.push(battle.trainer.name+" sent out "+battle.enemy.name+"!");
+  battle.msgQ.push("Go! "+battle.me.name+"!");
+  nextBattleMsg("menu");
+}
+function nextBattleMsg(nextState){
+  if (battle.msgQ.length>0){ battle.msg = battle.msgQ.shift(); battle.state="msg"; battle._after=nextState; }
+  else { battle.state = nextState; battle.msg=""; }
+}
+function stageMult(stage){
+  // Gen-1-ish stage multipliers
+  const t=[0.25,0.28,0.33,0.4,0.5,0.66,1,1.5,2,2.5,3,3.5,4];
+  return t[clamp(stage+6,0,12)];
+}
+function calcDamage(attacker, defender, move){
+  const mv = MOVES[move];
+  if (mv.power<=0) return 0;
+  const lvl = attacker.level;
+  const phys = isPhysical(mv.type);
+  let A = phys? attacker.max.atk*stageMult(attacker.stage.atk) : attacker.max.spc*stageMult(attacker.stage.spc);
+  let D = phys? defender.max.def*stageMult(defender.stage.def) : defender.max.spc;
+  A=Math.max(1,A); D=Math.max(1,D);
+  let dmg = Math.floor(Math.floor(Math.floor(2*lvl/5+2) * mv.power * A / D)/50) + 2;
+  const stab = (mv.type===SPECIES[attacker.id].type)?1.5:1;
+  const eff = effMult(mv.type, SPECIES[defender.id].type);
+  dmg = Math.floor(dmg*stab);
+  dmg = Math.floor(dmg*eff);
+  const r = (217 + rnd(39))/255; // 0.85..1.0
+  dmg = Math.max(1, Math.floor(dmg*r));
+  return { dmg, eff };
+}
+function accHit(move){ const mv=MOVES[move]; return Math.random()*100 < mv.acc; }
+
+// Resolve one full turn given player's chosen action.
+function doPlayerMove(moveIdx){
+  let meMove;
+  if (moveIdx<0){ meMove="struggle"; }           // out of PP -> STRUGGLE
+  else {
+    const m = battle.me.moves[moveIdx];
+    if (!m || m.pp<=0){ return; }
+    m.pp--; meMove = m.id;
+  }
+  // enemy AI picks a move
+  const enemyMoveId = enemyChooseMove();
+  const mePri = MOVES[meMove].priority||0, enPri = MOVES[enemyMoveId].priority||0;
+  let meFirst;
+  if (mePri!==enPri) meFirst = mePri>enPri;
+  else {
+    const ms=battle.me.max.spd*stageMult(battle.me.stage.spd), es=battle.enemy.max.spd*stageMult(battle.enemy.stage.spd);
+    meFirst = ms>es || (ms===es && Math.random()<0.5);
+  }
+  const seq=[];
+  if (meFirst){ seq.push(["me",meMove]); seq.push(["en",enemyMoveId]); }
+  else { seq.push(["en",enemyMoveId]); seq.push(["me",meMove]); }
+  battle.turnSeq = seq;
+  battle.turnStep = 0;
+  battle.state="turn";
+  battle.msgQ=[];
+  advanceTurn();
+}
+function enemyChooseMove(){
+  const mv = battle.enemy.moves;
+  // prefer a super-effective damaging move
+  let best=null, bestEff=0;
+  for (const mo of mv){ if (mo.pp<=0) continue; const M=MOVES[mo.id]; if(M.power<=0) continue;
+    const e=effMult(M.type, SPECIES[battle.me.id].type); if(e>bestEff){ bestEff=e; best=mo.id; } }
+  if (best && bestEff>1 && Math.random()<0.7) return best;
+  const usable = mv.filter(mo=>mo.pp>0);
+  const pick = usable.length? usable[rnd(usable.length)] : {id:"tackle"};
+  return pick.id;
+}
+function advanceTurn(){
+  // process next action in the turn sequence
+  if (battle.turnStep >= battle.turnSeq.length){ endTurn(); return; }
+  const [side, moveId] = battle.turnSeq[battle.turnStep];
+  battle.turnStep++;
+  const attacker = side==="me"? battle.me : battle.enemy;
+  const defender = side==="me"? battle.enemy : battle.me;
+  if (attacker.hp<=0){ advanceTurn(); return; } // fainted before acting
+  const M = MOVES[moveId];
+  battle.pendMsgs = [];
+  battle.pendMsgs.push((side==="me"?battle.me.name:"Foe "+battle.enemy.name)+" used "+M.name+"!");
+  if (!accHit(moveId)){
+    battle.pendMsgs.push((side==="me"?battle.me.name:"Foe "+battle.enemy.name)+"'s attack missed!");
+    queueTurnMsgs(()=>advanceTurn());
+    return;
+  }
+  if (M.effect){
+    // stat-lowering move on the defender
+    if (M.effect==="atk-"){ defender.stage.atk=clamp(defender.stage.atk-1,-6,6); battle.pendMsgs.push((side==="me"?"Foe "+battle.enemy.name:battle.me.name)+"'s ATTACK fell!"); }
+    if (M.effect==="def-"){ defender.stage.def=clamp(defender.stage.def-1,-6,6); battle.pendMsgs.push((side==="me"?"Foe "+battle.enemy.name:battle.me.name)+"'s DEFENSE fell!"); }
+    queueTurnMsgs(()=>advanceTurn());
+    return;
+  }
+  const {dmg,eff} = calcDamage(attacker, defender, moveId);
+  defender.hp = Math.max(0, defender.hp - dmg);
+  if (eff>1) battle.pendMsgs.push("It's super effective!");
+  else if (eff<1 && eff>0) battle.pendMsgs.push("It's not very effective...");
+  battle.hitFlash = side==="me"?"enemy":"me";
+  queueTurnMsgs(()=>{
+    battle.hitFlash=null;
+    if (defender.hp<=0){ handleFaint(side); }
+    else advanceTurn();
+  });
+}
+function queueTurnMsgs(after){
+  battle.msgQ = battle.pendMsgs.slice();
+  battle.turnAfter = after;
+  battle.state="turnmsg";
+  battle.msg = battle.msgQ.shift();
+}
+function handleFaint(attackerSide){
+  const fainted = attackerSide==="me"? "enemy":"me";
+  if (fainted==="enemy"){
+    battle.msgQ=["Foe "+battle.enemy.name+" fainted!"];
+    battle.turnAfter = ()=>afterEnemyFaint();
+    battle.state="turnmsg"; battle.msg=battle.msgQ.shift();
+  } else {
+    battle.msgQ=[battle.me.name+" fainted!"];
+    battle.turnAfter = ()=>afterMyFaint();
+    battle.state="turnmsg"; battle.msg=battle.msgQ.shift();
+  }
+}
+function afterEnemyFaint(){
+  // grant xp
+  const gain = Math.floor(SPECIES[battle.enemy.id].exp * battle.enemy.level / 7)+1;
+  const msgs = grantXP(battle.me, gain);
+  // next enemy?
+  const remaining = battle.enemyTeam.slice(battle.enemyIdx+1).filter(e=>e.hp>0);
+  battle.msgQ = [battle.me.name+" gained "+gain+" EXP!"].concat(msgs);
+  if (battle.trainer && battle.enemyIdx < battle.enemyTeam.length-1){
+    battle.turnAfter = ()=>{
+      battle.enemyIdx++;
+      battle.enemy = battle.enemyTeam[battle.enemyIdx];
+      battle.enemy.stage={atk:0,def:0,spc:0,spd:0};
+      battle.msgQ=[battle.trainer.name+" sent out "+battle.enemy.name+"!"];
+      battle.turnAfter=()=>{ battle.state="menu"; battle.menuSel=0; };
+      battle.state="turnmsg"; battle.msg=battle.msgQ.shift();
+    };
+  } else {
+    battle.turnAfter = ()=>winBattle();
+  }
+  battle.state="turnmsg"; battle.msg=battle.msgQ.shift();
+}
+function grantXP(cr, amount){
+  const msgs=[];
+  cr.xp += amount;
+  while (cr.level<100 && cr.xp >= xpForLevel(cr.level+1)){
+    cr.level++;
+    const oldMax=cr.max.hp;
+    recomputeStats(cr);
+    cr.hp += (cr.max.hp-oldMax);
+    msgs.push(cr.name+" grew to LV "+cr.level+"!");
+    // learn moves
+    for (const [lv,mv] of SPECIES[cr.id].learn){
+      if (lv===cr.level){
+        if (!cr.moves.find(x=>x.id===mv)){
+          if (cr.moves.length<4){ cr.moves.push({id:mv,pp:MOVES[mv].pp,max:MOVES[mv].pp}); msgs.push(cr.name+" learned "+MOVES[mv].name+"!"); }
+          else { cr.moves.shift(); cr.moves.push({id:mv,pp:MOVES[mv].pp,max:MOVES[mv].pp}); msgs.push(cr.name+" learned "+MOVES[mv].name+"!"); }
+        }
+      }
+    }
+    // evolution
+    const ev = SPECIES[cr.id].evolve;
+    if (ev && cr.level>=ev.lvl){
+      const old=cr.name;
+      cr.id=ev.into; cr.name=SPECIES[ev.into].name;
+      recomputeStats(cr); cr.hp=Math.min(cr.hp,cr.max.hp);
+      G.seen[ev.into]=true; G.caught[ev.into]=true;
+      msgs.push(old+" evolved into "+cr.name+"!");
+    }
+  }
+  return msgs;
+}
+function afterMyFaint(){
+  const idx = firstAlive();
+  if (idx<0){ battle.turnAfter=()=>blackOut(); battle.msgQ=[getPlayerName()+" is out of usable creatures!"]; battle.state="turnmsg"; battle.msg=battle.msgQ.shift(); return; }
+  // force switch
+  battle.forceSwitch = true;
+  battle.state="switch"; battle.switchSel=idx;
+}
+function getPlayerName(){ return "YOU"; }
+function blackOut(){
+  startDialog([getPlayerName()+" blacked out!","...","You scramble back to PALEWOOD","to recover."], ()=>{
+    healParty();
+    G.player.map="center"; G.player.x=4; G.player.y=3; G.player.dir="down"; G.player.px=0; G.player.py=0; G.player.moving=false;
+    G.mode="world"; battle=null; saveGame();
+  });
+}
+function winBattle(){
+  if (battle.trainer){
+    const money = battle.trainerMoney||0;
+    G.money += money;
+    let end = (battle.trainerWinText||["You won!"]).slice();
+    if (money>0) end.push("You got $"+money+"!");
+    if (battle.badge){ end.push("","You earned the STONE BADGE!","","* CONGRATULATIONS! *","You've completed PALEWOOD QUEST!","Thanks for playing - more","adventures await beyond."); }
+    const after = battle.afterWin;
+    battle=null; G.mode="world";
+    startDialog(end, ()=>{ if(after) after(); saveGame(); });
+  } else {
+    battle=null; G.mode="world"; saveGame();
+  }
+}
+function fleeBattle(){ battle=null; G.mode="world"; saveGame(); }
+
+// item use in battle (capsule / potion)
+function useCapsule(){
+  if (battle.trainer){ pushBattleMsg(["You can't catch another","trainer's creature!"], ()=>{ battle.state="menu"; }); return; }
+  if ((G.bag.capsule||0)<=0){ pushBattleMsg(["You have no CAPSULES left!"], ()=>{ battle.state="menu"; }); return; }
+  G.bag.capsule--;
+  const e=battle.enemy;
+  const rate = SPECIES[e.id].catch;
+  const hpFactor = (3*e.max.hp - 2*e.hp)/(3*e.max.hp);
+  const p = Math.min(1, hpFactor * (rate/180) * 1.6 + 0.05);
+  // simulate shakes
+  let shakes=0; for (let i=0;i<3;i++){ if (Math.random()<Math.pow(p,0.75)) shakes++; else break; }
+  const caught = Math.random()<p;
+  const finalShakes = caught?3:Math.min(shakes,2);
+  battle.catchAnim = { t:0, shakes:finalShakes, caught:caught };
+  battle.state="catch";
+  battle.msgQ=["You threw a CAPSULE!"];
+  battle.msg=battle.msgQ.shift();
+}
+function catchSuccess(){
+  const e=battle.enemy;
+  G.caught[e.id]=true;
+  const msgs=[e.name+" was caught!"];
+  if (G.party.length<6){ G.party.push(e); }
+  else { G.box.push(e); msgs.push(e.name+" was sent to the BOX."); }
+  pushBattleMsg(msgs, ()=>{ battle=null; G.mode="world"; saveGame(); });
+}
+function pushBattleMsg(arr, after){
+  battle.msgQ=arr.slice(); battle.turnAfter=after; battle.state="turnmsg"; battle.msg=battle.msgQ.shift();
+}
+function usePotionInBattle(){
+  if ((G.bag.potion||0)<=0){ pushBattleMsg(["You have no POTIONS!"], ()=>{ battle.state="menu"; }); return; }
+  if (battle.me.hp>=battle.me.max.hp){ pushBattleMsg([battle.me.name+" is already full HP!"], ()=>{ battle.state="menu"; }); return; }
+  G.bag.potion--;
+  battle.me.hp = Math.min(battle.me.max.hp, battle.me.hp+20);
+  // using an item costs your turn -> enemy attacks
+  pushBattleMsg([battle.me.name+" recovered 20 HP!"], ()=>{ enemyFreeTurn(); });
+}
+function enemyFreeTurn(){
+  // enemy gets one move after item/switch
+  const enemyMoveId = enemyChooseMove();
+  battle.turnSeq=[["en",enemyMoveId]]; battle.turnStep=0; battle.state="turn"; advanceTurn();
+}
+function tryRun(){
+  if (battle.trainer){ pushBattleMsg(["There's no running from a","trainer battle!"], ()=>{ battle.state="menu"; }); return; }
+  battle.runCount++;
+  const ms=battle.me.max.spd, es=battle.enemy.max.spd;
+  const chance = es<=0?1: Math.min(1, (ms*1.0)/(es*1.0)*0.5 + 0.25 + battle.runCount*0.15);
+  if (Math.random()<chance){ pushBattleMsg(["Got away safely!"], ()=>fleeBattle()); }
+  else { pushBattleMsg(["Can't escape!"], ()=>enemyFreeTurn()); }
+}
+function switchTo(idx){
+  if (idx===battle.meIdx && !battle.forceSwitch){ battle.state="menu"; return; }
+  if (G.party[idx].hp<=0){ return; }
+  const forced = battle.forceSwitch;
+  battle.meIdx=idx; battle.me=G.party[idx];
+  if (!battle.me.stage) battle.me.stage={atk:0,def:0,spc:0,spd:0}; else battle.me.stage={atk:0,def:0,spc:0,spd:0};
+  battle.forceSwitch=false;
+  if (forced){ pushBattleMsg(["Go! "+battle.me.name+"!"], ()=>{ battle.state="menu"; battle.menuSel=0; }); }
+  else { pushBattleMsg(["Go! "+battle.me.name+"!"], ()=>enemyFreeTurn()); }
+}
+function endTurn(){ battle.state="menu"; battle.menuSel=0; }
+
+/* =====================================================================
+   UPDATE
+===================================================================== */
+function update(){
+  G.ticks++;
+  if (fade){
+    fade.t += fade.dir;
+    if (fade.dir>0 && fade.t>=8){ const cb=fade.cb; fade=null; if(cb)cb(); }
+    else if (fade.dir<0 && fade.t<=0){ fade=null; }
+    return;
+  }
+  if (flash>0) flash--;
+
+  if (G.mode==="title") updateTitle();
+  else if (G.mode==="world") updateWorld();
+  else if (G.mode==="dialog") updateDialog();
+  else if (G.mode==="menu") updateMenu();
+  else if (G.mode==="shop") updateShop();
+  else if (G.mode==="battle") updateBattle();
+  else if (G.mode==="starterpick") {}
+}
+
+let titleSel=0;
+function updateTitle(){
+  const opts = hasSave()? ["CONTINUE","NEW GAME"] : ["NEW GAME"];
+  if (edge("up")) titleSel=(titleSel+opts.length-1)%opts.length;
+  if (edge("down")) titleSel=(titleSel+1)%opts.length;
+  if (edge("a")||edge("start")){
+    const choice=opts[titleSel];
+    if (choice==="CONTINUE"){ if(loadGame()){ G.mode="world"; } }
+    else { newGame(); }
+  }
+}
+
+function updateWorld(){
+  const p=G.player;
+  if (p.moving){
+    p.animT++;
+    const step = 2; // px per frame; 8 frames = 16px
+    if (p.dir==="up") p.py = -p.animT*step;
+    else if (p.dir==="down") p.py = p.animT*step;
+    else if (p.dir==="left") p.px = -p.animT*step;
+    else p.px = p.animT*step;
+    if (p.animT>=8){ finishMove(); }
+    return;
+  }
+  if (p.bump>0){ p.bump--; } // brief pause after bumping a wall
+  if (edge("start")){ openMenu(); return; }
+  if (edge("a")){ interact(); return; }
+  // movement (hold)
+  let dir=null;
+  if (held.up) dir="up"; else if(held.down) dir="down"; else if(held.left) dir="left"; else if(held.right) dir="right";
+  // clear edges for dirs (consumed by hold)
+  pressed.up=pressed.down=pressed.left=pressed.right=false;
+  if (dir && !p.bump){ tryMove(dir); }
+}
+
+function updateDialog(){
+  if (dialog.question){
+    if (edge("up")||edge("down")) dialog.sel = dialog.sel?0:1;
+    if (edge("a")){
+      const yes = dialog.sel===0;
+      const oy=dialog.onYes, on=dialog.onNo;
+      dialog=null; G.mode="world";
+      if (yes){ if(oy)oy(); } else { if(on)on(); }
+    }
+    if (edge("b")){ const on=dialog.onNo; dialog=null; G.mode="world"; if(on)on(); }
+    return;
+  }
+  if (edge("a")||edge("b")){
+    dialog.page++;
+    // lines are shown 3 at a time
+    if (dialog.page*3 >= dialog.lines.length){
+      const cb=dialog.cb; dialog=null;
+      if (G.mode==="dialog") G.mode="world";
+      if (cb) cb();
+    }
+  }
+}
+
+/* ------- start menu ------- */
+function openMenu(){ menu={ screen:"main", sel:0, sub:null }; G.mode="menu"; }
+function updateMenu(){
+  if (menu.screen==="main"){
+    const items=["CREATURE","BAG","SAVE","DEX","EXIT"];
+    if (edge("up")) menu.sel=(menu.sel+items.length-1)%items.length;
+    if (edge("down")) menu.sel=(menu.sel+1)%items.length;
+    if (edge("b")||edge("start")){ menu=null; G.mode="world"; return; }
+    if (edge("a")){
+      const it=items[menu.sel];
+      if (it==="EXIT"){ menu=null; G.mode="world"; }
+      else if (it==="CREATURE"){ menu.screen="party"; menu.sel=0; }
+      else if (it==="BAG"){ menu.screen="bag"; menu.sel=0; }
+      else if (it==="DEX"){ menu.screen="dex"; }
+      else if (it==="SAVE"){ saveGame(); menu.screen="saved"; }
+    }
+    return;
+  }
+  if (menu.screen==="party"){
+    const n=G.party.length;
+    if (n===0){ if (edge("a")||edge("b")){ menu.screen="main"; menu.sel=0; } return; }
+    if (menu.sel>=n) menu.sel=0;
+    if (edge("up")) menu.sel=(menu.sel+n-1)%n;
+    if (edge("down")) menu.sel=(menu.sel+1)%n;
+    if (edge("a")) menu.screen="summary";
+    if (edge("b")){ menu.screen="main"; menu.sel=0; }
+    return;
+  }
+  if (menu.screen==="summary"){ if (edge("a")||edge("b")) menu.screen="party"; return; }
+  if (menu.screen==="bag"){
+    const items=bagList();
+    if (items.length){
+      if (edge("up")) menu.sel=(menu.sel+items.length-1)%items.length;
+      if (edge("down")) menu.sel=(menu.sel+1)%items.length;
+    }
+    if (edge("b")){ menu.screen="main"; menu.sel=1; }
+    return;
+  }
+  if (menu.screen==="dex"){ if (edge("a")||edge("b")){ menu.screen="main"; menu.sel=3; } return; }
+  if (menu.screen==="saved"){ if (edge("a")||edge("b")){ menu.screen="main"; } return; }
+}
+function bagList(){
+  const out=[];
+  if (G.bag.capsule) out.push({id:"capsule",name:"CAPSULE",n:G.bag.capsule});
+  if (G.bag.potion) out.push({id:"potion",name:"POTION",n:G.bag.potion});
+  return out;
+}
+
+/* ------- shop ------- */
+function updateShop(){
+  if (shop.mode==="buy"){
+    if (edge("up")) shop.sel=(shop.sel+SHOP_ITEMS.length-1)%SHOP_ITEMS.length;
+    if (edge("down")) shop.sel=(shop.sel+1)%SHOP_ITEMS.length;
+    if (edge("b")){ shop=null; G.mode="world"; return; }
+    if (edge("a")){
+      const it=SHOP_ITEMS[shop.sel];
+      if (G.money>=it.price){ G.money-=it.price; G.bag[it.id]=(G.bag[it.id]||0)+1; shop.msg="Bought a "+it.name+"! ($"+it.price+")"; saveGame(); }
+      else shop.msg="You don't have enough money!";
+    }
+    return;
+  }
+}
+
+/* ------- battle input ------- */
+function updateBattle(){
+  const b=battle;
+  if (b.state==="msg"){
+    if (edge("a")||edge("b")){
+      if (b.msgQ.length>0){ b.msg=b.msgQ.shift(); }
+      else { const nx=b._after; b.state=nx; if(nx==="menu"){ b.menuSel=0; } }
+    }
+    return;
+  }
+  if (b.state==="turnmsg"){
+    b._msgTimer=(b._msgTimer||0)+1;
+    if (edge("a")||edge("b")|| b._msgTimer>90){
+      b._msgTimer=0;
+      if (b.msgQ.length>0){ b.msg=b.msgQ.shift(); }
+      else { const after=b.turnAfter; b.turnAfter=null; if(after)after(); }
+    }
+    return;
+  }
+  if (b.state==="catch"){
+    b._msgTimer=(b._msgTimer||0)+1;
+    if (b.msgQ.length>0){ if(edge("a")||edge("b")||b._msgTimer>60){ b._msgTimer=0; b.msg=b.msgQ.shift(); } return; }
+    const ca=b.catchAnim; ca.t++;
+    if (ca.t> (40 + ca.shakes*22)){
+      if (ca.caught){ catchSuccess(); }
+      else { pushBattleMsg([battle.enemy.name+" broke free!"], ()=>enemyFreeTurn()); }
+    }
+    return;
+  }
+  if (b.state==="menu"){
+    // 2x2: FIGHT BAG / CREATURE RUN
+    const opts=["FIGHT","BAG","CREATURE","RUN"];
+    if (edge("left")&&b.menuSel%2===1) b.menuSel--;
+    if (edge("right")&&b.menuSel%2===0) b.menuSel++;
+    if (edge("up")&&b.menuSel>1) b.menuSel-=2;
+    if (edge("down")&&b.menuSel<2) b.menuSel+=2;
+    if (edge("a")){
+      if (b.menuSel===0){ b.state="fight"; b.moveSel=0; }
+      else if (b.menuSel===1){ b.state="bag"; b.itemSel=0; }
+      else if (b.menuSel===2){ b.state="switch"; b.switchSel=b.meIdx; }
+      else if (b.menuSel===3){ tryRun(); }
+    }
+    return;
+  }
+  if (b.state==="fight"){
+    const mv=b.me.moves;
+    if (edge("up")) b.moveSel=(b.moveSel+mv.length-1)%mv.length;
+    if (edge("down")) b.moveSel=(b.moveSel+1)%mv.length;
+    if (edge("b")){ b.state="menu"; return; }
+    if (edge("a")){
+      const allEmpty = mv.every(m=>m.pp<=0);
+      if (allEmpty){ doPlayerMove(-1); }         // STRUGGLE when no PP left
+      else if (mv[b.moveSel].pp<=0){ return; }   // this move empty; pick another
+      else doPlayerMove(b.moveSel);
+    }
+    return;
+  }
+  if (b.state==="bag"){
+    const items=bagList();
+    if (edge("b")){ b.state="menu"; return; }
+    if (items.length===0) return;
+    if (edge("up")) b.itemSel=(b.itemSel+items.length-1)%items.length;
+    if (edge("down")) b.itemSel=(b.itemSel+1)%items.length;
+    if (edge("a")){
+      const it=items[b.itemSel];
+      if (it.id==="capsule") useCapsule();
+      else if (it.id==="potion") usePotionInBattle();
+    }
+    return;
+  }
+  if (b.state==="switch"){
+    const n=G.party.length;
+    if (edge("up")) b.switchSel=(b.switchSel+n-1)%n;
+    if (edge("down")) b.switchSel=(b.switchSel+1)%n;
+    if (edge("b")){ if(!b.forceSwitch){ b.state="menu"; } return; }
+    if (edge("a")){
+      if (G.party[b.switchSel].hp>0){ switchTo(b.switchSel); }
+    }
+    return;
+  }
+}
+
+/* =====================================================================
+   RENDER
+===================================================================== */
+function cls(color){ ctx.fillStyle=PAL[color]; ctx.fillRect(0,0,SCREEN_W,SCREEN_H); }
+function panel(x,y,w,h){
+  ctx.fillStyle=PAL[3]; ctx.fillRect(x,y,w,h);
+  ctx.fillStyle=PAL[0];
+  ctx.fillRect(x,y,w,1); ctx.fillRect(x,y+h-1,w,1);
+  ctx.fillRect(x,y,1,h); ctx.fillRect(x+w-1,y,1,h);
+  ctx.fillStyle=PAL[1];
+  ctx.fillRect(x+2,y+2,w-4,1); // inner accent line top
+}
+function textbox(x,y,w,h){ // dialogue window
+  ctx.fillStyle=PAL[3]; ctx.fillRect(x,y,w,h);
+  ctx.fillStyle=PAL[0];
+  ctx.fillRect(x,y,w,2); ctx.fillRect(x,y+h-2,w,2);
+  ctx.fillRect(x,y,2,h); ctx.fillRect(x+w-2,y,2,h);
+}
+
+function render(){
+  if (G.mode==="title"){ renderTitle(); }
+  else if (G.mode==="battle"){ renderBattle(); }
+  else {
+    renderWorld();
+    if (G.mode==="dialog") renderDialog();
+    if (G.mode==="menu") renderMenu();
+    if (G.mode==="shop") renderShop();
+  }
+  if (fade){ const a=fade.t/8; ctx.fillStyle="rgba(15,56,15,"+a+")"; ctx.fillRect(0,0,SCREEN_W,SCREEN_H); }
+  if (flash>0){ ctx.fillStyle="rgba(155,188,15,0.5)"; ctx.fillRect(0,0,SCREEN_W,SCREEN_H); }
+}
+
+function renderTitle(){
+  cls(3);
+  // decorative silhouette band
+  ctx.fillStyle=PAL[1]; ctx.fillRect(0,96,160,48);
+  ctx.fillStyle=PAL[0]; ctx.fillRect(0,96,160,2);
+  // grass tufts
+  ctx.fillStyle=PAL[0];
+  for (let i=0;i<160;i+=8){ ctx.fillRect(i+2,100,1,4); ctx.fillRect(i+4,102,1,4); }
+  // creature mascot
+  ctx.drawImage(CRSPR["embercub"], 100, 40);
+  ctx.drawImage(CRSPR["leafawn"], 36, 44);
+  // title
+  ctx.fillStyle=PAL[0]; ctx.fillRect(18,14,124,24);
+  ctx.fillStyle=PAL[2]; ctx.fillRect(20,16,120,20);
+  drawText("PALEWOOD", 40, 20, 0);
+  drawText("Q U E S T", 44, 29, 0);
+  // menu box
+  const opts = hasSave()? ["CONTINUE","NEW GAME"] : ["NEW GAME"];
+  const bx=54, by=104, bw=72, bh=8+opts.length*10;
+  textbox(bx,by,bw,bh);
+  for (let i=0;i<opts.length;i++){
+    if (i===titleSel) drawText("~", bx+5, by+6+i*10, 0);
+    drawText(opts[i], bx+12, by+6+i*10, 0);
+  }
+  drawText("A CREATURE ADVENTURE", 22, 134, 1);
+}
+
+function renderWorld(){
+  const p=G.player, map=getMap(p.map);
+  cls(2);
+  // camera centers on player (in pixels), clamped to map
+  const camXf = p.x*TILE + p.px - (SCREEN_W/2 - TILE/2);
+  const camYf = p.y*TILE + p.py - (SCREEN_H/2 - TILE/2);
+  const maxCamX = map.w*TILE - SCREEN_W, maxCamY = map.h*TILE - SCREEN_H;
+  let camX = clamp(Math.round(camXf), 0, Math.max(0,maxCamX));
+  let camY = clamp(Math.round(camYf), 0, Math.max(0,maxCamY));
+  if (map.w*TILE < SCREEN_W) camX = -Math.floor((SCREEN_W-map.w*TILE)/2);
+  if (map.h*TILE < SCREEN_H) camY = -Math.floor((SCREEN_H-map.h*TILE)/2);
+  // black backdrop for interiors
+  if (map.indoor){ cls(0); }
+  // draw tiles
+  const startX=Math.floor(camX/TILE)-1, startY=Math.floor(camY/TILE)-1;
+  for (let ty=startY; ty<startY+13; ty++){
+    for (let tx=startX; tx<startX+13; tx++){
+      if (tx<0||ty<0||tx>=map.w||ty>=map.h) continue;
+      const ch=map.rows[ty][tx];
+      const sx=tx*TILE-camX, sy=ty*TILE-camY;
+      const t=TILEC[ch]||TILEC["."];
+      ctx.drawImage(t, sx, sy);
+    }
+  }
+  // draw NPCs
+  for (const n of map.npcs){
+    if (n._gone) continue;
+    const sx=n.x*TILE-camX, sy=n.y*TILE-camY;
+    if (sx<-16||sy<-16||sx>SCREEN_W||sy>SCREEN_H) continue;
+    let spr;
+    if (n.spr==="ball") spr=BALLSPR;
+    else spr=NPC[n.spr]||NPC.person;
+    ctx.drawImage(spr, sx, sy);
+  }
+  // draw player (centered-ish)
+  const psx = p.x*TILE - camX + p.px, psy = p.y*TILE - camY + p.py;
+  const frame = p.moving? (p.animT<4?0:1) : 0;
+  ctx.drawImage(PLYR[p.dir][frame], Math.round(psx), Math.round(psy));
+  // location banner briefly on entry (simple: show map name top)
+  // (kept minimal)
+}
+
+function wrapLines(str, maxChars){
+  const words=str.split(" "); const lines=[]; let cur="";
+  for (const w of words){ if ((cur+" "+w).trim().length>maxChars){ lines.push(cur.trim()); cur=w; } else cur+=" "+w; }
+  if (cur.trim()) lines.push(cur.trim());
+  return lines;
+}
+function renderDialog(){
+  const bx=4, by=100, bw=152, bh=40;
+  textbox(bx,by,bw,bh);
+  if (dialog.question){
+    const pageLines = dialog.lines;
+    for (let i=0;i<Math.min(3,pageLines.length);i++) drawText(pageLines[i], bx+8, by+7+i*10, 0);
+    // yes/no box
+    const qx=112,qy=64,qw=42,qh=26; textbox(qx,qy,qw,qh);
+    drawText("YES", qx+12, qy+5, 0); drawText("NO", qx+12, qy+15, 0);
+    drawText("~", qx+5, qy+5+dialog.sel*10, 0);
+  } else {
+    const start=dialog.page*3;
+    for (let i=0;i<3;i++){
+      const line=dialog.lines[start+i];
+      if (line!==undefined) drawText(line, bx+8, by+7+i*10, 0);
+    }
+    // blinking advance arrow
+    if (Math.floor(G.ticks/20)%2===0) drawText("~", bx+bw-12, by+bh-10, 0);
+  }
+}
+
+function renderMenu(){
+  if (menu.screen==="main"){
+    const items=["CREATURE","BAG","SAVE","DEX","EXIT"];
+    const bx=100,by=6,bw=56,bh=8+items.length*10;
+    textbox(bx,by,bw,bh);
+    for (let i=0;i<items.length;i++){
+      if (i===menu.sel) drawText("~", bx+5, by+6+i*10, 0);
+      drawText(items[i], bx+12, by+6+i*10, 0);
+    }
+    return;
+  }
+  if (menu.screen==="party"||menu.screen==="summary"){
+    cls(3);
+    if (menu.screen==="party"){
+      drawText("CREATURES", 8, 6, 0);
+      for (let i=0;i<G.party.length;i++){
+        const c=G.party[i], y=18+i*20;
+        if (i===menu.sel){ ctx.fillStyle=PAL[2]; ctx.fillRect(4,y-2,152,20); }
+        // mini icon
+        ctx.drawImage(CRSPR[c.id], 6, y-3, 24,24); // scaled draw (source 24)
+        drawText(c.name, 34, y, 0);
+        drawText("L"+c.level, 120, y, 0);
+        // hp bar
+        hpBar(34, y+9, 80, c.hp, c.max.hp);
+        drawText(c.hp+"/"+c.max.hp, 118, y+8, 0);
+      }
+      drawText("A:VIEW  B:BACK", 8, 132, 1);
+    } else {
+      const c=G.party[menu.sel];
+      if (!c){ menu.screen = G.party.length? "party" : "main"; return; }
+      drawText(c.name, 8, 6, 0);
+      drawText("LEVEL "+c.level, 100, 6, 0);
+      ctx.drawImage(CRSPR[c.id], 10, 16);
+      drawText("TYPE "+SPECIES[c.id].type, 8, 48, 0);
+      drawText("HP  "+c.hp+"/"+c.max.hp, 78, 18, 0);
+      drawText("ATK "+c.max.atk, 78, 28, 0);
+      drawText("DEF "+c.max.def, 78, 38, 0);
+      drawText("SPC "+c.max.spc, 78, 48, 0);
+      drawText("SPD "+c.max.spd, 78, 58, 0);
+      drawText("MOVES:", 8, 78, 0);
+      for (let i=0;i<c.moves.length;i++){
+        const m=c.moves[i];
+        drawText(MOVES[m.id].name, 12, 90+i*10, 0);
+        drawText(m.pp+"/"+m.max, 118, 90+i*10, 0);
+      }
+      drawText("B:BACK", 8, 132, 1);
+    }
+    return;
+  }
+  if (menu.screen==="bag"){
+    cls(3);
+    drawText("BAG", 8, 6, 0);
+    const items=bagList();
+    if (items.length===0) drawText("Nothing in your bag.", 8, 30, 0);
+    for (let i=0;i<items.length;i++){
+      const y=24+i*14;
+      if (i===menu.sel) drawText("~", 6, y, 0);
+      drawText(items[i].name, 14, y, 0);
+      drawText("x"+items[i].n, 120, y, 0);
+    }
+    drawText("MONEY $"+G.money, 8, 120, 0);
+    drawText("B:BACK", 8, 132, 1);
+    return;
+  }
+  if (menu.screen==="dex"){
+    cls(3);
+    drawText("CREATURE-DEX", 8, 6, 0);
+    let caught=0, seen=0;
+    for (const k in SPECIES){ if(G.caught[k])caught++; if(G.seen[k]||G.caught[k])seen++; }
+    drawText("SEEN   "+seen, 8, 24, 0);
+    drawText("CAUGHT "+caught, 8, 36, 0);
+    let y=52, i=0;
+    for (const k in SPECIES){
+      const nm = G.caught[k]? SPECIES[k].name : (G.seen[k]? SPECIES[k].name : "-------");
+      drawText((G.caught[k]?"*":" ")+nm, 8+(i%2)*76, y, 0);
+      if (i%2===1) y+=10; i++;
+      if (y>120) break;
+    }
+    drawText("B:BACK", 8, 132, 1);
+    return;
+  }
+  if (menu.screen==="saved"){
+    const bx=30,by=58,bw=100,bh=28; textbox(bx,by,bw,bh);
+    drawText("GAME SAVED!", bx+18, by+8, 0);
+    drawText("A: OK", bx+34, by+18, 1);
+    return;
+  }
+}
+function hpBar(x,y,w,hp,max){
+  ctx.fillStyle=PAL[0]; ctx.fillRect(x-1,y-1,w+2,5);
+  ctx.fillStyle=PAL[3]; ctx.fillRect(x,y,w,3);
+  const frac=Math.max(0,hp/max);
+  ctx.fillStyle = frac>0.5?PAL[1]:(frac>0.2?PAL[1]:PAL[0]);
+  ctx.fillRect(x,y,Math.round(w*frac),3);
+}
+
+function renderShop(){
+  cls(3);
+  drawText("PALEWOOD MART", 8, 6, 0);
+  const bx=6,by=22,bw=148,bh=54; panel(bx,by,bw,bh);
+  for (let i=0;i<SHOP_ITEMS.length;i++){
+    const it=SHOP_ITEMS[i], y=by+8+i*14;
+    if (i===shop.sel) drawText("~", bx+4, y, 0);
+    drawText(it.name, bx+12, y, 0);
+    drawText("$"+it.price, bx+96, y, 0);
+  }
+  drawText("MONEY  $"+G.money, 8, 86, 0);
+  const mx=6,my=100,mw=148,mh=40; textbox(mx,my,mw,mh);
+  const lines=wrapLines(shop.msg,22);
+  for (let i=0;i<lines.length&&i<3;i++) drawText(lines[i], mx+8, my+8+i*10, 0);
+  drawText("A:BUY  B:LEAVE", mx+8, my+mh-11, 1);
+}
+
+/* --------------------------------------------------------- battle render */
+function renderBattle(){
+  const b=battle;
+  cls(3);
+  // background bands
+  ctx.fillStyle=PAL[2]; ctx.fillRect(0,0,SCREEN_W,80);
+  ctx.fillStyle=PAL[1]; ctx.fillRect(0,66,SCREEN_W,4);
+  // enemy platform + sprite (top right)
+  ctx.fillStyle=PAL[1]; ctx.fillRect(92,54,56,10);
+  if (!(b.state==="catch" && b.catchAnim && b.catchAnim.t>10 && !b.msgQ.length)){
+    if (b.hitFlash!=="enemy" || Math.floor(G.ticks/3)%2===0)
+      ctx.drawImage(CRSPR[b.enemy.id], 100, 30);
+  }
+  // player platform + sprite (bottom left)
+  ctx.fillStyle=PAL[1]; ctx.fillRect(6,86,60,10);
+  if (b.hitFlash!=="me" || Math.floor(G.ticks/3)%2===0)
+    ctx.drawImage(CRSPR[b.me.id], 14, 60);
+  // enemy info box (top left)
+  enemyInfo(6,6, b.enemy);
+  // player info box (right, above textbox)
+  playerInfo(72,72, b.me);
+  // catch ball animation
+  if (b.state==="catch" && !b.msgQ.length && b.catchAnim){
+    const ca=b.catchAnim;
+    const t=ca.t;
+    let bx=112, by=44;
+    if (t<20){ by = 90 - (t/20)*46; bx = 40 + (t/20)*72; } // toss arc
+    ctx.drawImage(BALLSPR, Math.round(bx), Math.round(by));
+    if (t>=20){
+      const shakeN=Math.floor((t-20)/22);
+      const wob=Math.sin(t*0.6)* (shakeN<ca.shakes?2:0);
+      ctx.drawImage(BALLSPR, Math.round(112+wob), 44);
+    }
+  }
+  // bottom text/menu area
+  renderBattleBottom();
+}
+function enemyInfo(x,y,c){
+  const w=84,h=26; textbox(x,y,w,h);
+  drawText(c.name, x+5, y+4, 0);
+  const lv="L"+c.level; drawText(lv, x+w-4-textWidth(lv), y+4, 0);
+  drawText("HP", x+5, y+15, 0);
+  hpBar(x+20, y+16, w-30, c.hp, c.max.hp);
+}
+function playerInfo(x,y,c){
+  const w=84,h=30; textbox(x,y,w,h);
+  drawText(c.name, x+5, y+4, 0);
+  const lv="L"+c.level; drawText(lv, x+w-4-textWidth(lv), y+4, 0);
+  drawText("HP", x+5, y+15, 0);
+  hpBar(x+20, y+16, w-46, c.hp, c.max.hp);
+  const hpn=c.hp+"/"+c.max.hp; drawText(hpn, x+w-4-textWidth(hpn), y+23, 0);
+}
+function renderBattleBottom(){
+  const b=battle;
+  const bx=0,by=104,bw=160,bh=40;
+  if (b.state==="msg"||b.state==="turnmsg"||b.state==="catch"){
+    textbox(bx+2,by,bw-4,bh);
+    const lines=wrapLines(b.msg||"",24);
+    for (let i=0;i<lines.length&&i<3;i++) drawText(lines[i], bx+10, by+8+i*10, 0);
+    if (b.msgQ.length>0 && Math.floor(G.ticks/20)%2===0) drawText("~", bx+bw-14, by+bh-11, 0);
+    return;
+  }
+  if (b.state==="menu"){
+    // left message stub + right 2x2 menu
+    textbox(bx+2,by,90,bh);
+    drawText("What will", bx+10, by+8, 0);
+    drawText(b.me.name+" do?", bx+10, by+18, 0);
+    const mx=94,my=by,mw=64,mh=bh; textbox(mx,my,mw,mh);
+    const opts=["FIGHT","BAG","CREATURE","RUN"];
+    const pos=[[mx+10,my+8],[mx+40,my+8],[mx+10,my+22],[mx+40,my+22]];
+    // CREATURE is long; adjust layout
+    drawText("FIGHT", mx+10, my+8, 0);
+    drawText("BAG", mx+42, my+8, 0);
+    drawText("CREA.", mx+10, my+22, 0);
+    drawText("RUN", mx+42, my+22, 0);
+    const cur=[[mx+4,my+8],[mx+36,my+8],[mx+4,my+22],[mx+36,my+22]][b.menuSel];
+    drawText("~", cur[0], cur[1], 0);
+    return;
+  }
+  if (b.state==="fight"){
+    textbox(bx+2,by,110,bh);
+    const mv=b.me.moves;
+    for (let i=0;i<mv.length;i++){
+      const yy=by+7+i*8;
+      if (i===b.moveSel) drawText("~", bx+6, yy, 0);
+      drawText(MOVES[mv[i].id].name, bx+12, yy, 0);
+    }
+    const mm=b.me.moves[b.moveSel];
+    textbox(114,by,46,bh);
+    drawText("PP", 118, by+7, 0);
+    drawText(mm.pp+"/"+mm.max, 118, by+16, 0);
+    drawText(MOVES[mm.id].type, 118, by+27, 0);
+    return;
+  }
+  if (b.state==="bag"){
+    textbox(bx+2,by,bw-4,bh);
+    drawText("BAG", bx+10, by+6, 0);
+    const items=bagList();
+    if (items.length===0){ drawText("Empty!", bx+10, by+18, 0); }
+    for (let i=0;i<items.length;i++){
+      const yy=by+16+i*9;
+      if (i===b.itemSel) drawText("~", bx+8, yy, 0);
+      drawText(items[i].name+" x"+items[i].n, bx+14, yy, 0);
+    }
+    drawText("B:BACK", bx+118, by+28, 1);
+    return;
+  }
+  if (b.state==="switch"){
+    // full-screen party pick
+    ctx.fillStyle=PAL[3]; ctx.fillRect(0,80,160,64);
+    ctx.fillStyle=PAL[0]; ctx.fillRect(0,80,160,2);
+    for (let i=0;i<G.party.length;i++){
+      const c=G.party[i], y=86+i*10;
+      if (i===b.switchSel) drawText("~", 4, y, 0);
+      drawText(c.name, 12, y, c.hp>0?0:1);
+      drawText("L"+c.level, 78, y, 0);
+      drawText(c.hp+"/"+c.max.hp, 108, y, c.hp>0?0:1);
+    }
+    drawText(battle.forceSwitch?"CHOOSE NEXT":"A:SEND B:BACK", 4, 136, 1);
+    return;
+  }
+}
+
+/* =====================================================================
+   MAIN LOOP
+===================================================================== */
+buildTiles();
+let acc=0, last=0;
+function frame(ts){
+  if (!last) last=ts;
+  let dt=ts-last; last=ts;
+  if (dt>100) dt=100;
+  acc+=dt;
+  const STEP=1000/60;
+  let guard=0;
+  while (acc>=STEP && guard<5){ update(); acc-=STEP; guard++; }
+  render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// expose a tiny debug hook (also used by the offline verification harness)
+window.__PW = {
+  G, MAPS, SPECIES, MOVES, CRSPR, PLYR, NPC, TILEC,
+  save:saveGame, load:loadGame, hasSave, collectSave,
+  reset:()=>{ localStorage.removeItem(SAVE_KEY); location.reload(); },
+  // manual drive (pane may be throttled when not visible)
+  step:()=>update(),
+  render:()=>render(),
+  steps:(n)=>{ for(let i=0;i<n;i++){ update(); } render(); },
+  press:(name)=>{ pressed[name]=true; },
+  hold:(name,v)=>{ held[name]=(v!==false); },
+  tap:(name)=>{ pressed[name]=true; update(); render(); },
+  // helpers for tests
+  makeCreature, calcDamage:(a,d,m)=>calcDamage(a,d,m), effMult, xpForLevel, statCalc,
+  grantXP, newGame,
+  giveStarter:(sp)=>chooseStarter(sp),
+  battleWild:(id,lvl)=>{ if(G.party.length===0) chooseStarter("embercub"); dialog=null; beginBattle({wild:makeCreature(id,lvl)}); if(battle){ while(battle.state==="msg"&&battle.msgQ.length){ battle.msg=battle.msgQ.shift(); } if(battle.state==="msg"){ battle.state=battle._after; } } },
+  openMenuHook:()=>{ if(G.party.length===0) chooseStarter("embercub"); openMenu(); },
+  openShopHook:()=>openShop(),
+  setDialog:(pages)=>startDialog(pages),
+  startTrainer:(cfg)=>startTrainerBattle(cfg),
+  interact:()=>interact(),
+  activateNPC:(n)=>activateNPC(n),
+  warpTo:(map,x,y)=>{ G.player.map=map; G.player.x=x; G.player.y=y; G.player.px=0; G.player.py=0; G.player.moving=false; },
+  forceWorld:()=>{ dialog=null; menu=null; shop=null; battle=null; fade=null; G.mode="world"; },
+  state:()=>({ mode:G.mode, battleState:battle&&battle.state, dialog:dialog&&dialog.lines, party:G.party.map(c=>({n:c.name,l:c.level,hp:c.hp,max:c.max.hp})) })
+};
+})();
+</script>
+</body>
+</html>
