@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copilot Skills in Excel — Build, Write &amp; Share SKILL.md</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f2f1;
+  --panel:#ffffff;
+  --panel2:#faf9f8;
+  --line:#d8d6d4;
+  --grid:#e3e1df;
+  --ink:#1c1c1b;
+  --mut:#5a5956;
+  --dim:#8a8886;
+  --green:#217346;
+  --green-hi:#185C37;
+  --green-soft:#e6f2ea;
+  --blue:#0F6CBD;
+  --blue-hi:#0a5493;
+  --blue-soft:#e6f0f9;
+  --purple:#8764B8;
+  --purple-hi:#6d4d9b;
+  --purple-soft:#f0eaf8;
+  --orange:#C43E1C;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;min-height:100vh;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:100% 26px,88px 100%;background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(33,115,70,.22)}
+
+/* part theming */
+.pa{--acc:var(--green);--acc-hi:var(--green-hi);--soft:var(--green-soft)}
+.pb{--acc:var(--blue);--acc-hi:var(--blue-hi);--soft:var(--blue-soft)}
+.pc{--acc:var(--purple);--acc-hi:var(--purple-hi);--soft:var(--purple-soft)}
+
+/* ---------- ribbon ---------- */
+.ribbon{position:sticky;top:0;z-index:50;background:var(--green);color:#fff;padding:0}
+.rtop{display:flex;align-items:center;gap:14px;padding:8px 18px;flex-wrap:wrap}
+.rtop .brand{font-weight:700;font-size:.86rem;letter-spacing:.02em;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.xicon{width:19px;height:19px;border-radius:3px;background:#fff;color:var(--green);font-family:var(--mono);font-weight:600;
+  font-size:.72rem;display:grid;place-items:center;flex-shrink:0}
+.obar{flex:1;min-width:120px;height:7px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden}
+.obar>div{height:100%;width:0%;background:#fff;transition:width .35s ease}
+.opct{font-family:var(--mono);font-size:.75rem;min-width:8.5ch;text-align:right;color:rgba(255,255,255,.92)}
+.rtabs{display:flex;gap:2px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.rtab{font-size:.79rem;padding:8px 13px;color:var(--mut);text-decoration:none;border-bottom:2.5px solid transparent;white-space:nowrap}
+.rtab:hover{color:var(--ink);background:var(--panel2)}
+.rtab b{font-family:var(--mono);font-size:.72rem;margin-right:6px}
+.rtab.ta b{color:var(--green)} .rtab.tb b{color:var(--blue)} .rtab.tc b{color:var(--purple)}
+.tbtn{font-family:var(--mono);font-size:.7rem;background:var(--panel2);border:1px solid var(--line);color:var(--mut);
+  padding:3px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;margin:4px 0 4px 4px}
+.tbtn:hover{color:var(--ink);border-color:var(--dim);background:#fff}
+
+/* formula bar */
+.fbar{display:flex;align-items:stretch;background:var(--panel);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.78rem}
+.fbar .namebox{width:96px;flex-shrink:0;padding:6px 10px;border-right:1px solid var(--line);color:var(--mut)}
+.fbar .fx{width:34px;flex-shrink:0;display:grid;place-items:center;border-right:1px solid var(--line);color:var(--dim);font-style:italic}
+.fbar .formula{flex:1;padding:6px 12px;color:var(--green-hi);overflow-x:auto;white-space:nowrap}
+
+/* ---------- layout ---------- */
+.wrap{max-width:880px;margin:0 auto;padding:0 22px}
+
+/* ---------- hero ---------- */
+.hero{padding:52px 0 22px}
+.hero .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.hero h1{font-weight:700;font-size:clamp(1.8rem,5vw,2.7rem);line-height:1.14;letter-spacing:-.02em}
+.hero h1 .g{color:var(--green)}
+.hero h1 .b{color:var(--blue)}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:15px;font-size:1.01rem}
+
+/* signature: sheet mock */
+.sheet{margin:30px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.sheet svg{display:block;width:100%;height:auto}
+.stabs{display:flex;gap:0;border-top:1px solid var(--line);background:var(--panel2);font-size:.74rem;font-family:var(--mono)}
+.stabs span{padding:6px 14px;color:var(--dim);border-right:1px solid var(--line)}
+.stabs span.on{background:#fff;color:var(--green);font-weight:600;border-bottom:2px solid var(--green);margin-bottom:-1px}
+
+/* ---------- how to use ---------- */
+.howto{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:6px;padding:18px 20px;margin:24px 0 6px;box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.howto h2{font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;color:var(--green);margin-bottom:8px;font-weight:700}
+.howto p{color:var(--mut);font-size:.94rem;margin-bottom:7px}
+.howto p:last-child{margin-bottom:0}
+.howto b{color:var(--ink);font-weight:600}
+#persistNote{font-family:var(--mono);font-size:.76rem;color:var(--dim)}
+
+/* ---------- part banners ---------- */
+.part{margin-top:50px}
+.pbanner{border:1px solid var(--line);border-radius:8px;padding:22px 22px 18px;background:linear-gradient(180deg,var(--soft),var(--panel) 78%);position:relative;overflow:hidden}
+.pbanner .pk{font-family:var(--mono);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:6px}
+.pbanner h2{font-weight:700;font-size:clamp(1.25rem,3.2vw,1.6rem);line-height:1.18}
+.pbanner .pdesc{color:var(--mut);margin-top:8px;max-width:66ch;font-size:.95rem}
+.pprog{display:flex;align-items:center;gap:12px;margin-top:14px}
+.pbar{flex:1;height:6px;border-radius:99px;background:#eceae8;border:1px solid var(--line);overflow:hidden;max-width:320px}
+.pbar>div{height:100%;width:0%;background:var(--acc);transition:width .35s ease}
+.pcnt{font-family:var(--mono);font-size:.73rem;color:var(--mut)}
+
+/* ---------- sections ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-top:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.sec.done{border-color:var(--acc)}
+.sec-head{width:100%;display:flex;align-items:center;gap:13px;padding:14px 16px;background:none;border:none;color:inherit;
+  font-family:inherit;text-align:left;cursor:pointer}
+.sec-head:hover{background:var(--panel2)}
+.sec-head:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.snum{font-family:var(--mono);font-size:.76rem;font-weight:600;color:var(--acc);border:1px solid var(--acc);background:var(--soft);
+  border-radius:4px;padding:4px 8px;min-width:40px;text-align:center;flex-shrink:0}
+.stitle{flex:1;min-width:0}
+.stitle h3{font-weight:600;font-size:1.02rem;line-height:1.3}
+.stitle .ssub{color:var(--dim);font-size:.82rem;margin-top:1px}
+.cnt{font-family:var(--mono);font-size:.73rem;color:var(--dim);flex-shrink:0;min-width:4ch;text-align:right}
+.cnt.full{color:var(--green)}
+.chev{flex-shrink:0;transition:transform .25s ease;color:var(--dim)}
+.sec[data-open="true"] .chev{transform:rotate(180deg)}
+.sec-body{display:none;padding:2px 18px 20px;border-top:1px solid var(--line)}
+.sec[data-open="true"] .sec-body{display:block}
+.blurb{color:var(--mut);font-size:.94rem;margin:14px 0 4px;max-width:70ch}
+.blurb b{color:var(--ink)}
+
+.gh{font-family:var(--mono);font-size:.69rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:600;margin:18px 0 8px}
+ul.checks{list-style:none}
+ul.checks li{margin-bottom:1px}
+ul.checks label{display:flex;gap:11px;align-items:flex-start;padding:6px 9px;border-radius:5px;cursor:pointer;font-size:.94rem}
+ul.checks label:hover{background:var(--panel2)}
+ul.checks input{appearance:none;-webkit-appearance:none;width:17px;height:17px;flex-shrink:0;margin-top:3px;border-radius:3px;
+  border:1.5px solid var(--dim);background:#fff;cursor:pointer;position:relative}
+ul.checks input:checked{background:var(--acc);border-color:var(--acc)}
+ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #fff;border-width:0 2.2px 2.2px 0;transform:rotate(43deg)}
+ul.checks input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(0,0,0,.22)}
+ul.checks b{color:var(--ink);font-weight:600}
+
+.tip{margin-top:16px;border-left:3px solid var(--acc);background:var(--soft);border-radius:0 6px 6px 0;padding:11px 15px;font-size:.89rem;color:var(--mut)}
+.tip b{color:var(--acc-hi);font-weight:700;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px}
+.warn{border-left-color:var(--orange);background:#fbeeea}
+.warn b{color:var(--orange)}
+
+pre{background:#1e1e1e;border:1px solid #333;border-radius:6px;padding:13px 15px;overflow-x:auto;margin-top:12px}
+code{font-family:var(--mono);font-size:.79rem;line-height:1.55;color:#dcdcdc;white-space:pre-wrap;word-break:break-word}
+pre .c{color:#6a9955} pre .k{color:#569cd6} pre .s{color:#ce9178} pre .h{color:#4ec9b0}
+p code, li code, td code{background:var(--green-soft);color:var(--green-hi);border-radius:3px;padding:1px 5px;font-size:.85em;white-space:normal}
+.fname{font-family:var(--mono);font-size:.72rem;color:var(--dim);margin:14px 0 -6px;letter-spacing:.03em}
+
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.88rem}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{font-weight:600}
+
+/* ---------- footer ---------- */
+footer{margin:56px 0 36px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:7px}
+.srcs{margin-top:10px;font-size:.82rem;line-height:1.9}
+.backlink{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:.77rem;color:var(--mut);margin-top:22px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  .rtop{gap:8px;padding:7px 14px}
+  .opct{display:none}
+  .fbar .namebox{width:70px}
+  .hero{padding:36px 0 18px}
+  .sec-head{padding:12px 13px;gap:9px}
+  .stitle .ssub{display:none}
+  .sec-body{padding:2px 13px 16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff;background-image:none}
+  .ribbon,.fbar,.chev,.tbtn{display:none}
+  .sec-body{display:block!important}
+  .sec,.pbanner,.howto,.sheet{box-shadow:none}
+  pre{background:#f5f5f5;border-color:#ccc}
+  code{color:#111}
+}
+</style>
+</head>
+<body class="pa">
+
+<!-- ============ RIBBON ============ -->
+<div class="ribbon">
+  <div class="rtop">
+    <span class="brand"><span class="xicon">X</span> Copilot Skills in Excel</span>
+    <div class="obar"><div id="obarFill"></div></div>
+    <span class="opct" id="opct">0% done</span>
+  </div>
+  <div class="rtabs">
+    <a class="rtab ta" href="#parta"><b>A</b>Anatomy</a>
+    <a class="rtab tb" href="#partb"><b>B</b>Writing them well</a>
+    <a class="rtab tc" href="#partc"><b>C</b>Sharing &amp; governing</a>
+    <a class="rtab" href="#examples">Examples</a>
+    <button class="tbtn" id="toggleAll" type="button">Collapse all</button>
+    <button class="tbtn" id="resetBtn" type="button">Reset</button>
+  </div>
+</div>
+<div class="fbar">
+  <span class="namebox">SKILL.md</span>
+  <span class="fx">fx</span>
+  <span class="formula">=IF(task_is_repeatable, WRITE_SKILL(), JUST_PROMPT())</span>
+</div>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Microsoft 365 Copilot &middot; Excel</p>
+  <h1>Stop re-prompting.<br>Write the <span class="g">skill</span> once, then <span class="b">share</span> it.</h1>
+  <p class="sub">A skill is a folder with a <code>SKILL.md</code> in it that teaches Copilot in Excel how <em>your</em> variance analysis, DCF, or month-end refresh is supposed to be done &mdash; so the tenth run looks like the first. Short page on purpose: what a skill is made of, how to write one that actually fires, how to share it, and three you can copy today.</p>
+
+  <div class="sheet" aria-hidden="true">
+    <svg viewBox="0 0 860 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="860" height="190" fill="#ffffff"/>
+      <!-- column headers -->
+      <rect x="0" y="0" width="860" height="20" fill="#f3f2f1"/>
+      <g font-family="JetBrains Mono,monospace" font-size="9" fill="#8a8886">
+        <text x="36" y="14">A</text><text x="176" y="14">B</text><text x="336" y="14">C</text><text x="516" y="14">D</text><text x="700" y="14">E</text>
+      </g>
+      <g stroke="#e3e1df" stroke-width="1">
+        <line x1="0" y1="20" x2="860" y2="20"/><line x1="24" y1="0" x2="24" y2="190"/>
+        <line x1="0" y1="62" x2="860" y2="62"/><line x1="0" y1="104" x2="860" y2="104"/><line x1="0" y1="146" x2="860" y2="146"/>
+      </g>
+      <g font-family="JetBrains Mono,monospace" font-size="9" fill="#8a8886">
+        <text x="8" y="46">1</text><text x="8" y="88">2</text><text x="8" y="130">3</text><text x="8" y="172">4</text>
+      </g>
+      <!-- flow boxes sitting on the grid -->
+      <rect x="36" y="52" width="150" height="86" rx="6" fill="#e6f2ea" stroke="#217346" stroke-width="1.5"/>
+      <text x="111" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#185C37">skills/</text>
+      <text x="111" y="100" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#1c1c1b">variance-analysis</text>
+      <text x="111" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5a5956">SKILL.md</text>
+
+      <path d="M190,95 H232" stroke="#a19f9d" stroke-width="1.5"/><path d="M232,95 l-7,-4.5 v9 z" fill="#a19f9d"/>
+
+      <rect x="240" y="52" width="150" height="86" rx="6" fill="#ffffff" stroke="#0F6CBD" stroke-width="1.5"/>
+      <text x="315" y="82" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#0F6CBD">Copilot reads it</text>
+      <text x="315" y="102" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5a5956">@variance-analysis</text>
+      <text x="315" y="119" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8a8886">plan &rarr; approve</text>
+
+      <path d="M394,95 H436" stroke="#a19f9d" stroke-width="1.5"/><path d="M436,95 l-7,-4.5 v9 z" fill="#a19f9d"/>
+
+      <rect x="444" y="34" width="200" height="52" rx="6" fill="#ffffff" stroke="#8764B8" stroke-width="1.5"/>
+      <text x="544" y="65" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#6d4d9b">Same output, every time</text>
+      <rect x="444" y="104" width="200" height="52" rx="6" fill="#ffffff" stroke="#C43E1C" stroke-width="1.5"/>
+      <text x="544" y="135" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#C43E1C">Reviewable in the workbook</text>
+
+      <path d="M648,95 H690" stroke="#a19f9d" stroke-width="1.5"/><path d="M690,95 l-7,-4.5 v9 z" fill="#a19f9d"/>
+
+      <rect x="698" y="52" width="140" height="86" rx="6" fill="#e6f2ea" stroke="#217346" stroke-width="1.5"/>
+      <text x="768" y="88" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#185C37">Share it</text>
+      <text x="768" y="108" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5a5956">team reuses it</text>
+    </svg>
+    <div class="stabs"><span class="on">Overview</span><span>Anatomy</span><span>Best practice</span><span>Examples</span></div>
+  </div>
+
+  <div class="howto">
+    <h2>How to use this page</h2>
+    <p><b>Part A</b> is what a skill actually is and where it lives. <b>Part B</b> is how to write one that fires when it should and does what you meant. <b>Part C</b> is sharing and keeping it trustworthy. Then three copy-paste examples. Check items off as you go &mdash; <span id="persistNote">progress and collapsed sections save in this browser on this device.</span></p>
+    <p>Assumes a paid <b>Microsoft 365 Copilot</b> licence and Copilot in Excel with skills enabled. Custom skills are new and moving fast &mdash; the underlying <code>SKILL.md</code> format is the open Agent Skills spec, so what you learn here carries to Copilot Cowork and Claude alike.</p>
+  </div>
+</header>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART A ================================ -->
+<!-- ==================================================================== -->
+<section class="part pa" id="parta">
+  <div class="pbanner">
+    <p class="pk">Part A &middot; Anatomy</p>
+    <h2>What a skill is, and where it lives</h2>
+    <p class="pdesc">A prompt is a request. A skill is a procedure Copilot can look up. Get the folder, the file and the frontmatter right and everything else is writing.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="a"></div></div><span class="pcnt" data-pcnt="a">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="a1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A1</span>
+      <span class="stitle"><h3>Prompt, agent mode, or skill?</h3><span class="ssub">pick the right tool before you write anything</span></span>
+      <span class="cnt">0/3</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">The test is repeatability. If you will do it once, prompt it. If you will do it every month and you care that it looks the same every month, that is a skill &mdash; Copilot loads it, follows your steps, and applies your structure and formatting instead of improvising a fresh answer each time.</p>
+      <table>
+        <tr><th>Use</th><th>When</th><th>Lives</th></tr>
+        <tr><td><b>Prompt</b></td><td>One-off question, exploratory analysis, "what's driving this?"</td><td>Nowhere &mdash; the chat</td></tr>
+        <tr><td><b>Agent mode</b></td><td>Outcome-based ask; Copilot plans steps, writes formulas, builds the output in the workbook</td><td>The session</td></tr>
+        <tr><td><b>Skill</b></td><td>A process <em>you</em> own that must land identically every time, for you or the team</td><td><code>SKILL.md</code> in OneDrive</td></tr>
+      </table>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a1-1"><span>Name the task you re-prompt most often each close &mdash; that's your first skill.</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-2"><span>Run it once by hand in agent mode first, and note every correction you had to make.</span></label></li>
+        <li><label><input type="checkbox" data-k="a1-3"><span>Those corrections <b>are</b> the skill body &mdash; write them down before you forget them.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>A skill built from a transcript of corrections beats one written from scratch. You are encoding the fixes, not the ideal.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="a2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A2</span>
+      <span class="stitle"><h3>The folder and the file</h3><span class="ssub">one folder, one SKILL.md, optional companions</span></span>
+      <span class="cnt">0/4</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Every skill is a directory whose name matches the <code>name</code> in its frontmatter, containing at minimum a <code>SKILL.md</code>. Extra material goes in conventional subfolders that Copilot only opens when it needs them &mdash; that is the whole point of the layout.</p>
+      <pre><code>skills/
+└── variance-analysis/
+    ├── SKILL.md          <span class="c"># required: frontmatter + instructions</span>
+    ├── references/       <span class="c"># optional: detail loaded on demand</span>
+    │   └── account-map.md
+    ├── scripts/          <span class="c"># optional: Office.js run to completion</span>
+    │   └── build-bridge.js
+    └── assets/           <span class="c"># optional: templates, lookup tables</span>
+        └── variance-template.xlsx</code></pre>
+      <p class="blurb">The frontmatter is fenced by <code>---</code> and only two fields are required. <code>name</code> is lowercase letters, numbers and hyphens, max 64 characters, no leading/trailing or doubled hyphens, and <b>must match the folder name</b>. For Excel, tag it so it is recognised as workbook-facing:</p>
+      <p class="fname">skills/variance-analysis/SKILL.md</p>
+      <pre><code><span class="k">---</span>
+<span class="h">name</span>: variance-analysis
+<span class="h">description</span>: <span class="s">Builds a monthly actual-vs-budget variance bridge with commentary
+  thresholds. Use when the user asks for variance analysis, budget vs actual,
+  a bridge, or explains-the-gap reporting on a P&amp;L extract.</span>
+<span class="h">metadata</span>:
+  <span class="h">version</span>: <span class="s">"1.0.0"</span>
+  <span class="h">tags</span>: excel
+<span class="k">---</span>
+
+<span class="h"># Variance analysis</span>
+...instructions...</code></pre>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a2-1"><span>Folder name === <code>name</code> field. A mismatch is the single most common reason a skill never shows up.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-2"><span>Add <code>metadata.tags: excel</code> so it's identified as an Excel skill.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-3"><span>Version it in <code>metadata</code> from day one &mdash; you will be editing this file for months.</span></label></li>
+        <li><label><input type="checkbox" data-k="a2-4"><span>Anything long (account mappings, entity lists, formatting rules) goes in <code>references/</code>, not the body.</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="a3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">A3</span>
+      <span class="stitle"><h3>Getting it in front of Copilot</h3><span class="ssub">OneDrive skills folder, Refresh, @mention</span></span>
+      <span class="cnt">0/4</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Custom skills live in a <code>skills</code> folder in your own OneDrive. Copilot creates it for you: <b>Copilot pane &rarr; Settings &rarr; Manage skills &rarr; Custom skills &rarr; Create OneDrive folder</b>. Drop skill folders in there, hit <b>Refresh</b>, and they appear under <b>Add work content &rarr; All Skills</b>.</p>
+      <p class="blurb">Invoke either way: pick it from the All Skills list, or <code>@skill-name</code> inline in your prompt &mdash; e.g. <code>@variance-analysis on the Actuals sheet for June</code>. Microsoft ships its own too, like <code>@brandkit</code> and <code>@theme-design</code> for workbook styling, plus a pre-built finance library worth reading before you write your own.</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="a3-1"><span>Create the OneDrive <code>skills</code> folder from Manage skills &mdash; don't hand-make one somewhere else.</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-2"><span>Hit <b>Refresh</b> after every add or rename; Copilot won't notice otherwise.</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-3"><span>Test the <code>@mention</code> path and the auto-fire path &mdash; they behave differently (see B1).</span></label></li>
+        <li><label><input type="checkbox" data-k="a3-4"><span>To retire a skill, rename its folder rather than deleting &mdash; instant rollback if you were wrong.</span></label></li>
+      </ul>
+      <div class="tip warn"><b>Gotcha</b>Disabling a skill only stops Copilot choosing it <em>automatically</em>. Anyone who <code>@mentions</code> it directly still gets it. "Disabled" is not "off".</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART B ================================ -->
+<!-- ==================================================================== -->
+<section class="part pb" id="partb">
+  <div class="pbanner">
+    <p class="pk">Part B &middot; Craft</p>
+    <h2>Writing a skill that actually fires &mdash; and behaves</h2>
+    <p class="pdesc">Two failure modes: it never triggers, or it triggers and does something you didn't ask for. The description fixes the first; the body and the guardrails fix the second.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="b"></div></div><span class="pcnt" data-pcnt="b">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="b1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B1</span>
+      <span class="stitle"><h3>The description is the trigger</h3><span class="ssub">the only part always loaded</span></span>
+      <span class="cnt">0/4</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Skills load progressively. Only <code>name</code> and <code>description</code> sit in context all the time (~100 tokens); the body is read <em>after</em> Copilot decides to use the skill. So the description is not a summary &mdash; it is the routing logic. Say what it does <b>and</b> when to use it, in the user's words, with the keywords they'd actually type. Up to 1024 characters; use a couple of hundred of them.</p>
+      <pre><code><span class="c"># weak — never fires</span>
+<span class="h">description</span>: <span class="s">Helps with variance.</span>
+
+<span class="c"># strong — does what and when, with trigger words</span>
+<span class="h">description</span>: <span class="s">Builds a monthly actual-vs-budget variance bridge with
+  commentary above a materiality threshold. Use when the user asks for variance
+  analysis, budget vs actual, plan vs actual, a bridge, or "explain the gap"
+  on a P&amp;L or cost-centre extract.</span></code></pre>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b1-1"><span>Write the description last, after the body &mdash; you'll know what it really does.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-2"><span>Include the synonyms your team uses, not just the official term.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-3"><span>Name the boundary too &mdash; "not for forecast rebuilds" &mdash; so it doesn't grab neighbouring work.</span></label></li>
+        <li><label><input type="checkbox" data-k="b1-4"><span>Two skills with overlapping descriptions will fight. Sharpen one or merge them.</span></label></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B2</span>
+      <span class="stitle"><h3>The body: steps, workbook output, pitfalls</h3><span class="ssub">the three sections every Excel skill wants</span></span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">There are no format rules for the body, but Excel skills converge on the same shape. Write numbered, unambiguous steps &mdash; the reader is following instructions, not being inspired. Then two sections that are specific to Excel: <b>Workbook output</b> (because the deliverable is a sheet, not a chat reply) and <b>Common pitfalls to avoid</b> (because the failure modes are predictable and worth naming).</p>
+      <pre><code><span class="h">## Steps</span>
+1. Locate the actuals and budget columns on the active sheet by header,
+   not by position. If either is missing, ask &mdash; do not guess.
+2. Compute variance = actual &minus; budget, and variance % = variance / budget.
+3. Flag any line where |variance| &gt; 5% <span class="k">and</span> |variance| &gt; 50,000.
+
+<span class="h">## Workbook output</span>
+- Create a sheet named "Variance Bridge"; never overwrite an existing one.
+- Columns: Account | Actual | Budget | Var | Var % | Commentary.
+- Currency as #,##0;(#,##0); negatives red; % to one decimal.
+- Leave Commentary blank for the preparer &mdash; do not write commentary.
+
+<span class="h">## Common pitfalls to avoid</span>
+- Do not search unrelated sheets for data.
+- Do not invent missing months or accounts.
+- Do not hard-code values a formula should produce.
+- Do not claim the workbook was updated if it wasn't.</code></pre>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b2-1"><span>Keep <code>SKILL.md</code> under ~500 lines; push detail to <code>references/</code> one level deep.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-2"><span>Replace the generic "output format" section with <b>Workbook output</b> &mdash; sheet name, columns, number formats.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-3"><span>Write the <b>Common pitfalls</b> list from real mistakes you watched it make.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-4"><span>Say explicitly what to do when data is missing: <b>ask, don't invent</b>.</span></label></li>
+        <li><label><input type="checkbox" data-k="b2-5"><span>Keep worked examples small &mdash; a five-row sample teaches as well as five hundred.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>"Ask instead of guessing" is the highest-value line in most skills. Invented data that looks plausible is far more expensive than a clarifying question.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="b3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">B3</span>
+      <span class="stitle"><h3>Guardrails, scripts and iteration</h3><span class="ssub">bound it, then tune it on real workbooks</span></span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Two reference files earn their keep in almost every Excel skill. The first is a <b>data guardrail</b>: how the workbook should be cleaned or normalised before the skill writes anything, using the exact sheet and column names your scenario expects &mdash; scenario-specific, not generic Excel advice. The second covers <b>in-Excel vs outside-Excel execution</b>: what to do if someone invokes the skill from Copilot chat where there is no workbook to touch (answer: explain the steps, never claim a sheet was created).</p>
+      <p class="blurb">If the skill needs to do something the model can't reliably do by hand, add an Office.js script under <code>scripts/</code> and say in the body exactly when to run it &mdash; and when not to. Each script must run to completion unattended, and must <b>not</b> call <code>Office.onReady</code> or define <code>Office.initialize</code>; Copilot creates the runtime and loads Office.js for you.</p>
+      <pre><code><span class="c">// scripts/build-bridge.js — no Office.onReady, no Office.initialize</span>
+<span class="k">await</span> Excel.run(<span class="k">async</span> (context) => {
+  <span class="k">const</span> sheet = context.workbook.worksheets.add(<span class="s">"Variance Bridge"</span>);
+  <span class="c">// ...write headers, formulas, formats...</span>
+  <span class="k">await</span> context.sync();
+});</code></pre>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="b3-1"><span>Add a data-guardrail reference naming the exact sheets/columns the skill needs.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-2"><span>Add an in-Excel vs out-of-Excel reference so it degrades honestly in chat.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-3"><span>Spell out run-this-script-when / don't-run-it-when for every script.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-4"><span>Test on a messy real workbook, not your tidy sample &mdash; that's where the pitfalls list grows.</span></label></li>
+        <li><label><input type="checkbox" data-k="b3-5"><span>Use the <b>plan</b> step: read Copilot's proposed actions before it edits, and fix the skill when the plan is wrong.</span></label></li>
+      </ul>
+      <div class="tip warn"><b>Preview caution</b>Skills that ship Office.js scripts are still preview territory &mdash; don't put one on a production close process until you've watched it run a full cycle on a copy.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ PART C ================================ -->
+<!-- ==================================================================== -->
+<section class="part pc" id="partc">
+  <div class="pbanner">
+    <p class="pk">Part C &middot; Distribution</p>
+    <h2>Sharing skills without losing control of them</h2>
+    <p class="pdesc">Skills are user-level artefacts living in personal OneDrive. That makes sharing easy and governance a thing you have to do deliberately.</p>
+    <div class="pprog"><div class="pbar"><div data-pbar="c"></div></div><span class="pcnt" data-pcnt="c">0 / 0</span></div>
+  </div>
+
+  <div class="sec" data-open="true" id="c1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C1</span>
+      <span class="stitle"><h3>Getting a skill to the rest of the team</h3><span class="ssub">no admin push — it's copy, share, import</span></span>
+      <span class="cnt">0/4</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">There is no admin console that drops a <code>SKILL.md</code> into everyone's folder. Each person has their own <code>skills</code> folder, so distribution is: publish the canonical copy somewhere the team can see it, and each teammate copies the folder into their own OneDrive and hits Refresh. Sharing the file from OneDrive or Teams, or sharing the skill to specific people in your organisation from its detail page, are both just ways of handing over that copy.</p>
+      <p class="blurb">Which means the real problem is <b>drift</b>: five copies, three of them stale. Solve it the way you'd solve it for code &mdash; one source of truth, a version number in <code>metadata</code>, and a note in the body saying where the canonical copy lives.</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c1-1"><span>Pick one canonical home (team SharePoint/Teams folder, or a Git repo) and say so inside the <code>SKILL.md</code> itself.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-2"><span>Bump <code>metadata.version</code> on every change so people can tell what they're running.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-3"><span>Ship it with a two-line "how to install": copy folder into OneDrive <code>skills</code>, then Refresh.</span></label></li>
+        <li><label><input type="checkbox" data-k="c1-4"><span>Strip anything confidential from examples before sharing &mdash; skill files travel further than you expect.</span></label></li>
+      </ul>
+      <div class="tip"><b>Field note</b>Keep team skills in Git and treat a change like a PR. Plain-text Markdown diffs beautifully, and review is the whole point &mdash; you're editing a procedure the finance team will execute.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="c2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">C2</span>
+      <span class="stitle"><h3>Keeping shared skills trustworthy</h3><span class="ssub">plan, Show Changes, review cadence</span></span>
+      <span class="cnt">0/4</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">A shared skill is a shared procedure: when it's wrong, it's wrong for everybody, quietly. Two Copilot features do the heavy lifting. <b>Plan</b> makes Copilot draft its proposed actions first so you can approve, edit, or answer questions before anything in the workbook moves. <b>Show Changes</b> lists what it did alongside human edits, so a Copilot-made change is never anonymous.</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="c2-1"><span>Require the plan step for any skill that writes to a workbook others depend on.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-2"><span>Review Show Changes before saving a close-cycle workbook &mdash; treat it as your diff.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-3"><span>Re-read shared skills once a quarter; stale thresholds and renamed accounts are the usual rot.</span></label></li>
+        <li><label><input type="checkbox" data-k="c2-4"><span>Never let a skill be the only record of a control &mdash; the procedure still belongs in your documentation.</span></label></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- =========================== EXAMPLES =============================== -->
+<!-- ==================================================================== -->
+<section class="part pa" id="examples">
+  <div class="pbanner">
+    <p class="pk">Copy-paste &middot; three starters</p>
+    <h2>Three skills worth stealing</h2>
+    <p class="pdesc">Trimmed to the bones so they're readable. Each is a folder named for its <code>name</code> field, containing one <code>SKILL.md</code>.</p>
+  </div>
+
+  <div class="sec" data-open="true" id="e1">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">1</span>
+      <span class="stitle"><h3>Month-end variance bridge</h3><span class="ssub">the classic repeatable close task</span></span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="fname">skills/variance-analysis/SKILL.md</p>
+      <pre><code><span class="k">---</span>
+<span class="h">name</span>: variance-analysis
+<span class="h">description</span>: <span class="s">Builds a monthly actual-vs-budget variance bridge with a
+  materiality flag and a blank commentary column. Use when the user asks for
+  variance analysis, budget vs actual, plan vs actual, a bridge, or to explain
+  the gap on a P&amp;L or cost-centre extract. Not for forecast rebuilds.</span>
+<span class="h">metadata</span>:
+  <span class="h">version</span>: <span class="s">"1.2.0"</span>
+  <span class="h">tags</span>: excel
+<span class="k">---</span>
+
+<span class="h"># Variance analysis</span>
+
+<span class="h">## Steps</span>
+1. Find Account, Actual and Budget columns by header on the active sheet.
+   If any is missing, ask for the exact header &mdash; do not guess or search
+   other sheets.
+2. Confirm the period with the user before computing anything.
+3. Variance = Actual &minus; Budget. Variance % = Variance / Budget
+   (blank, not #DIV/0!, when Budget is zero).
+4. Flag rows where |Variance| &gt; 50,000 AND |Variance %| &gt; 5%.
+
+<span class="h">## Workbook output</span>
+- New sheet "Variance Bridge &lt;period&gt;". Never overwrite an existing sheet.
+- Account | Actual | Budget | Variance | Var % | Flag | Commentary
+- #,##0;[Red](#,##0) for currency; 0.0% for percentages; freeze the header row.
+- Leave Commentary empty &mdash; the preparer writes it, not Copilot.
+
+<span class="h">## Common pitfalls to avoid</span>
+- Do not write commentary or explanations into the sheet.
+- Do not invent accounts or periods that aren't in the source.
+- Do not reorder or re-map accounts; keep source order.</code></pre>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="e2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">2</span>
+      <span class="stitle"><h3>Data hygiene pass</h3><span class="ssub">the one everybody should own</span></span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="fname">skills/data-hygiene-check/SKILL.md</p>
+      <pre><code><span class="k">---</span>
+<span class="h">name</span>: data-hygiene-check
+<span class="h">description</span>: <span class="s">Audits an extract for the problems that break downstream
+  models &mdash; text-formatted numbers, trailing spaces, merged cells, duplicate
+  keys, inconsistent dates &mdash; and reports them without changing anything. Use
+  before analysing a new export, or when totals look wrong.</span>
+<span class="h">metadata</span>:
+  <span class="h">version</span>: <span class="s">"1.0.0"</span>
+  <span class="h">tags</span>: excel
+<span class="k">---</span>
+
+<span class="h"># Data hygiene check</span>
+
+<span class="h">## Steps</span>
+1. Work only on the active sheet unless told otherwise.
+2. Check, in order: numbers stored as text; leading/trailing whitespace;
+   merged cells; blank rows inside the table; duplicate values in the
+   key column; mixed date formats; inconsistent account codes.
+3. Count occurrences and capture up to 5 example cell references each.
+
+<span class="h">## Workbook output</span>
+- New sheet "Hygiene Report": Issue | Count | Example cells | Suggested fix.
+- Sort by Count descending. Do not modify the source sheet &mdash; report only.
+
+<span class="h">## Common pitfalls to avoid</span>
+- Do not fix anything. This skill reports; the user decides.
+- Do not flag intentional blanks in a subtotal block as errors.
+- If the sheet has no recognisable table, say so and stop.</code></pre>
+      <div class="tip"><b>Why this one first</b>It's read-only, so it's safe to hand round on day one &mdash; and it teaches the team what a skill feels like before you let one write to a workbook.</div>
+    </div>
+  </div>
+
+  <div class="sec" data-open="true" id="e3">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">3</span>
+      <span class="stitle"><h3>House-style formatting</h3><span class="ssub">short skills are still skills</span></span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="fname">skills/house-format/SKILL.md</p>
+      <pre><code><span class="k">---</span>
+<span class="h">name</span>: house-format
+<span class="h">description</span>: <span class="s">Applies our reporting format to a finished table &mdash; number
+  formats, header style, column widths, print setup. Use when the user asks to
+  format, tidy, or make a sheet presentable, or mentions house style.</span>
+<span class="h">metadata</span>:
+  <span class="h">version</span>: <span class="s">"1.1.0"</span>
+  <span class="h">tags</span>: excel
+<span class="k">---</span>
+
+<span class="h"># House format</span>
+
+<span class="h">## Workbook output</span>
+- Header row: bold, white on #217346, frozen, autofilter on.
+- Currency #,##0;[Red](#,##0) &middot; percentages 0.0% &middot; dates dd-mmm-yy.
+- Inputs blue font, formulas black, links green. Never change a value.
+- Column widths autofit, capped at 40. Gridlines off. Fit to one page wide.
+
+<span class="h">## Common pitfalls to avoid</span>
+- Do not alter values, formulas, or column order &mdash; formatting only.
+- Do not apply this to a raw data extract; it is for finished output.</code></pre>
+      <div class="tip"><b>Field note</b>Formatting skills pay for themselves fastest because the rules are objective and the reviewer notices immediately when they're missed.</div>
+    </div>
+  </div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>Built with Claude Code. Progress on this page is stored locally in your browser.</p>
+  <div class="srcs">
+    Sources &mdash;
+    <a href="https://support.microsoft.com/en-us/excel/copilot/copilot-in-excel-skills">Use skills with Copilot in Excel (Microsoft Support)</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/office/dev/add-ins/excel/excel-skills">Overview of Copilot skills for Excel, preview (Microsoft Learn)</a> &middot;
+    <a href="https://agentskills.io/specification">Agent Skills specification</a> &middot;
+    <a href="https://www.computerworld.com/article/4189977/microsoft-adds-new-skills-and-more-oversight-for-copilot-in-excel.html">Microsoft adds new skills &mdash; and more oversight &mdash; for Copilot in Excel (Computerworld)</a>
+  </div>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#217346">■</span> Copilot Skills in Excel</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  var KEY = 'excel_copilot_skills_v1';
+  var mem = {};
+  var canStore = true;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ mem = JSON.parse(raw) || {}; }
+    }catch(e){
+      canStore = false; mem = {};
+      var n = document.getElementById('persistNote');
+      if(n){ n.textContent = 'saving is unavailable in this view — open the file in your browser and progress will stick.'; }
+    }
+  }
+  function save(){
+    if(!canStore) return;
+    try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){ canStore = false; }
+  }
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+
+  function partOf(el){
+    var p = el.closest('.part');
+    if(!p) return null;
+    if(p.id === 'parta') return 'a';
+    if(p.id === 'partb') return 'b';
+    if(p.id === 'partc') return 'c';
+    return null;
+  }
+
+  function refresh(){
+    var total = boxes.length, done = 0;
+    var pt = {a:0,b:0,c:0}, pd = {a:0,b:0,c:0};
+
+    boxes.forEach(function(b){
+      var p = partOf(b);
+      if(p){ pt[p]++; }
+      if(b.checked){ done++; if(p){ pd[p]++; } }
+    });
+
+    document.querySelectorAll('.sec').forEach(function(sec){
+      var sb = sec.querySelectorAll('input[type=checkbox][data-k]');
+      var cnt = sec.querySelector('.cnt');
+      if(!sb.length){ return; }
+      var sd = 0;
+      sb.forEach(function(b){ if(b.checked) sd++; });
+      if(cnt){
+        cnt.textContent = sd + '/' + sb.length;
+        cnt.classList.toggle('full', sd === sb.length);
+      }
+      sec.classList.toggle('done', sd === sb.length);
+    });
+
+    ['a','b','c'].forEach(function(p){
+      var bar = document.querySelector('[data-pbar="' + p + '"]');
+      var cnt = document.querySelector('[data-pcnt="' + p + '"]');
+      var pct = pt[p] ? Math.round(pd[p] / pt[p] * 100) : 0;
+      if(bar){ bar.style.width = pct + '%'; }
+      if(cnt){ cnt.textContent = pd[p] + ' / ' + pt[p] + ' complete'; }
+    });
+
+    var opct = total ? Math.round(done / total * 100) : 0;
+    var ob = document.getElementById('obarFill');
+    var ot = document.getElementById('opct');
+    if(ob){ ob.style.width = opct + '%'; }
+    if(ot){ ot.textContent = opct + '% done'; }
+  }
+
+  load();
+  boxes.forEach(function(b){
+    var k = b.getAttribute('data-k');
+    if(mem[k]){ b.checked = true; }
+    b.addEventListener('change', function(){
+      if(b.checked){ mem[k] = 1; } else { delete mem[k]; }
+      save(); refresh();
+    });
+  });
+
+  // restore saved collapse state
+  document.querySelectorAll('.sec').forEach(function(sec){
+    if(sec.id && mem['open:' + sec.id] === 0){
+      sec.setAttribute('data-open', 'false');
+      var hh = sec.querySelector('.sec-head');
+      if(hh){ hh.setAttribute('aria-expanded', 'false'); }
+    }
+  });
+
+  document.querySelectorAll('.sec-head').forEach(function(h){
+    h.addEventListener('click', function(){
+      var sec = h.closest('.sec');
+      var open = sec.getAttribute('data-open') === 'true';
+      sec.setAttribute('data-open', open ? 'false' : 'true');
+      h.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if(sec.id){
+        if(open){ mem['open:' + sec.id] = 0; } else { delete mem['open:' + sec.id]; }
+        save();
+      }
+    });
+  });
+
+  var tAll = document.getElementById('toggleAll');
+  var allOpen = true;
+  if(tAll){
+    tAll.addEventListener('click', function(){
+      allOpen = !allOpen;
+      document.querySelectorAll('.sec').forEach(function(sec){
+        sec.setAttribute('data-open', allOpen ? 'true' : 'false');
+        var h = sec.querySelector('.sec-head');
+        if(h){ h.setAttribute('aria-expanded', allOpen ? 'true' : 'false'); }
+        if(sec.id){
+          if(allOpen){ delete mem['open:' + sec.id]; } else { mem['open:' + sec.id] = 0; }
+        }
+      });
+      save();
+      tAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  var rBtn = document.getElementById('resetBtn');
+  if(rBtn){
+    rBtn.addEventListener('click', function(){
+      if(!confirm('Clear all progress on this page?')) return;
+      mem = {};
+      boxes.forEach(function(b){ b.checked = false; });
+      save(); refresh();
+    });
+  }
+
+  refresh();
+})();
+</script>
+</body>
+</html>
