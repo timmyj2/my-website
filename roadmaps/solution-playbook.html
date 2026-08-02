@@ -167,6 +167,17 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 .homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
 .homebtn svg{width:14px;height:14px;display:block}
 @media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
+
+/* ---- inline figures (hand-drawn schematics, not screenshots) ---- */
+.fig{margin:18px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px 14px}
+.fig svg{display:block;width:100%;height:auto}
+.fig svg text{font-family:var(--mono)}
+.fig svg .ff-disp{font-family:var(--disp)}
+.fig figcaption{font-family:var(--mono);font-size:.72rem;line-height:1.68;color:var(--dim);
+  margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}
+.fig figcaption b{color:var(--amber-hi);font-weight:600}
+@media (max-width:640px){.fig{padding:14px 12px 11px}}
+@media print{.fig{background:#fff;border-color:#ccc}}
 </style>
 </head>
 <body>
@@ -200,6 +211,48 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 <section id="first">
   <div class="shead"><span class="snum">01</span><h2>The first conversation &mdash; six questions before you build anything</h2></div>
   <p class="slede">The most expensive mistake is building the thing someone asked for instead of the thing they need. These six questions take four minutes and save weeks. Ask them in this order &mdash; the order matters, because Q1 changes the answer to everything else.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 820 240" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>A funnel narrowing left to right through six numbered gates, ending in a point labelled "what you build" — a "no" answer at any gate ends the conversation there instead of continuing.</title>
+
+      <text x="8" y="14" class="ff-disp" font-size="10" letter-spacing="0.08em" fill="var(--dim)">SIX GATES, IN ORDER &mdash; A &ldquo;NO&rdquo; AT ANY ONE ENDS IT</text>
+
+      <path d="M40,30 L150,42.3 L260,54.7 L370,67 L480,79.3 L590,91.7 L700,104 L700,116 L590,128.3 L480,140.7 L370,153 L260,165.3 L150,177.7 L40,190 Z"
+            fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.4"/>
+
+      <g stroke="var(--line)" stroke-width="1.2">
+        <path d="M150,42.3 V177.7"/>
+        <path d="M260,54.7 V165.3"/>
+        <path d="M370,67 V153"/>
+        <path d="M480,79.3 V140.7"/>
+        <path d="M590,91.7 V128.3"/>
+      </g>
+
+      <g font-size="12" font-weight="700" fill="var(--bg)" text-anchor="middle">
+        <circle cx="95" cy="110" r="13" fill="var(--amber)"/><text x="95" y="114">1</text>
+        <circle cx="205" cy="110" r="13" fill="var(--amber)"/><text x="205" y="114">2</text>
+        <circle cx="315" cy="110" r="13" fill="var(--amber)"/><text x="315" y="114">3</text>
+        <circle cx="425" cy="110" r="13" fill="var(--amber)"/><text x="425" y="114">4</text>
+        <circle cx="535" cy="110" r="13" fill="var(--amber)"/><text x="535" y="114">5</text>
+        <circle cx="645" cy="110" r="13" fill="var(--amber)"/><text x="645" y="114">6</text>
+      </g>
+
+      <g font-size="9.5" fill="var(--mut)" text-anchor="middle">
+        <text x="95" y="214">real story</text>
+        <text x="205" y="214">actual need</text>
+        <text x="315" y="214">true urgency</text>
+        <text x="425" y="214">who else</text>
+        <text x="535" y="214">real risk</text>
+        <text x="645" y="214">first release</text>
+      </g>
+
+      <path d="M700,110 H710" stroke="var(--amber)" stroke-width="1.4"/>
+      <text x="716" y="106" font-size="11" font-weight="600" fill="var(--ink)">what you build</text>
+      <text x="716" y="122" font-size="9" fill="var(--dim)">&mdash; their answer to Q6</text>
+    </svg>
+    <figcaption><b>The funnel only narrows.</b> Each gate either passes the request through or ends it &mdash; a "no" at Q1 ("actually, nothing happened") or Q3 ("actually, monthly is fine") means you stop there, not that you push a weaker version through to Q6. What survives all six is genuinely worth building, and Q6 hands you the scope for free.</figcaption>
+  </figure>
 
   <ol class="qs">
     <li>
@@ -426,6 +479,46 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 <section id="size">
   <div class="shead"><span class="snum">03</span><h2>Sizing it before you commit</h2></div>
   <p class="slede">The question you'll be asked in the corridor is "how long would that take?" Being roughly right, fast, is a genuine professional skill &mdash; and these are the factors that actually drive the answer.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 430" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>A two-by-two grid of effort against value delivered. Low effort and high value is labelled Do It Now. High effort and high value is Plan It. Low effort and low value is Squeeze It In. High effort and low value is Leave It, shown muted. A handful of unlabelled dots scatter across the grid to suggest how real requests actually land.</title>
+
+      <text x="80" y="16" class="ff-disp" font-size="10" letter-spacing="0.08em" fill="var(--dim)">EFFORT &#8594; &middot; VALUE &#8593;</text>
+
+      <rect x="80" y="40" width="240" height="180" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="1.3"/>
+      <rect x="320" y="40" width="240" height="180" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.3"/>
+      <rect x="80" y="220" width="240" height="180" fill="var(--sky-soft)" stroke="var(--sky)" stroke-width="1.3"/>
+      <rect x="320" y="220" width="240" height="180" fill="var(--panel2)" stroke="var(--line)" stroke-width="1.3"/>
+
+      <text x="94" y="66" font-size="13.5" font-weight="700" fill="var(--teal)">DO IT NOW</text>
+      <text x="94" y="82" font-size="9.5" fill="var(--dim)">low effort, high value</text>
+
+      <text x="334" y="66" font-size="13.5" font-weight="700" fill="var(--amber-hi)">PLAN IT</text>
+      <text x="334" y="82" font-size="9.5" fill="var(--dim)">high effort, high value</text>
+
+      <text x="94" y="246" font-size="13.5" font-weight="700" fill="var(--sky)">SQUEEZE IT IN</text>
+      <text x="94" y="262" font-size="9.5" fill="var(--dim)">low effort, low value</text>
+
+      <text x="334" y="246" font-size="13.5" font-weight="700" fill="var(--dim)">LEAVE IT</text>
+      <text x="334" y="262" font-size="9.5" fill="var(--dim)">high effort, low value</text>
+
+      <path d="M76,396 V44" stroke="var(--dim)" stroke-width="1.1" fill="none"/>
+      <path d="M72,48 L76,38 L80,48 Z" fill="var(--dim)"/>
+      <path d="M84,404 H556" stroke="var(--dim)" stroke-width="1.1" fill="none"/>
+      <path d="M552,400 L562,404 L552,408 Z" fill="var(--dim)"/>
+      <text x="80" y="422" font-size="9.5" fill="var(--dim)">low</text>
+      <text x="560" y="422" text-anchor="end" font-size="9.5" fill="var(--dim)">high</text>
+
+      <g fill="var(--ink)" opacity="0.55">
+        <circle cx="150" cy="110" r="5.5"/>
+        <circle cx="420" cy="120" r="5.5"/>
+        <circle cx="160" cy="300" r="5.5"/>
+        <circle cx="480" cy="340" r="5.5"/>
+      </g>
+    </svg>
+    <figcaption><b>The dots are illustrative, not a real dataset.</b> Most incoming requests genuinely do cluster top-left &mdash; people ask for small things more often than they ask for hard things. The one bottom-right is the request that feels urgent, costs three weeks, and moves nothing. That's the one worth pricing out loud rather than quietly starting.</figcaption>
+  </figure>
 
   <div class="tscroll"><table>
     <tr><th>Factor</th><th>Cheap when&hellip;</th><th>Expensive when&hellip;</th></tr>

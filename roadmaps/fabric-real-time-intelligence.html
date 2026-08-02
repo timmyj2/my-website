@@ -158,6 +158,37 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 .homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
 .homebtn svg{width:14px;height:14px;display:block}
 @media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
+
+/* ---- figures (namespaced: .fig wrapper, fg-* inside SVG) ---- */
+.fig{margin:18px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:19px 21px 14px}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-family:var(--mono);font-size:.7rem;line-height:1.7;color:var(--dim);
+  margin-top:12px;padding-top:10px;border-top:1px solid var(--line);letter-spacing:.02em}
+.fig figcaption b{color:var(--mut);font-weight:600}
+@media (max-width:640px){.fig{padding:13px 11px 10px}.fig figcaption{font-size:.66rem}}
+@media print{.fig{background:#fff;border-color:#ccc}}
+
+.fig svg text{font-family:var(--mono);font-size:11px;fill:var(--mut)}
+.fig .fg-ttl{font-family:var(--disp);font-weight:600;font-size:12px;fill:var(--ink)}
+.fig .fg-code{font-size:12px;fill:var(--ink)}
+.fig .fg-hd{font-size:11px;fill:var(--dim);letter-spacing:.09em}
+.fig .fg-sml{fill:var(--dim)}
+.fig .fg-ink{fill:var(--ink)} .fig .fg-mut{fill:var(--mut)}
+.fig .fg-pink{fill:var(--pink-hi)} .fig .fg-cyan{fill:var(--cyan-hi)}
+.fig .fg-lime{fill:var(--lime)} .fig .fg-amber{fill:var(--amber)} .fig .fg-violet{fill:var(--violet)}
+.fig .fg-dotp{fill:var(--pink)} .fig .fg-dota{fill:var(--amber)} .fig .fg-dotv{fill:var(--violet)}
+.fig .fg-dotc{fill:var(--cyan)} .fig .fg-dotl{fill:var(--lime)}
+.fig .fg-fpanel{fill:var(--panel)} .fig .fg-fpanel2{fill:var(--panel2)} .fig .fg-fnone{fill:none}
+.fig .fg-shade-a{fill:var(--amber-soft)} .fig .fg-shade-p{fill:var(--pink-soft)}
+.fig .fg-line{stroke:var(--line);stroke-width:1;fill:none}
+.fig .fg-base{stroke:var(--line);stroke-width:1.3;fill:none}
+.fig .fg-ar{stroke:var(--dim);stroke-width:1.6;fill:none}
+.fig .fg-arh{fill:var(--dim);stroke:none}
+.fig .fg-sp{stroke:var(--pink);fill:none} .fig .fg-sc{stroke:var(--cyan);fill:none}
+.fig .fg-sl{stroke:var(--lime);fill:none} .fig .fg-sa{stroke:var(--amber);fill:none}
+.fig .fg-sv{stroke:var(--violet);fill:none} .fig .fg-sd{stroke:var(--dim);fill:none}
+.fig .fg-dash{stroke-dasharray:4 4} .fig .fg-dash2{stroke-dasharray:3 5}
+.fig .fg-stack{fill:var(--line);stroke:var(--dim);stroke-width:1}
 </style>
 </head>
 <body>
@@ -193,6 +224,77 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 <section id="why">
   <div class="shead"><span class="snum">01</span><h2>The shift in one picture</h2></div>
   <p class="slede">Batch analytics answers "what happened last month". Real-time answers "something is happening now, and here's who needs to know". Different questions, different machinery.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 356" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>Two timelines over the same 24 hours. In the batch lane a problem at 14:20 is not seen until someone opens a report at 08:30 the next morning, eighteen hours later. In the real-time lane the same event triggers an alert forty seconds after it happens.</title>
+
+      <!-- ===== lane A: batch ===== -->
+      <text x="8" y="26" class="fg-ttl fg-amber" font-size="13">BATCH</text>
+      <text x="64" y="26" class="fg-sml">&mdash; one load a night; nothing looks in between</text>
+
+      <g aria-hidden="true">
+        <path class="fg-line" d="M98,38 V132 M246,38 V132 M394,38 V132 M542,38 V132"/>
+      </g>
+      <rect class="fg-shade-a" x="156" y="38" width="448" height="94"/>
+      <path class="fg-sa fg-dash" d="M604,38 V132" stroke-width="1.2"/>
+
+      <path class="fg-stack" d="M24,132 H74 V124 H124 V116 H174 V108 H224 V100 H274 V92 H324 V84 H374 V76 H424 V70 H443 V132 Z"/>
+      <path class="fg-stack" d="M443,132 H493 V126 H543 V120 H593 V114 H616 V132 Z"/>
+      <path class="fg-base" d="M24,132 H616"/>
+
+      <path class="fg-sa" d="M443,45 V132" stroke-width="2"/>
+      <path class="fg-dota" d="M443,36 l7,10 h-14 z"/>
+      <text x="443" y="58" text-anchor="middle" class="fg-amber">02:00 &middot; the load runs</text>
+
+      <text x="32" y="76" class="fg-sml">data piles up, unqueried</text>
+      <text x="163" y="58" class="fg-pink">a problem starts &middot; 14:20</text>
+
+      <circle class="fg-dota" cx="604" cy="132" r="4"/>
+      <circle class="fg-dotp" cx="156" cy="132" r="4.5"/>
+
+      <!-- ===== the punchline band ===== -->
+      <rect class="fg-fpanel2 fg-line" x="24" y="138" width="592" height="56" rx="9"/>
+      <text x="380" y="150" text-anchor="middle" class="fg-amber">18 h 10 m before anyone looks</text>
+      <path class="fg-sa" d="M156,156 H604" stroke-width="1.6"/>
+      <path class="fg-dota" d="M156,156 l9,-4.5 v9 z M604,156 l-9,-4.5 v9 z"/>
+      <path class="fg-sp" d="M156,178 H172" stroke-width="3.5" stroke-linecap="round"/>
+      <text x="182" y="182" class="fg-pink">40 s, and the alert has already gone out</text>
+
+      <!-- ===== lane B: real-time ===== -->
+      <text x="8" y="210" class="fg-ttl fg-cyan" font-size="13">REAL-TIME</text>
+      <text x="88" y="210" class="fg-sml">&mdash; every event checked the moment it lands</text>
+
+      <g aria-hidden="true">
+        <path class="fg-line" d="M98,220 V300 M246,220 V300 M394,220 V300 M542,220 V300"/>
+        <path class="fg-sc" stroke-width="2" opacity=".72" d="M30,300 V292 M44,300 V286 M58,300 V294 M72,300 V282 M86,300 V290 M100,300 V293 M114,300 V285 M128,300 V291 M142,300 V288 M170,300 V284 M184,300 V292 M198,300 V289 M212,300 V293 M226,300 V287 M240,300 V290 M254,300 V294 M268,300 V283 M282,300 V291 M296,300 V288 M310,300 V292 M324,300 V286 M338,300 V293 M352,300 V289 M366,300 V285 M380,300 V294 M394,300 V290 M408,300 V287 M422,300 V292 M436,300 V284 M450,300 V291 M464,300 V293 M478,300 V288 M492,300 V289 M506,300 V294 M520,300 V286 M534,300 V290 M548,300 V292 M562,300 V285 M576,300 V291 M590,300 V287 M604,300 V293"/>
+      </g>
+      <path class="fg-base" d="M24,300 H616"/>
+      <path class="fg-sp" d="M156,300 V258" stroke-width="2.6"/>
+      <g aria-hidden="true" class="fg-sp" opacity=".45" fill="none">
+        <path d="M180,241 a11,11 0 0 1 0,15"/>
+        <path d="M188,235 a19,19 0 0 1 0,27"/>
+      </g>
+      <circle class="fg-dotp" cx="172" cy="248" r="4.5"/>
+      <text x="196" y="240" class="fg-pink">the alert fires here</text>
+      <text x="196" y="256" class="fg-sml">Teams message &middot; named owner</text>
+
+      <!-- shared time axis -->
+      <path class="fg-sp fg-dash2" d="M156,32 V306" stroke-width="1.2" opacity=".6"/>
+      <g class="fg-sml">
+        <text x="24" y="318">09:00</text>
+        <text x="98" y="318" text-anchor="middle">12:00</text>
+        <text x="246" y="318" text-anchor="middle">18:00</text>
+        <text x="394" y="318" text-anchor="middle">00:00</text>
+        <text x="542" y="318" text-anchor="middle">06:00</text>
+        <text x="616" y="318" text-anchor="end">09:00</text>
+      </g>
+      <text x="443" y="318" text-anchor="middle" class="fg-amber">02:00</text>
+
+      <text x="320" y="342" text-anchor="middle" class="fg-mut">Same events either way &mdash; the difference is when a human finds out.</text>
+    </svg>
+    <figcaption><b>Schematic, not a capture.</b> The batch lane isn&rsquo;t slow because the machine is slow &mdash; the load itself takes minutes. It&rsquo;s slow because nothing <em>looks</em> at the data until a person opens a report the next morning. Real-time doesn&rsquo;t speed up the processing; it deletes the waiting-to-be-noticed step. That shaded block is the bit you are actually buying.</figcaption>
+  </figure>
 
   <div class="flow">
     <svg viewBox="0 0 880 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of the Real-Time Intelligence flow from sources through Eventstream and Eventhouse to dashboards and Activator alerts">
@@ -280,6 +382,84 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
       <p><b>Think of it as:</b> the part that makes all the rest worth building.</p>
     </div>
   </div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 330" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>How the four parts wire together: sources feed an Eventstream, which lands data in an Eventhouse. From that one Eventhouse the flow forks in parallel to a Real-Time Dashboard and to Activator, and Activator fires an action such as an email, a Teams message or a Fabric job.</title>
+
+      <!-- sources -->
+      <text x="60" y="54" text-anchor="middle" class="fg-hd">SOURCES</text>
+      <rect class="fg-fpanel2 fg-sd fg-dash" x="8" y="64" width="104" height="72" rx="10" stroke-width="1.2"/>
+      <g class="fg-sml">
+        <text x="60" y="86" text-anchor="middle">IoT &middot; sensors</text>
+        <text x="60" y="104" text-anchor="middle">app events</text>
+        <text x="60" y="122" text-anchor="middle">CDC from SQL</text>
+      </g>
+      <path class="fg-ar" d="M112,100 H132"/><path class="fg-arh" d="M138,100 l-8,-5 v10 z"/>
+
+      <!-- eventstream -->
+      <rect class="fg-fpanel2 fg-sc" x="140" y="62" width="118" height="76" rx="11" stroke-width="1.6"/>
+      <text x="199" y="95" text-anchor="middle" class="fg-ttl fg-cyan" font-size="12.5">Eventstream</text>
+      <text x="199" y="115" text-anchor="middle">ingest &middot; route</text>
+      <path class="fg-ar" d="M258,100 H278"/><path class="fg-arh" d="M284,100 l-8,-5 v10 z"/>
+
+      <!-- eventhouse -->
+      <rect class="fg-fpanel fg-sv" x="286" y="54" width="134" height="92" rx="11" stroke-width="1.8"/>
+      <text x="353" y="88" text-anchor="middle" class="fg-ttl fg-violet" font-size="13">Eventhouse</text>
+      <text x="353" y="108" text-anchor="middle">KQL database</text>
+      <text x="353" y="126" text-anchor="middle" class="fg-sml">one shared store</text>
+      <text x="353" y="166" text-anchor="middle" class="fg-violet">one store, two readers</text>
+
+      <!-- the fork -->
+      <path class="fg-ar" d="M420,100 H442"/>
+      <circle class="fg-dotv" cx="444" cy="100" r="4"/>
+      <path class="fg-sv" d="M444,100 C460,100 456,62 464,62" stroke-width="1.6" fill="none"/>
+      <path class="fg-sv" d="M444,100 C460,100 456,138 464,138" stroke-width="1.6" fill="none"/>
+      <path class="fg-dotv" d="M470,62 l-8,-5 v10 z M470,138 l-8,-5 v10 z"/>
+
+      <!-- dashboard branch -->
+      <rect class="fg-fpanel2 fg-sl" x="470" y="36" width="162" height="52" rx="10" stroke-width="1.5"/>
+      <text x="551" y="58" text-anchor="middle" class="fg-ttl fg-lime">Real-Time Dashboard</text>
+      <text x="551" y="76" text-anchor="middle" class="fg-sml">someone is watching</text>
+
+      <!-- activator branch -->
+      <rect class="fg-fpanel2 fg-sp" x="470" y="112" width="162" height="52" rx="10" stroke-width="1.7"/>
+      <text x="551" y="134" text-anchor="middle" class="fg-ttl fg-pink">Activator</text>
+      <text x="551" y="152" text-anchor="middle" class="fg-sml">nobody has to be</text>
+
+      <path class="fg-sp" d="M551,164 V174" stroke-width="1.6"/>
+      <path class="fg-dotp" d="M551,180 l-5,-8 h10 z"/>
+      <text x="560" y="176" class="fg-pink">on a hit</text>
+
+      <rect class="fg-fpanel2 fg-sa" x="470" y="182" width="162" height="44" rx="10" stroke-width="1.4"/>
+      <text x="551" y="200" text-anchor="middle" class="fg-amber">email &middot; Teams message</text>
+      <text x="551" y="216" text-anchor="middle" class="fg-amber">or a Fabric job</text>
+
+      <!-- role legend -->
+      <g aria-hidden="true">
+        <rect class="fg-sc" fill="var(--cyan)" x="8" y="250" width="144" height="3" stroke="none"/>
+        <rect fill="var(--violet)" x="168" y="250" width="144" height="3"/>
+        <rect fill="var(--lime)" x="328" y="250" width="144" height="3"/>
+        <rect fill="var(--pink)" x="488" y="250" width="144" height="3"/>
+      </g>
+      <text x="8" y="272" class="fg-ttl fg-cyan">Eventstream</text>
+      <text x="8" y="290">gets the events in,</text>
+      <text x="8" y="306">filters and routes</text>
+
+      <text x="168" y="272" class="fg-ttl fg-violet">Eventhouse</text>
+      <text x="168" y="290">keeps them, answers</text>
+      <text x="168" y="306">questions in ms</text>
+
+      <text x="328" y="272" class="fg-ttl fg-lime">Real-Time Dashboard</text>
+      <text x="328" y="290">for when someone</text>
+      <text x="328" y="306">is watching</text>
+
+      <text x="488" y="272" class="fg-ttl fg-pink">Activator</text>
+      <text x="488" y="290">for when nobody</text>
+      <text x="488" y="306">is watching</text>
+    </svg>
+    <figcaption><b>Schematic of the item wiring, not a Fabric screenshot.</b> The bit worth noticing is the fork. The dashboard and Activator are siblings reading the same Eventhouse, not links in a chain &mdash; so you can bolt Activator on months later without touching anything upstream, and you can delete a dashboard nobody opens without losing a single alert. Colours match the four cards above.</figcaption>
+  </figure>
 
   <div class="tip"><b>The one that's newest</b>Eventhouse is now the default analytical store for <b>business events</b> in Fabric &mdash; create a business event in Real-Time Hub and each one maps to its own KQL table, automatically ingested and retained. That's platform-level activity (items changed, jobs run, workspaces updated) becoming queryable data, which is a governance and monitoring goldmine most people haven't noticed yet.</div>
 </section>
@@ -376,6 +556,61 @@ Heartbeats
 | <span class="k">summarize</span> LastSeen = <span class="f">max</span>(Timestamp) <span class="k">by</span> SourceSystem
 | <span class="k">where</span> <span class="f">isnull</span>(LastSeen) <span class="k">or</span> LastSeen &lt; <span class="f">ago</span>(<span class="n">30m</span>)</code></pre>
   </div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 640 256" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>Two rules feeding the same action box. A spike rule watches a line cross a threshold. A silence rule watches a run of heartbeat ticks for a gap where nothing arrives. Both land in the same Activator action.</title>
+
+      <text x="16" y="20" class="fg-hd">SIGNAL</text>
+      <text x="204" y="20" class="fg-hd">CONDITION</text>
+      <text x="392" y="20" class="fg-hd">ACTION</text>
+
+      <!-- shared action box -->
+      <rect class="fg-fpanel fg-sa" x="392" y="58" width="230" height="140" rx="12" stroke-width="1.7"/>
+      <text x="402" y="90" class="fg-ttl fg-amber" font-size="13">Activator fires</text>
+      <text x="402" y="112" class="fg-amber">email &middot; Teams message</text>
+      <text x="402" y="128" class="fg-amber">or a Fabric job</text>
+      <text x="402" y="154" class="fg-sml">same rule engine,</text>
+      <text x="402" y="170" class="fg-sml">either trigger below</text>
+
+      <!-- ===== row A: spike ===== -->
+      <rect class="fg-fpanel2 fg-sp" x="16" y="36" width="170" height="68" rx="10" stroke-width="1.5"/>
+      <text x="26" y="52" class="fg-ttl fg-pink" font-size="11">SPIKE</text>
+      <path class="fg-line fg-dash" d="M26,66 H172"/>
+      <text x="176" y="46" class="fg-sml" text-anchor="end">threshold</text>
+      <path class="fg-sp" stroke-width="1.6" fill="none" d="M26,88 L50,84 L74,90 L98,78 L122,82 L146,58 L172,46"/>
+      <circle class="fg-dotp" cx="146" cy="66" r="3.5"/>
+
+      <rect class="fg-fpanel2 fg-line" x="204" y="36" width="170" height="68" rx="10" stroke-width="1.3"/>
+      <text x="214" y="54" class="fg-sml">crosses &amp; holds</text>
+      <text x="214" y="76" class="fg-ink">value &gt; threshold</text>
+      <text x="214" y="94" class="fg-sml">for N minutes</text>
+
+      <path class="fg-ar" d="M186,70 H200"/><path class="fg-arh" d="M196,64 L204,70 L196,76 Z"/>
+      <path class="fg-ar" d="M374,70 H388"/><path class="fg-arh" d="M384,64 L392,70 L384,76 Z"/>
+
+      <!-- ===== row B: silence ===== -->
+      <rect class="fg-fpanel2 fg-sd" x="16" y="150" width="170" height="68" rx="10" stroke-width="1.3"/>
+      <text x="26" y="166" class="fg-ttl fg-mut" font-size="11">SILENCE</text>
+      <g class="fg-line" stroke-width="1.4" opacity=".8">
+        <path d="M34,206 V196"/><path d="M44,206 V198"/><path d="M54,206 V195"/>
+        <path d="M64,206 V199"/><path d="M74,206 V196"/><path d="M84,206 V198"/>
+      </g>
+      <rect class="fg-shade-p" x="92" y="188" width="80" height="24" rx="4"/>
+      <text x="132" y="212" class="fg-pink" text-anchor="middle" font-size="9.5">no heartbeat</text>
+
+      <rect class="fg-fpanel2 fg-line" x="204" y="150" width="170" height="68" rx="10" stroke-width="1.3"/>
+      <text x="214" y="168" class="fg-sml">count, not compare</text>
+      <text x="214" y="190" class="fg-ink">zero events</text>
+      <text x="214" y="208" class="fg-sml">for N minutes</text>
+
+      <path class="fg-ar" d="M186,184 H200"/><path class="fg-arh" d="M196,178 L204,184 L196,190 Z"/>
+      <path class="fg-ar" d="M374,184 H388"/><path class="fg-arh" d="M384,178 L392,184 L384,190 Z"/>
+
+      <text x="320" y="240" text-anchor="middle" class="fg-mut">Same engine either way &mdash; only what counts as &ldquo;true&rdquo; changes.</text>
+    </svg>
+    <figcaption><b>The gap is the harder one to build, and the more valuable one.</b> A spike rule asks whether a value crossed a line. A silence rule asks whether anything arrived at all &mdash; there is no value to look at, only an absence, which is why almost nobody builds it. Both are the same object &middot; condition &middot; action shape underneath, and both land in the same Teams message.</figcaption>
+  </figure>
 </section>
 
 <!-- ============ BUILD ============ -->

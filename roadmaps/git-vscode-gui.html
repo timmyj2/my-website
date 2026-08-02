@@ -156,6 +156,25 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 .homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
 .homebtn svg{width:14px;height:14px;display:block}
 @media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
+
+/* ---- inline figures (hand-drawn schematics) ---- */
+.fig{margin:20px 0 0;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px}
+.fig svg{display:block;width:100%;height:auto}
+.fig svg text{font-family:var(--body)}
+.fig svg .fig-m{font-family:var(--mono)}
+.fig figcaption{font-family:var(--mono);font-size:.71rem;line-height:1.66;color:var(--dim);
+  margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}
+.fig figcaption b{color:var(--amber);font-weight:600}
+.fig-legend{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 22px;margin-top:16px}
+.fig-legend li{position:relative;padding-left:29px;margin:0;font-size:.87rem;line-height:1.5;color:var(--mut)}
+.fig-legend li b{color:var(--ink);font-weight:600}
+.fig-n{position:absolute;left:0;top:1px;display:grid;place-items:center;width:20px;height:20px;border-radius:6px;
+  background:var(--vs);color:var(--bg);font-family:var(--mono);font-size:.7rem;font-weight:700}
+.fig-n.fig-g{background:var(--green)}
+.fig-n.fig-a{background:var(--amber)}
+@media (max-width:700px){.fig-legend{grid-template-columns:1fr}.fig{padding:13px 12px 12px}}
+@media (min-width:1000px){.fig-wide{margin-left:-26px;margin-right:-26px}}
+@media print{.fig{background:#fff;border-color:#ccc}}
 </style>
 </head>
 <body>
@@ -316,12 +335,219 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   </div>
 
   <div class="tip ok"><b>The habit worth building first</b>Callout 5. <b>Click every changed file and read the diff before you commit.</b> Green is added, red is removed. Ten seconds per file, and it catches the accidental deletion, the debug line you left in, and the file you didn't mean to touch. This one habit is most of what "being careful with Git" means.</div>
+
+  <figure class="fig fig-wide">
+    <svg viewBox="0 0 760 400" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>Schematic of VS Code's Source Control sidebar with seven numbered markers, alongside a close-up of a single file row and a key to the status letters</title>
+      <defs><clipPath id="figA-win"><rect x="8" y="8" width="292" height="384" rx="9"/></clipPath></defs>
+
+      <!-- window shell: activity bar + sidebar + status bar -->
+      <g clip-path="url(#figA-win)">
+        <rect x="8" y="8" width="36" height="384" fill="var(--bg)"/>
+        <rect x="44" y="8" width="256" height="384" fill="var(--panel)"/>
+        <rect x="8" y="364" width="292" height="28" fill="var(--vs)"/>
+      </g>
+      <rect x="8" y="8" width="292" height="384" rx="9" fill="none" stroke="var(--line)"/>
+
+      <!-- activity bar icons -->
+      <g aria-hidden="true">
+        <rect x="19" y="28" width="14" height="12" rx="2" fill="var(--dim)"/>
+        <circle cx="25" cy="65" r="5" fill="none" stroke="var(--dim)" stroke-width="1.6"/>
+        <path d="M28.8,68.8 L32.5,72.5" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/>
+        <rect x="8" y="90" width="2.5" height="28" fill="var(--vs)"/>
+        <g fill="none" stroke="var(--ink)" stroke-width="1.5">
+          <circle cx="22" cy="97" r="3"/><circle cx="22" cy="111" r="3"/><circle cx="32" cy="104" r="3"/>
+          <path d="M22,100 V108"/><path d="M25,97 H29 V101"/>
+        </g>
+        <circle cx="35" cy="115" r="7.5" fill="var(--vs)"/>
+        <text x="35" y="118.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--bg)">3</text>
+        <g fill="var(--dim)">
+          <rect x="19" y="172" width="6" height="6" rx="1"/><rect x="27" y="172" width="6" height="6" rx="1"/>
+          <rect x="19" y="180" width="6" height="6" rx="1"/><rect x="27" y="180" width="6" height="6" rx="1"/>
+        </g>
+      </g>
+
+      <!-- sidebar header -->
+      <text x="54" y="27" font-size="10.5" font-weight="600" letter-spacing="0.7" fill="var(--mut)">SOURCE CONTROL</text>
+      <text x="246" y="28" font-size="13" fill="var(--mut)">&#8635;</text>
+      <text x="268" y="28" font-size="13" fill="var(--mut)">&#8943;</text>
+
+      <!-- message box + commit button -->
+      <rect x="54" y="44" width="236" height="36" rx="5" fill="var(--bg)" stroke="var(--vs)" stroke-width="1.3"/>
+      <text x="64" y="66" font-size="10" fill="var(--dim)">Message (Ctrl+Enter to commit)</text>
+      <rect x="54" y="88" width="236" height="30" rx="5" fill="var(--vs)"/>
+      <text x="172" y="107" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">&#10003;  Commit</text>
+
+      <!-- staged changes -->
+      <text x="54" y="146" font-size="10.5" font-weight="600" fill="var(--mut)">Staged Changes</text>
+      <circle cx="280" cy="142" r="8.5" fill="var(--line)"/>
+      <text x="280" y="145.5" text-anchor="middle" font-size="9.5" fill="var(--ink)">1</text>
+      <text x="66" y="172" font-size="10.5" fill="var(--amber)">index.html</text>
+      <text x="124" y="172" font-size="9" fill="var(--dim)">roadmaps</text>
+      <text x="250" y="173" font-size="13" fill="var(--mut)">&#8722;</text>
+      <text x="274" y="172" font-size="10.5" font-weight="600" fill="var(--amber)">M</text>
+
+      <!-- changes -->
+      <text x="54" y="210" font-size="10.5" font-weight="600" fill="var(--mut)">Changes</text>
+      <circle cx="280" cy="206" r="8.5" fill="var(--line)"/>
+      <text x="280" y="209.5" text-anchor="middle" font-size="9.5" fill="var(--ink)">2</text>
+      <rect x="44" y="222" width="256" height="24" fill="var(--vs-soft)"/>
+      <text x="66" y="238" font-size="10.5" fill="var(--amber)">fabric-apps.html</text>
+      <text x="226" y="239" font-size="12" fill="var(--mut)">&#8634;</text>
+      <text x="250" y="239" font-size="13" fill="var(--mut)">+</text>
+      <text x="274" y="238" font-size="10.5" font-weight="600" fill="var(--amber)">M</text>
+      <text x="66" y="264" font-size="10.5" fill="var(--green)">new-page.html</text>
+      <text x="250" y="265" font-size="13" fill="var(--mut)">+</text>
+      <text x="274" y="264" font-size="10.5" font-weight="600" fill="var(--green)">U</text>
+
+      <!-- status bar contents -->
+      <text x="18" y="382" font-size="10.5" fill="var(--ink)">&#9138; add-cards*</text>
+      <text x="150" y="382" font-size="10.5" fill="var(--ink)">&#8635; 1&#8593; 0&#8595;</text>
+
+      <!-- markers -->
+      <g aria-hidden="true" stroke="var(--line)">
+        <path d="M302,22 H313"/><path d="M302,62 H313"/><path d="M302,103 H313"/>
+        <path d="M302,155 H313"/><path d="M302,234 H313"/><path d="M302,378 H313"/>
+      </g>
+      <g font-size="13" font-weight="700" fill="var(--bg)" text-anchor="middle">
+        <circle cx="26" cy="142" r="11" fill="var(--vs)"/><text x="26" y="146.5">1</text>
+        <circle cx="326" cy="22" r="11" fill="var(--vs)"/><text x="326" y="26.5">2</text>
+        <circle cx="326" cy="62" r="11" fill="var(--vs)"/><text x="326" y="66.5">3</text>
+        <circle cx="326" cy="103" r="11" fill="var(--vs)"/><text x="326" y="107.5">4</text>
+        <circle cx="326" cy="155" r="11" fill="var(--green)"/><text x="326" y="159.5">5</text>
+        <circle cx="326" cy="234" r="11" fill="var(--amber)"/><text x="326" y="238.5">6</text>
+        <circle cx="326" cy="378" r="11" fill="var(--vs)"/><text x="326" y="382.5">7</text>
+      </g>
+
+      <!-- right column: one row, close up -->
+      <text x="352" y="30" font-size="11" font-weight="600" letter-spacing="0.08em" fill="var(--dim)">HOVER A FILE ROW AND THREE THINGS APPEAR</text>
+      <rect x="352" y="44" width="396" height="60" rx="9" fill="var(--vs-soft)" stroke="var(--vs)" stroke-opacity="0.45"/>
+      <text x="372" y="81" font-size="15" fill="var(--amber)">fabric-apps.html</text>
+      <text x="566" y="83" text-anchor="middle" font-size="21" fill="var(--mut)">&#8634;</text>
+      <text x="630" y="83" text-anchor="middle" font-size="23" fill="var(--mut)">+</text>
+      <text x="702" y="82" text-anchor="middle" font-size="18" font-weight="600" fill="var(--amber)">M</text>
+
+      <g>
+        <rect x="352" y="118" width="26" height="26" rx="7" fill="var(--bg)" stroke="var(--line)"/>
+        <text x="365" y="136" text-anchor="middle" font-size="13" fill="var(--rose)">&#8634;</text>
+        <text x="390" y="136" font-size="12" font-weight="600" fill="var(--rose)">Discard</text>
+        <text x="470" y="136" font-size="10.5" fill="var(--mut)">throws the edit away &#8212; there is no undo</text>
+
+        <rect x="352" y="156" width="26" height="26" rx="7" fill="var(--bg)" stroke="var(--line)"/>
+        <text x="365" y="175" text-anchor="middle" font-size="15" fill="var(--vs-hi)">+</text>
+        <text x="390" y="174" font-size="12" font-weight="600" fill="var(--vs-hi)">Stage</text>
+        <text x="470" y="174" font-size="10.5" fill="var(--mut)">put this file into the next commit</text>
+
+        <rect x="352" y="194" width="26" height="26" rx="7" fill="var(--bg)" stroke="var(--line)"/>
+        <text x="365" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="var(--amber)">M</text>
+        <text x="390" y="212" font-size="12" font-weight="600" fill="var(--amber)">Letter</text>
+        <text x="470" y="212" font-size="10.5" fill="var(--mut)">what happened to it &#8212; key below</text>
+      </g>
+
+      <text x="352" y="250" font-size="11" font-weight="600" letter-spacing="0.08em" fill="var(--dim)">STATUS LETTERS</text>
+      <g>
+        <rect x="352" y="262" width="26" height="24" rx="6" fill="var(--amber-soft)" stroke="var(--amber)" stroke-opacity="0.5"/>
+        <text x="365" y="279" text-anchor="middle" font-size="12" font-weight="600" fill="var(--amber)">M</text>
+        <text x="386" y="279" font-size="11" fill="var(--mut)">modified</text>
+        <rect x="452" y="262" width="26" height="24" rx="6" fill="var(--green-soft)" stroke="var(--green)" stroke-opacity="0.5"/>
+        <text x="465" y="279" text-anchor="middle" font-size="12" font-weight="600" fill="var(--green)">U</text>
+        <text x="486" y="279" font-size="11" fill="var(--mut)">untracked</text>
+        <rect x="552" y="262" width="26" height="24" rx="6" fill="var(--rose-soft)" stroke="var(--rose)" stroke-opacity="0.5"/>
+        <text x="565" y="279" text-anchor="middle" font-size="12" font-weight="600" fill="var(--rose)">D</text>
+        <text x="586" y="279" font-size="11" fill="var(--mut)">deleted</text>
+        <rect x="652" y="262" width="26" height="24" rx="6" fill="var(--violet-soft)" stroke="var(--violet)" stroke-opacity="0.5"/>
+        <text x="665" y="279" text-anchor="middle" font-size="12" font-weight="600" fill="var(--violet)">C</text>
+        <text x="686" y="279" font-size="11" fill="var(--mut)">conflict</text>
+      </g>
+    </svg>
+
+    <ol class="fig-legend">
+      <li><span class="fig-n">1</span><b>Source Control icon</b> &mdash; third down the activity bar. The blue badge is how many files have changed.</li>
+      <li><span class="fig-n">2</span><b>The <span class="ui">&#8943;</span> menu</b> &mdash; everything that isn't a button: Pull, Push, Checkout to&hellip;, Undo Last Commit.</li>
+      <li><span class="fig-n">3</span><b>Message box</b> &mdash; one line saying what you changed. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> commits straight from here.</li>
+      <li><span class="fig-n">4</span><b>Commit</b> &mdash; makes the save point, on your machine only. Becomes <span class="ui">Publish Branch</span> or <span class="ui">Sync Changes</span> once there's something to send.</li>
+      <li><span class="fig-n fig-g">5</span><b>Staged Changes</b> &mdash; what's going into this commit. The <span class="ui">&minus;</span> takes a file back out without touching your edits.</li>
+      <li><span class="fig-n fig-a">6</span><b>Changes</b> &mdash; edited, not included yet. Click the name to read the diff; hover the row for <span class="ui">&#8634;</span> and <span class="ui">+</span>.</li>
+      <li><span class="fig-n">7</span><b>Status bar</b> &mdash; branch name on the left, sync state beside it. <span class="ui">1&#8593;</span> means one commit is sitting on your machine waiting to be pushed.</li>
+    </ol>
+
+    <figcaption><b>Schematic, not a screenshot</b> &mdash; drawn from the layout, so your version and theme will differ in detail. The three row icons on the right only exist while the pointer is over the row, which is why most people never find them.</figcaption>
+  </figure>
 </section>
 
 <!-- ============ DAILY LOOP ============ -->
 <section id="loop">
   <div class="shead"><span class="snum">03</span><h2>The daily loop &mdash; six clicks, every time</h2></div>
   <p class="slede">This is the whole workflow. It doesn't get more complicated than this for 95% of what you do.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 270" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>The six-step daily loop drawn left to right: sync, edit, stage, message, commit, sync, with an arrow returning to the start. Only the first and last steps talk to GitHub.</title>
+
+      <text x="16" y="32" font-size="11" font-weight="600" letter-spacing="0.09em" fill="var(--dim)">ONE PASS THROUGH THE LOOP</text>
+
+      <!-- local / remote bands -->
+      <rect x="16" y="58" width="104" height="30" rx="7" fill="var(--vs-soft)" stroke="var(--vs)" stroke-opacity="0.5"/>
+      <text x="68" y="77" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--vs-hi)">GitHub</text>
+      <rect x="142" y="58" width="482" height="30" rx="7" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="383" y="77" text-anchor="middle" font-size="11" fill="var(--mut)">all local &#8212; nothing has left your machine yet</text>
+      <rect x="646" y="58" width="104" height="30" rx="7" fill="var(--vs-soft)" stroke="var(--vs)" stroke-opacity="0.5"/>
+      <text x="698" y="77" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--vs-hi)">GitHub</text>
+
+      <!-- steps -->
+      <g>
+        <rect x="16" y="112" width="104" height="76" rx="9" fill="var(--panel)" stroke="var(--vs)" stroke-opacity="0.55"/>
+        <text x="68" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Sync</text>
+        <text x="68" y="171" text-anchor="middle" font-size="10" fill="var(--mut)">pull what's new</text>
+
+        <rect x="142" y="112" width="104" height="76" rx="9" fill="var(--panel)" stroke="var(--line)"/>
+        <text x="194" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Edit</text>
+        <text x="194" y="171" text-anchor="middle" font-size="10" fill="var(--mut)">files change</text>
+
+        <rect x="268" y="112" width="104" height="76" rx="9" fill="var(--panel)" stroke="var(--line)"/>
+        <text x="320" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Stage</text>
+        <text x="320" y="171" text-anchor="middle" font-size="10" fill="var(--mut)">click the +</text>
+
+        <rect x="394" y="112" width="104" height="76" rx="9" fill="var(--panel)" stroke="var(--line)"/>
+        <text x="446" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Message</text>
+        <text x="446" y="171" text-anchor="middle" font-size="10" fill="var(--mut)">what and why</text>
+
+        <rect x="520" y="112" width="104" height="76" rx="9" fill="var(--panel)" stroke="var(--line)"/>
+        <text x="572" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Commit</text>
+        <text x="572" y="171" text-anchor="middle" font-size="10" fill="var(--mut)">the save point</text>
+
+        <rect x="646" y="112" width="104" height="76" rx="9" fill="var(--panel)" stroke="var(--vs)" stroke-opacity="0.55"/>
+        <text x="698" y="152" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)">Sync</text>
+        <text x="698" y="171" text-anchor="middle" font-size="10" fill="var(--mut)">push it up</text>
+      </g>
+
+      <!-- arrows between steps -->
+      <g aria-hidden="true" fill="var(--dim)">
+        <path d="M124,150 H134" stroke="var(--dim)" stroke-width="1.6"/><path d="M133,146 L140,150 L133,154 Z"/>
+        <path d="M250,150 H260" stroke="var(--dim)" stroke-width="1.6"/><path d="M259,146 L266,150 L259,154 Z"/>
+        <path d="M376,150 H386" stroke="var(--dim)" stroke-width="1.6"/><path d="M385,146 L392,150 L385,154 Z"/>
+        <path d="M502,150 H512" stroke="var(--dim)" stroke-width="1.6"/><path d="M511,146 L518,150 L511,154 Z"/>
+        <path d="M628,150 H638" stroke="var(--dim)" stroke-width="1.6"/><path d="M637,146 L644,150 L637,154 Z"/>
+      </g>
+
+      <!-- step numbers -->
+      <g font-size="13" font-weight="700" fill="var(--bg)" text-anchor="middle">
+        <circle cx="68" cy="112" r="13" fill="var(--vs)"/><text x="68" y="116.5">1</text>
+        <circle cx="194" cy="112" r="13" fill="var(--amber)"/><text x="194" y="116.5">2</text>
+        <circle cx="320" cy="112" r="13" fill="var(--green)"/><text x="320" y="116.5">3</text>
+        <circle cx="446" cy="112" r="13" fill="var(--violet)"/><text x="446" y="116.5">4</text>
+        <circle cx="572" cy="112" r="13" fill="var(--green)"/><text x="572" y="116.5">5</text>
+        <circle cx="698" cy="112" r="13" fill="var(--vs)"/><text x="698" y="116.5">6</text>
+      </g>
+
+      <!-- return arrow -->
+      <path d="M698,188 V222 Q698,228 692,228 H74 Q68,228 68,222 V198" fill="none" stroke="var(--vs)"
+            stroke-opacity="0.6" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <path d="M63.5,200 L68,190 L72.5,200 Z" fill="var(--vs)" aria-hidden="true"/>
+      <text x="383" y="252" text-anchor="middle" font-size="11.5" fill="var(--dim)">next time you sit down, start again at 1 &#8212; not at 2</text>
+    </svg>
+    <figcaption><b>Only the two ends touch GitHub.</b> Steps 2 to 5 happen entirely on your own machine, which is what makes experimenting safe &mdash; nothing is shared until the last click. The step people skip is the first one, and that is where most conflicts come from.</figcaption>
+  </figure>
 
   <ol class="steps">
     <li>
@@ -366,6 +592,74 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
     <p>It is not an error, and nothing is broken or lost. Git is asking you one question: <b>"which of these do you want &mdash; or both?"</b> You answer, you commit, it's over.</p>
     <p>This is exactly what happens when two feature branches each add a card to the same grid in <code>index.html</code>: both edited the same spot, and both changes are wanted. The answer is nearly always <b>both</b>.</p>
   </div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 280" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>Left: a branch leaving main, both sides editing the same line of index.html, and the merge point flagged as a conflict. Right: the anatomy of a conflict block, with the HEAD, equals and incoming marker lines labelled.</title>
+
+      <line x1="322" y1="24" x2="322" y2="262" stroke="var(--line)" aria-hidden="true"/>
+
+      <!-- ---- left: where a conflict comes from ---- -->
+      <text x="16" y="30" font-size="11" font-weight="600" letter-spacing="0.08em" fill="var(--dim)">WHERE ONE COMES FROM</text>
+
+      <rect x="144" y="48" width="124" height="24" rx="6" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="206" y="64" text-anchor="middle" font-size="10.5" fill="var(--mut)">index.html line 42</text>
+      <path d="M206,72 V99" stroke="var(--line)" stroke-dasharray="3 3" aria-hidden="true"/>
+
+      <path d="M30,110 H320" stroke="var(--vs)" stroke-width="2.5"/>
+      <path d="M112,110 C146,110 146,190 180,190" fill="none" stroke="var(--green)" stroke-width="2.5"/>
+      <path d="M180,190 H244" stroke="var(--green)" stroke-width="2.5"/>
+      <path d="M244,190 C274,190 266,110 278,110" fill="none" stroke="var(--green)" stroke-width="2.5"/>
+
+      <g stroke="var(--panel2)" stroke-width="2.5">
+        <circle cx="56" cy="110" r="7" fill="var(--vs)"/>
+        <circle cx="112" cy="110" r="7" fill="var(--vs)"/>
+        <circle cx="206" cy="110" r="7" fill="var(--vs)"/>
+        <circle cx="180" cy="190" r="7" fill="var(--green)"/>
+        <circle cx="244" cy="190" r="7" fill="var(--green)"/>
+      </g>
+      <circle cx="278" cy="110" r="11" fill="var(--rose-soft)" stroke="var(--rose)" stroke-width="2"/>
+      <text x="278" y="115" text-anchor="middle" font-size="13" font-weight="700" fill="var(--rose)">!</text>
+      <text x="278" y="88" text-anchor="middle" font-size="11" font-weight="600" fill="var(--rose)">conflict</text>
+
+      <text x="30" y="96" font-size="11.5" font-weight="600" fill="var(--vs)">main</text>
+      <text x="112" y="214" font-size="11.5" font-weight="600" fill="var(--green)">your branch</text>
+
+      <path d="M244,197 V227" stroke="var(--line)" stroke-dasharray="3 3" aria-hidden="true"/>
+      <rect x="182" y="228" width="124" height="24" rx="6" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="244" y="244" text-anchor="middle" font-size="10.5" fill="var(--mut)">index.html line 42</text>
+
+      <!-- ---- right: what Git writes into the file ---- -->
+      <text x="352" y="30" font-size="11" font-weight="600" letter-spacing="0.08em" fill="var(--dim)">WHAT GIT WRITES INTO THE FILE</text>
+      <rect x="352" y="44" width="396" height="162" rx="8" fill="var(--bg)" stroke="var(--line)"/>
+
+      <rect x="353" y="52" width="394" height="22" fill="var(--green-soft)"/>
+      <text x="364" y="67" class="fig-m" font-size="10.5" fill="var(--green)">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</text>
+      <text x="470" y="67" font-size="10" fill="var(--mut)">everything below is yours</text>
+
+      <rect x="353" y="74" width="394" height="40" fill="var(--green-soft)" opacity="0.45"/>
+      <text x="364" y="90" class="fig-m" font-size="10" fill="var(--ink)">  &lt;a class="card fabric"&gt;</text>
+      <text x="364" y="106" class="fig-m" font-size="10" fill="var(--ink)">    &lt;h2&gt;Fabric in 7 Days&lt;/h2&gt;</text>
+      <text x="736" y="90" text-anchor="end" font-size="10" font-weight="600" fill="var(--green)">Current Change</text>
+
+      <rect x="353" y="114" width="394" height="22" fill="var(--line)" opacity="0.45"/>
+      <text x="364" y="129" class="fig-m" font-size="10.5" fill="var(--mut)">=======</text>
+      <text x="470" y="129" font-size="10" fill="var(--dim)">the dividing line</text>
+
+      <rect x="353" y="136" width="394" height="40" fill="var(--vs-soft)" opacity="0.5"/>
+      <text x="364" y="152" class="fig-m" font-size="10" fill="var(--ink)">  &lt;a class="card excel"&gt;</text>
+      <text x="364" y="168" class="fig-m" font-size="10" fill="var(--ink)">    &lt;h2&gt;Copilot in Excel&lt;/h2&gt;</text>
+      <text x="736" y="152" text-anchor="end" font-size="10" font-weight="600" fill="var(--vs-hi)">Incoming Change</text>
+
+      <rect x="353" y="176" width="394" height="22" fill="var(--vs-soft)"/>
+      <text x="364" y="191" class="fig-m" font-size="10.5" fill="var(--vs-hi)">&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</text>
+      <text x="470" y="191" font-size="10" fill="var(--mut)">everything above is theirs</text>
+
+      <text x="352" y="234" font-size="11.5" fill="var(--mut)">Nothing is broken. Git is asking you one question:</text>
+      <text x="352" y="256" font-size="13" font-weight="600" fill="var(--ink)">which of these should the file end up with &#8212; or both?</text>
+    </svg>
+    <figcaption><b>Both sides are kept.</b> Git never throws either version away &mdash; it writes both into the file, fenced by the three marker lines, and leaves the choice to you. The markers disappear the moment you click one of the Accept links, which is why the file below looks alarming and isn't.</figcaption>
+  </figure>
 
   <div class="mock">
     <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of an inline merge conflict in VS Code with Accept Current, Accept Incoming and Accept Both buttons">
