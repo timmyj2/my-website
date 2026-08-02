@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-Time Intelligence &amp; KQL — The Half of Fabric Nobody in Finance Knows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a12;
+  --panel:#13131f;
+  --panel2:#0f0f19;
+  --line:#26263c;
+  --ink:#eaeaf5;
+  --mut:#9d9dbb;
+  --dim:#66668a;
+  --pink:#f472b6;
+  --pink-hi:#f9a8d4;
+  --pink-soft:rgba(244,114,182,.12);
+  --cyan:#22d3ee;
+  --cyan-hi:#67e8f9;
+  --cyan-soft:rgba(34,211,238,.12);
+  --lime:#a3e635;
+  --lime-soft:rgba(163,230,53,.11);
+  --amber:#fbbf24;
+  --amber-soft:rgba(251,191,36,.11);
+  --violet:#a78bfa;
+  --violet-soft:rgba(167,139,250,.12);
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.63;min-height:100vh;
+  background-image:radial-gradient(900px 430px at 88% -6%, rgba(244,114,182,.13), transparent 62%),
+                   radial-gradient(900px 430px at 8% -4%, rgba(34,211,238,.11), transparent 62%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(244,114,182,.3)}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(10,10,18,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:9px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--pink)}
+.live{font-family:var(--mono);font-size:.66rem;border:1px solid var(--pink);color:var(--pink-hi);border-radius:99px;
+  padding:2px 9px;background:var(--pink-soft);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.live .dot{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.28}}
+.navlinks{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font-family:var(--mono);font-size:.71rem;color:var(--mut);text-decoration:none;padding:4px 9px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{color:var(--ink);background:var(--panel)}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 22px}
+
+.hero{padding:56px 0 14px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:13px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5.2vw,2.85rem);line-height:1.12;letter-spacing:-.018em}
+.hero h1 .p{color:var(--pink-hi)}
+.hero h1 .c{color:var(--cyan-hi)}
+.hero .sub{color:var(--mut);max-width:65ch;margin-top:16px;font-size:1.04rem}
+
+.premise{margin:28px 0 6px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--pink);
+  border-radius:12px;padding:20px 22px}
+.premise h2{font-family:var(--disp);font-size:.84rem;letter-spacing:.07em;text-transform:uppercase;color:var(--pink-hi);margin-bottom:9px}
+.premise p{color:var(--mut);font-size:.96rem;margin-bottom:8px}
+.premise p:last-child{margin-bottom:0}
+.premise b{color:var(--ink);font-weight:600}
+
+section{margin-top:50px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.snum{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--pink-hi);border:1.5px solid var(--pink);
+  background:var(--pink-soft);border-radius:7px;padding:3px 10px;flex-shrink:0}
+.shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.28rem,3.4vw,1.68rem);line-height:1.2}
+.slede{color:var(--mut);font-size:1rem;max-width:72ch;margin-bottom:14px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:21px 23px;margin-top:15px}
+.card h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--mut);font-size:.95rem}
+.card p + p{margin-top:9px}
+.card b{color:var(--ink);font-weight:600}
+
+/* pipeline diagram */
+.flow{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:20px 22px 13px}
+.flow svg{display:block;width:100%;height:auto}
+.flowcap{font-family:var(--mono);font-size:.69rem;color:var(--dim);margin-top:9px;letter-spacing:.05em}
+
+/* four components */
+.quad{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:16px}
+@media (max-width:740px){.quad{grid-template-columns:1fr}}
+.quad .card{margin-top:0;border-top:3px solid var(--acc,var(--pink))}
+.quad .c1{--acc:var(--cyan)} .quad .c2{--acc:var(--violet)} .quad .c3{--acc:var(--lime)} .quad .c4{--acc:var(--pink)}
+.quad .term{font-family:var(--mono);font-size:.68rem;color:var(--acc,var(--pink));letter-spacing:.09em;
+  text-transform:uppercase;font-weight:600;margin-bottom:5px;display:block}
+
+ul.plain{list-style:none;margin-top:11px}
+ul.plain li{position:relative;padding-left:21px;margin-bottom:8px;color:var(--mut);font-size:.95rem}
+ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--pink)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+ol.steps{list-style:none;counter-reset:s;margin-top:16px}
+ol.steps li{counter-increment:s;position:relative;padding:15px 20px 15px 58px;background:var(--panel);
+  border:1px solid var(--line);border-radius:11px;margin-bottom:10px}
+ol.steps li::before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:7px;
+  background:var(--pink-soft);border:1px solid var(--pink);color:var(--pink-hi);font-family:var(--mono);
+  font-size:.85rem;font-weight:600;display:grid;place-items:center}
+ol.steps h4{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:3px}
+ol.steps p{color:var(--mut);font-size:.93rem}
+
+.tip{margin-top:16px;border-left:3px solid var(--pink);background:var(--pink-soft);border-radius:0 10px 10px 0;
+  padding:12px 16px;font-size:.93rem;color:var(--mut)}
+.tip b{color:var(--pink-hi);font-weight:600;font-family:var(--mono);font-size:.71rem;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:4px}
+.tip.warn{border-left-color:var(--amber);background:var(--amber-soft)}
+.tip.warn b{color:var(--amber)}
+.tip.ok{border-left-color:var(--lime);background:var(--lime-soft)}
+.tip.ok b{color:var(--lime)}
+
+pre{background:#06060d;border:1px solid #1c1c2c;border-radius:9px;padding:13px 15px;overflow-x:auto;margin-top:11px}
+code{font-family:var(--mono);font-size:.785rem;line-height:1.58;color:#d5d5ea;white-space:pre;word-break:normal}
+pre .c{color:#5a5a80} pre .k{color:#67e8f9} pre .s{color:#a3e635} pre .f{color:#f9a8d4} pre .n{color:#fbbf24}
+:not(pre) > code{background:var(--cyan-soft);color:var(--cyan-hi);border-radius:5px;padding:1px 6px;font-size:.85em;
+  white-space:normal;word-break:break-word}
+
+table{width:100%;border-collapse:collapse;margin-top:15px;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{color:var(--ink);font-weight:600}
+.tscroll{overflow-x:auto}
+
+footer{margin:56px 0 38px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.86rem}
+footer a{color:var(--cyan);text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
+.srcs{margin-top:10px;font-size:.82rem;line-height:1.9}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .topbar{gap:8px;padding:8px 14px}
+  .navlinks{margin-left:0}
+  .hero{padding:38px 0 12px}
+  .card{padding:18px 16px}
+  code{font-size:.73rem}
+  ol.steps li{padding:14px 15px 14px 52px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}.live .dot{animation:none}}
+@media print{body{background:#fff;color:#111;background-image:none}.topbar{display:none}.card,.flow,ol.steps li{background:#fff;border-color:#ccc}pre{background:#f5f5f5}code{color:#111}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand"><span class="fl">&#9670;</span> Real-Time Intelligence</span>
+  <span class="live"><span class="dot"></span>LIVE</span>
+  <nav class="navlinks">
+    <a href="#why">Why</a>
+    <a href="#parts">The four parts</a>
+    <a href="#kql">KQL in 10 min</a>
+    <a href="#activator">Activator</a>
+    <a href="#build">Build this</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Microsoft Fabric &middot; Streaming &amp; KQL</p>
+  <h1>Stop reporting what <span class="p">happened</span>.<br>Start reacting to what's <span class="c">happening</span>.</h1>
+  <p class="sub">Real-Time Intelligence is the half of Fabric that Power BI people skip &mdash; which is exactly why it's worth your weekend. It's a different query language, a different storage engine, and a genuinely different way of thinking: instead of a dashboard someone remembers to open, a rule that messages them. KQL is also, unexpectedly, the most enjoyable query language you'll learn this year.</p>
+
+  <div class="premise">
+    <h2>Why this is the differentiation play</h2>
+    <p>Nearly everyone in a finance or analytics group knows SQL and DAX. Almost nobody knows KQL, and almost nobody has built an alert that fires in seconds. That gap is not because it's hard &mdash; <b>KQL is easier than SQL</b> &mdash; it's because nobody in that world has had a reason to look at it yet.</p>
+    <p>You don't need IoT sensors to justify it. Failed payment runs, integration errors, approval queues, refresh failures, threshold breaches on a live balance &mdash; all of it is event data, and all of it is currently discovered by someone noticing on a Thursday.</p>
+  </div>
+</header>
+
+<!-- ============ WHY ============ -->
+<section id="why">
+  <div class="shead"><span class="snum">01</span><h2>The shift in one picture</h2></div>
+  <p class="slede">Batch analytics answers "what happened last month". Real-time answers "something is happening now, and here's who needs to know". Different questions, different machinery.</p>
+
+  <div class="flow">
+    <svg viewBox="0 0 880 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of the Real-Time Intelligence flow from sources through Eventstream and Eventhouse to dashboards and Activator alerts">
+      <!-- sources -->
+      <rect x="6" y="62" width="140" height="86" rx="11" fill="#13131f" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="76" y="86" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#67e8f9">Sources</text>
+      <g font-family="JetBrains Mono,monospace" font-size="8.5" fill="#9d9dbb">
+        <text x="76" y="105" text-anchor="middle">app &amp; system events</text>
+        <text x="76" y="120" text-anchor="middle">Event Hubs &middot; Kafka</text>
+        <text x="76" y="135" text-anchor="middle">CDC &middot; job status</text>
+      </g>
+      <path d="M150,105 H188" stroke="#3a3a5c" stroke-width="1.6"/><path d="M188,105 l-8,-5 v10 z" fill="#3a3a5c"/>
+
+      <!-- eventstream -->
+      <rect x="196" y="62" width="150" height="86" rx="11" fill="#0f0f19" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="271" y="86" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#a78bfa">Eventstream</text>
+      <g font-family="JetBrains Mono,monospace" font-size="8.5" fill="#9d9dbb">
+        <text x="271" y="105" text-anchor="middle">no-code ingestion</text>
+        <text x="271" y="120" text-anchor="middle">filter &middot; route</text>
+        <text x="271" y="135" text-anchor="middle">transform in flight</text>
+      </g>
+      <path d="M350,105 H388" stroke="#3a3a5c" stroke-width="1.6"/><path d="M388,105 l-8,-5 v10 z" fill="#3a3a5c"/>
+
+      <!-- eventhouse -->
+      <rect x="396" y="52" width="156" height="106" rx="11" fill="#13131f" stroke="#a3e635" stroke-width="1.6"/>
+      <text x="474" y="78" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12.5" font-weight="700" fill="#a3e635">Eventhouse</text>
+      <g font-family="JetBrains Mono,monospace" font-size="8.5" fill="#9d9dbb">
+        <text x="474" y="97" text-anchor="middle">KQL database</text>
+        <text x="474" y="112" text-anchor="middle">built for time-series</text>
+        <text x="474" y="127" text-anchor="middle">billions of rows,</text>
+        <text x="474" y="141" text-anchor="middle">sub-second queries</text>
+      </g>
+
+      <!-- outputs -->
+      <path d="M556,80 H596" stroke="#3a3a5c" stroke-width="1.6"/><path d="M596,80 l-8,-5 v10 z" fill="#3a3a5c"/>
+      <path d="M556,130 H596" stroke="#3a3a5c" stroke-width="1.6"/><path d="M596,130 l-8,-5 v10 z" fill="#3a3a5c"/>
+
+      <rect x="604" y="56" width="152" height="48" rx="10" fill="#0f0f19" stroke="#22d3ee" stroke-width="1.4"/>
+      <text x="680" y="77" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="600" fill="#67e8f9">Real-Time Dashboard</text>
+      <text x="680" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#9d9dbb">for when someone IS watching</text>
+
+      <rect x="604" y="106" width="152" height="48" rx="10" fill="#0f0f19" stroke="#f472b6" stroke-width="1.6"/>
+      <text x="680" y="127" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="600" fill="#f9a8d4">Activator</text>
+      <text x="680" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#9d9dbb">for when nobody is</text>
+
+      <path d="M760,130 H800" stroke="#3a3a5c" stroke-width="1.6"/><path d="M800,130 l-8,-5 v10 z" fill="#3a3a5c"/>
+      <rect x="808" y="106" width="66" height="48" rx="10" fill="#13131f" stroke="#f472b6" stroke-width="1.4"/>
+      <text x="841" y="127" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10.5" font-weight="600" fill="#f9a8d4">Teams</text>
+      <text x="841" y="142" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10.5" font-weight="600" fill="#f9a8d4">email</text>
+
+      <text x="440" y="188" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#66668a">the whole point: the bottom path needs no human to be looking</text>
+    </svg>
+    <p class="flowcap">Real-Time Hub sits across all of it as the catalogue of what's streaming in your tenant.</p>
+  </div>
+</section>
+
+<!-- ============ FOUR PARTS ============ -->
+<section id="parts">
+  <div class="shead"><span class="snum">02</span><h2>The four parts, and what each is for</h2></div>
+  <p class="slede">Same trick as the rest of Fabric: a handful of items, each an engine pointed at data. Learn what each one is <em>for</em> and the menu stops being intimidating.</p>
+
+  <div class="quad">
+    <div class="card c1">
+      <span class="term">Ingest</span>
+      <h3>Eventstream</h3>
+      <p>A no-code pipeline for events. Connect a source, optionally filter/aggregate/route in flight, and send it to a destination &mdash; usually an Eventhouse, but it can also land in a lakehouse.</p>
+      <p><b>Think of it as:</b> Data Factory for things that never stop arriving.</p>
+    </div>
+    <div class="card c2">
+      <span class="term">Store &amp; query</span>
+      <h3>Eventhouse / KQL database</h3>
+      <p>A columnar store descended from Azure Data Explorer, built for append-heavy, time-stamped data. Automatic indexing on time, retention policies, and it stays fast at volumes that would make a warehouse sweat.</p>
+      <p><b>Think of it as:</b> the right home for anything with a timestamp and a lot of rows.</p>
+    </div>
+    <div class="card c3">
+      <span class="term">Show</span>
+      <h3>Real-Time Dashboard</h3>
+      <p>Native KQL-backed dashboards that auto-refresh on a live tile cadence, built for operational watching rather than monthly reporting. Point one straight at an Eventhouse table &mdash; no extra pipeline needed.</p>
+      <p><b>Think of it as:</b> a wall screen, not a board pack.</p>
+    </div>
+    <div class="card c4">
+      <span class="term">React</span>
+      <h3>Activator</h3>
+      <p>Rules over streams, KQL results or Power BI visuals. When a condition holds, it fires &mdash; Teams message, email, or a Power Automate flow that does something.</p>
+      <p><b>Think of it as:</b> the part that makes all the rest worth building.</p>
+    </div>
+  </div>
+
+  <div class="tip"><b>The one that's newest</b>Eventhouse is now the default analytical store for <b>business events</b> in Fabric &mdash; create a business event in Real-Time Hub and each one maps to its own KQL table, automatically ingested and retained. That's platform-level activity (items changed, jobs run, workspaces updated) becoming queryable data, which is a governance and monitoring goldmine most people haven't noticed yet.</div>
+</section>
+
+<!-- ============ KQL ============ -->
+<section id="kql">
+  <div class="shead"><span class="snum">03</span><h2>KQL in ten minutes &mdash; it's easier than SQL</h2></div>
+  <p class="slede">One idea carries the whole language: <b>start with a table, then pipe it through steps that each change it a bit.</b> Top to bottom, in the order things happen &mdash; unlike SQL, where you write SELECT first and it executes almost last.</p>
+
+  <div class="card">
+    <h3>The shape of every KQL query</h3>
+    <pre><code><span class="f">FailedPayments</span>
+| <span class="k">where</span> Timestamp &gt; <span class="f">ago</span>(<span class="n">1h</span>)              <span class="c">// filter first — always</span>
+| <span class="k">where</span> Amount &gt; <span class="n">10000</span>
+| <span class="k">summarize</span> Failures = <span class="f">count</span>() <span class="k">by</span> Vendor  <span class="c">// group</span>
+| <span class="k">order by</span> Failures <span class="k">desc</span>
+| <span class="k">take</span> <span class="n">10</span></code></pre>
+    <p>Read it as a sentence: <em>take FailedPayments, keep the last hour, keep the big ones, count by vendor, sort, show ten.</em> Each line takes a table in and hands a table out. That's the entire mental model &mdash; and it's why KQL is easier to compose than SQL: you build it up one line at a time and can run it after every line to see what you've got.</p>
+    <div class="tip ok"><b>Filter first, always</b><code>where</code> on the timestamp should be your first line in essentially every query. These tables hold billions of rows; the time filter is what keeps it instant &mdash; and it's the single biggest driver of both speed and cost.</div>
+  </div>
+
+  <div class="card">
+    <h3>The eight operators that cover almost everything</h3>
+    <div class="tscroll"><table>
+      <tr><th>Operator</th><th>What it does</th><th>SQL equivalent</th></tr>
+      <tr><td><code>where</code></td><td>Keep matching rows</td><td><code>WHERE</code></td></tr>
+      <tr><td><code>project</code></td><td>Pick / rename columns</td><td><code>SELECT</code></td></tr>
+      <tr><td><code>extend</code></td><td>Add a calculated column</td><td><code>SELECT ..., x AS y</code></td></tr>
+      <tr><td><code>summarize</code></td><td>Aggregate by something</td><td><code>GROUP BY</code></td></tr>
+      <tr><td><code>order by</code></td><td>Sort</td><td><code>ORDER BY</code></td></tr>
+      <tr><td><code>take</code> / <code>top</code></td><td>Limit rows</td><td><code>TOP</code> / <code>LIMIT</code></td></tr>
+      <tr><td><code>join</code></td><td>Combine tables</td><td><code>JOIN</code></td></tr>
+      <tr><td><code>render</code></td><td>Draw a chart, instantly</td><td><em>no equivalent &mdash; and it's lovely</em></td></tr>
+    </table></div>
+    <div class="tip"><b>The time-window trick</b><code>bin()</code> rounds timestamps into buckets, which is how every time-series chart gets built. <code>summarize count() by bin(Timestamp, 5m)</code> gives you a count per five minutes. Add <code>| render timechart</code> and you have a chart, from a query, in one line. There's genuinely nothing this pleasant in SQL.</div>
+  </div>
+
+  <div class="card">
+    <h3>Five queries worth stealing</h3>
+    <pre><code><span class="c">// 1. what's happened in the last hour, by type</span>
+Events
+| <span class="k">where</span> Timestamp &gt; <span class="f">ago</span>(<span class="n">1h</span>)
+| <span class="k">summarize</span> <span class="f">count</span>() <span class="k">by</span> EventType
+| <span class="k">order by</span> count_ <span class="k">desc</span>
+
+<span class="c">// 2. a chart of activity per 5 minutes</span>
+Events
+| <span class="k">where</span> Timestamp &gt; <span class="f">ago</span>(<span class="n">6h</span>)
+| <span class="k">summarize</span> <span class="f">count</span>() <span class="k">by</span> <span class="f">bin</span>(Timestamp, <span class="n">5m</span>)
+| <span class="k">render</span> timechart
+
+<span class="c">// 3. is today unusual? compare to the same hour yesterday</span>
+Events
+| <span class="k">where</span> Timestamp &gt; <span class="f">ago</span>(<span class="n">25h</span>)
+| <span class="k">extend</span> Period = <span class="k">iff</span>(Timestamp &gt; <span class="f">ago</span>(<span class="n">1h</span>), <span class="s">"now"</span>, <span class="s">"yesterday"</span>)
+| <span class="k">summarize</span> <span class="f">count</span>() <span class="k">by</span> Period, EventType
+
+<span class="c">// 4. find the spikes — anomaly detection, built in</span>
+Events
+| <span class="k">where</span> Timestamp &gt; <span class="f">ago</span>(<span class="n">7d</span>)
+| <span class="k">summarize</span> Cnt = <span class="f">count</span>() <span class="k">by</span> <span class="f">bin</span>(Timestamp, <span class="n">1h</span>)
+| <span class="k">extend</span> (anomalies, score, baseline) = <span class="f">series_decompose_anomalies</span>(Cnt)
+
+<span class="c">// 5. latest status per entity — the dedup pattern, KQL-style</span>
+JobRuns
+| <span class="k">summarize</span> <span class="f">arg_max</span>(Timestamp, *) <span class="k">by</span> JobName</code></pre>
+    <div class="tip ok"><b><code>arg_max</code> is the one to remember</b>"Give me the whole row where this column is highest, per group." It's pattern 01 from the SQL page &mdash; ROW_NUMBER, PARTITION BY, filter to 1 &mdash; in a single readable line. Once you've used it you'll resent SQL slightly.</div>
+  </div>
+</section>
+
+<!-- ============ ACTIVATOR ============ -->
+<section id="activator">
+  <div class="shead"><span class="snum">04</span><h2>Activator &mdash; the part that changes your reputation</h2></div>
+  <p class="slede">Everything above is plumbing. This is the bit people actually notice, and it's the smallest amount of work on the page.</p>
+
+  <div class="card">
+    <h3>The model: object, condition, action</h3>
+    <ul class="plain">
+      <li><b>What you're watching</b> &mdash; a stream, a KQL query result, or a Power BI visual.</li>
+      <li><b>The condition</b> &mdash; crosses a threshold, changes state, stays true for N minutes, or stops arriving entirely.</li>
+      <li><b>The action</b> &mdash; Teams message, email, or a Power Automate flow that opens a ticket, writes a row, or kicks off a process.</li>
+    </ul>
+    <p>Critically, Activator can watch <b>per entity</b>, not just in aggregate &mdash; alert on <em>each vendor</em> that breaches, rather than on the total. That distinction is what separates a useful alert from a noisy one.</p>
+    <div class="tip warn"><b>The rule that decides whether this succeeds</b>An alert that fires every day gets muted within a fortnight &mdash; and a muted alert is <em>worse</em> than no alert, because everyone still believes something is watching. Tune it until it's rare, make the message say what to do, and give every alert a named owner. Alert fatigue kills more monitoring projects than technology ever does.</div>
+  </div>
+
+  <div class="card">
+    <h3>The "stopped arriving" alert nobody builds</h3>
+    <p>Most people alert on bad values. The more valuable alert is on <b>absence</b> &mdash; the feed that went quiet, the nightly job that didn't report, the queue that stopped moving. Silence is the failure mode that reaches a board pack, because nothing looks wrong until someone asks why a number hasn't moved.</p>
+    <p>It's also a nice piece of KQL: count the events in the recent window and alert when the count is zero, rather than when a value is high.</p>
+    <pre><code><span class="c">// no heartbeat in 30 minutes = something is wrong</span>
+Heartbeats
+| <span class="k">where</span> Timestamp &gt; <span class="f">ago</span>(<span class="n">30m</span>)
+| <span class="k">summarize</span> LastSeen = <span class="f">max</span>(Timestamp) <span class="k">by</span> SourceSystem
+| <span class="k">where</span> <span class="f">isnull</span>(LastSeen) <span class="k">or</span> LastSeen &lt; <span class="f">ago</span>(<span class="n">30m</span>)</code></pre>
+  </div>
+</section>
+
+<!-- ============ BUILD ============ -->
+<section id="build">
+  <div class="shead"><span class="snum">05</span><h2>What to actually build first</h2></div>
+  <p class="slede">You don't have a factory floor. You do have plenty of event data hiding in plain sight &mdash; and the first one should take an afternoon, not a quarter.</p>
+
+  <ol class="steps">
+    <li>
+      <h4>Monitor your own pipelines</h4>
+      <p>The safest possible starting point: nobody else is affected if you get it wrong, and you're the customer. Stream your pipeline run outcomes into an Eventhouse, then alert on failures &mdash; and on the sneakier one, a success with suspiciously few rows.</p>
+    </li>
+    <li>
+      <h4>Then a threshold someone currently checks by hand</h4>
+      <p>A balance, a queue length, an exposure, an exception count. Somebody opens a report each morning to look at it &mdash; replace that with a message that only arrives when it matters. Instantly popular.</p>
+    </li>
+    <li>
+      <h4>Then the silence alert</h4>
+      <p>Pick the feed whose absence would be most expensive and alert on it going quiet. This is the one that eventually saves someone's month-end, and it's the one nobody else thought to build.</p>
+    </li>
+    <li>
+      <h4>Learn KQL against real data while you do it</h4>
+      <p>Don't study it separately. Every one of the above needs a query; write them, break them, run them line by line. A week of that and you'll be the KQL person &mdash; which, in a finance organisation, means the only one.</p>
+    </li>
+  </ol>
+
+  <div class="card">
+    <h3>Practical cautions</h3>
+    <ul class="plain">
+      <li><b>Set retention deliberately.</b> Eventhouse will happily keep everything forever and bill you for it. Decide how far back you actually need &mdash; usually far less than instinct suggests.</li>
+      <li><b>It shares your capacity.</b> RTI draws on the same CU pool as everything else. A firehose ingestion can affect other workloads, so watch the metrics app after you turn something on.</li>
+      <li><b>Real-time is an operational commitment.</b> Something that alerts at 2am implies someone responds at 2am. Agree that before you build it, not after the first incident.</li>
+      <li><b>Not everything belongs here.</b> If daily is genuinely fine, daily is cheaper, simpler and more robust. Use the latency question from the Solution Playbook before committing.</li>
+    </ul>
+  </div>
+
+  <div class="tip"><b>Where this takes you</b>The combination is rarer than you'd think: someone who models a gold layer properly <em>and</em> can write KQL <em>and</em> ships alerts people rely on. That person stops being asked for reports and starts being asked what should be built &mdash; which is the actual goal.</div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>Written August 2026. Fabric's Real-Time Intelligence surface moves quickly &mdash; check the monthly feature summaries before relying on specifics.</p>
+  <div class="srcs">
+    Worth bookmarking &mdash;
+    <a href="https://learn.microsoft.com/en-us/fabric/real-time-intelligence/">Real-Time Intelligence docs</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/real-time-intelligence/event-streams/overview">Eventstreams overview</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/training/paths/explore-real-time-analytics-microsoft-fabric/">Free Learn path: Implement RTI</a> &middot;
+    <a href="https://blog.fabric.microsoft.com/">Monthly feature summaries</a>
+  </div>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#f472b6">◆</span> Real-Time Intelligence</p>
+</footer>
+
+</div>
+</body>
+</html>

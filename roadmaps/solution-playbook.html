@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Solution Playbook — From "Can You Help With This?" to a Thing You Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14100c;
+  --panel:#1e1812;
+  --panel2:#191410;
+  --line:#382d22;
+  --ink:#f2ece4;
+  --mut:#b4a394;
+  --dim:#7d6d5f;
+  --amber:#f59e0b;
+  --amber-hi:#fbbf24;
+  --amber-soft:rgba(245,158,11,.12);
+  --rust:#ea7317;
+  --teal:#2dd4bf;
+  --teal-soft:rgba(45,212,191,.11);
+  --sky:#60a5fa;
+  --sky-soft:rgba(96,165,250,.11);
+  --rose:#fb7185;
+  --rose-soft:rgba(251,113,133,.11);
+  --lime:#a3e635;
+  --lime-soft:rgba(163,230,53,.11);
+  --violet:#c084fc;
+  --violet-soft:rgba(192,132,252,.11);
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.64;min-height:100vh;
+  background-image:radial-gradient(900px 440px at 10% -6%, rgba(245,158,11,.11), transparent 62%),
+                   radial-gradient(900px 440px at 90% -4%, rgba(234,115,23,.09), transparent 62%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(245,158,11,.3)}
+
+/* group accents */
+.g-move{--acc:var(--sky);--soft:var(--sky-soft)}
+.g-trust{--acc:var(--teal);--soft:var(--teal-soft)}
+.g-watch{--acc:var(--rose);--soft:var(--rose-soft)}
+.g-decide{--acc:var(--violet);--soft:var(--violet-soft)}
+.g-touch{--acc:var(--lime);--soft:var(--lime-soft)}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(20,16,12,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:9px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--amber)}
+.navlinks{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font-family:var(--mono);font-size:.71rem;color:var(--mut);text-decoration:none;padding:4px 9px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{color:var(--ink);background:var(--panel)}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 22px}
+
+.hero{padding:56px 0 14px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:13px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5.2vw,2.9rem);line-height:1.12;letter-spacing:-.018em}
+.hero h1 .a{color:var(--amber-hi)}
+.hero .sub{color:var(--mut);max-width:65ch;margin-top:16px;font-size:1.04rem}
+
+.premise{margin:28px 0 6px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--amber);
+  border-radius:12px;padding:20px 22px}
+.premise h2{font-family:var(--disp);font-size:.84rem;letter-spacing:.07em;text-transform:uppercase;color:var(--amber-hi);margin-bottom:9px}
+.premise p{color:var(--mut);font-size:.96rem;margin-bottom:8px}
+.premise p:last-child{margin-bottom:0}
+.premise b{color:var(--ink);font-weight:600}
+
+section{margin-top:52px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.snum{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--amber-hi);border:1.5px solid var(--amber);
+  background:var(--amber-soft);border-radius:7px;padding:3px 10px;flex-shrink:0}
+.shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.3rem,3.4vw,1.72rem);line-height:1.2}
+.slede{color:var(--mut);font-size:1rem;max-width:72ch;margin-bottom:16px}
+
+/* first-conversation questions */
+ol.qs{list-style:none;counter-reset:q;margin-top:18px}
+ol.qs li{counter-increment:q;position:relative;padding:14px 20px 14px 58px;background:var(--panel);
+  border:1px solid var(--line);border-radius:11px;margin-bottom:10px}
+ol.qs li::before{content:"Q" counter(q);position:absolute;left:15px;top:14px;width:32px;height:26px;border-radius:6px;
+  background:var(--amber-soft);border:1px solid var(--amber);color:var(--amber-hi);font-family:var(--mono);
+  font-size:.72rem;font-weight:600;display:grid;place-items:center}
+ol.qs h4{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:3px}
+ol.qs p{color:var(--mut);font-size:.93rem}
+
+/* group headers */
+.grouphead{display:flex;align-items:center;gap:12px;margin:40px 0 4px}
+.grouphead .gdot{width:11px;height:11px;border-radius:3px;background:var(--acc);flex-shrink:0}
+.grouphead h3{font-family:var(--disp);font-weight:700;font-size:1.12rem;color:var(--ink)}
+.grouphead .gsub{color:var(--dim);font-size:.87rem;font-family:var(--mono)}
+
+/* pattern cards */
+.pat{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:12px;
+  padding:20px 22px;margin-top:13px}
+.pat .said{font-family:var(--disp);font-weight:600;font-size:1.06rem;color:var(--ink);line-height:1.34}
+.pat .said::before{content:"\201C";color:var(--acc);font-size:1.5em;line-height:0;vertical-align:-.22em;margin-right:2px}
+.pat .said::after{content:"\201D";color:var(--acc);font-size:1.5em;line-height:0;vertical-align:-.22em;margin-left:1px}
+.pat .row{margin-top:13px}
+.pat .lab{font-family:var(--mono);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;color:var(--acc);
+  font-weight:600;display:block;margin-bottom:3px}
+.pat .row p{color:var(--mut);font-size:.94rem}
+.pat .row p b{color:var(--ink);font-weight:600}
+.pat .build{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media (max-width:720px){.pat .build{grid-template-columns:1fr}}
+.pat .bx{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px}
+.pat .bx .lab{color:var(--dim)}
+.pat .bx p{color:var(--mut);font-size:.9rem}
+.pat .bx.fast{border-color:rgba(163,230,53,.4)}
+.pat .bx.fast .lab{color:var(--lime)}
+.pat .trap{margin-top:13px;border-left:3px solid var(--rose);background:var(--rose-soft);border-radius:0 8px 8px 0;
+  padding:10px 14px;font-size:.9rem;color:var(--mut)}
+.pat .trap b{color:var(--rose);font-weight:600;font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:3px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:21px 23px;margin-top:16px}
+.card h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--mut);font-size:.95rem}
+.card p + p{margin-top:9px}
+.card b{color:var(--ink);font-weight:600}
+
+ul.plain{list-style:none;margin-top:11px}
+ul.plain li{position:relative;padding-left:21px;margin-bottom:8px;color:var(--mut);font-size:.95rem}
+ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--amber)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+.tip{margin-top:17px;border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 10px 10px 0;
+  padding:12px 16px;font-size:.93rem;color:var(--mut)}
+.tip b{color:var(--amber-hi);font-weight:600;font-family:var(--mono);font-size:.71rem;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:4px}
+
+table{width:100%;border-collapse:collapse;margin-top:15px;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{color:var(--ink);font-weight:600}
+.tscroll{overflow-x:auto}
+
+p code,li code,td code{background:var(--amber-soft);color:var(--amber-hi);border-radius:5px;padding:1px 6px;font-size:.85em;white-space:normal}
+
+footer{margin:58px 0 38px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.86rem}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .topbar{gap:8px;padding:8px 14px}
+  .navlinks{margin-left:0}
+  .hero{padding:38px 0 12px}
+  .pat{padding:17px 16px}
+  ol.qs li{padding:13px 15px 13px 52px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{body{background:#fff;color:#111;background-image:none}.topbar{display:none}.pat,.card,ol.qs li{background:#fff;border-color:#ccc}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand"><span class="fl">&#9670;</span> The Solution Playbook</span>
+  <nav class="navlinks">
+    <a href="#first">First conversation</a>
+    <a href="#patterns">The patterns</a>
+    <a href="#size">Sizing it</a>
+    <a href="#no">Saying no</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Problem shaping &middot; For people who build</p>
+  <h1>Someone describes a problem.<br>You need to hear a <span class="a">shape</span>.</h1>
+  <p class="sub">The hard part of building things at work was never the code &mdash; you can vibe your way through code. The hard part is that people describe problems in the language of their frustration, not in the language of what to build. This is a catalogue of the shapes underneath: what people actually say, what it really is, what to build, and how to do a scrappy version this afternoon instead of a proper version next quarter.</p>
+
+  <div class="premise">
+    <h2>The premise</h2>
+    <p>There are maybe sixteen problems in a business. You'll meet them over and over in different costumes &mdash; different department, different system, different vocabulary, same underlying shape. <b>Once you can name the shape, you already know roughly what to build</b>, and the building is the part you're good at.</p>
+    <p>Use it two ways: read it once to load the patterns into your head, then come back to it when someone corners you at a desk and you want to sound like you've seen this before. You have. It just had a different name last time.</p>
+  </div>
+</header>
+
+<!-- ============ FIRST CONVERSATION ============ -->
+<section id="first">
+  <div class="shead"><span class="snum">01</span><h2>The first conversation &mdash; six questions before you build anything</h2></div>
+  <p class="slede">The most expensive mistake is building the thing someone asked for instead of the thing they need. These six questions take four minutes and save weeks. Ask them in this order &mdash; the order matters, because Q1 changes the answer to everything else.</p>
+
+  <ol class="qs">
+    <li>
+      <h4>&ldquo;Walk me through the last time this happened.&rdquo;</h4>
+      <p>Not "what do you need" &mdash; that gets you their proposed solution. A specific recent story gets you the actual problem, the workaround they've built, and who else touches it. Always start here.</p>
+    </li>
+    <li>
+      <h4>&ldquo;What do you do with it once you have it?&rdquo;</h4>
+      <p>The answer is often "I copy three numbers into a slide." Then you're not building a report &mdash; you're building three numbers. Enormous amounts of work get avoided by this question.</p>
+    </li>
+    <li>
+      <h4>&ldquo;How often, and what happens if it's a day late?&rdquo;</h4>
+      <p>This is the latency question, and people always overstate it. "Real time" usually means "before my 9am meeting." Daily is dramatically cheaper to build than streaming, and honesty here is worth days of your life.</p>
+    </li>
+    <li>
+      <h4>&ldquo;Who else does this?&rdquo;</h4>
+      <p>If three teams do the same manual thing, you're not solving one person's problem, you're solving a company problem &mdash; which changes the priority, the design, and how much support you'll get for doing it properly.</p>
+    </li>
+    <li>
+      <h4>&ldquo;What does it look like when it goes wrong today?&rdquo;</h4>
+      <p>Surfaces the real risk and the real value. "We restated a board number" is a different project from "I was mildly annoyed." It also tells you what your solution has to protect against.</p>
+    </li>
+    <li>
+      <h4>&ldquo;If I could only fix one part of this, which part?&rdquo;</h4>
+      <p>Your scoping question. Their answer is your first release. Everything else is the backlog &mdash; and now it's <em>their</em> prioritisation, not your guess.</p>
+    </li>
+  </ol>
+
+  <div class="tip"><b>The move that buys you credibility</b>Write their answers back to them in five bullets and ask "have I got this right?" Almost nobody does this, it takes two minutes, and it makes people feel heard before you've built anything. It also catches the misunderstanding while it's still free to fix.</div>
+</section>
+
+<!-- ============ PATTERNS ============ -->
+<section id="patterns">
+  <div class="shead"><span class="snum">02</span><h2>The pattern catalogue</h2></div>
+  <p class="slede">Sixteen shapes, grouped by what they're fundamentally about. Each one gives you the sentence people actually say, what's really going on, what to build, and the scrappy version you could have working before you go home.</p>
+
+  <!-- ===== MOVE IT ===== -->
+  <div class="g-move">
+    <div class="grouphead"><span class="gdot"></span><h3>Getting data to people</h3><span class="gsub">the plumbing problems</span></div>
+
+    <div class="pat">
+      <p class="said">I export this every month and email it round.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>manual distribution problem</b>, and usually also an undocumented transformation problem &mdash; because between the export and the email, they do things. Filtering, renaming, a lookup they keep in another tab. That hidden work is the actual scope.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Recreate their final output as one table in a lakehouse or a view, and get it to them once. If it matches, you've validated the logic before automating anything.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Model it into gold, build a small report or a subscribed export, schedule it, and alert on failure. Retire the manual export deliberately &mdash; with them watching.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Automating the email and not the spreadsheet. If they still do the hidden steps by hand, you've saved them thirty seconds and kept all the risk.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">It's too much data for Excel now.</p>
+      <div class="row"><span class="lab">What it really is</span><p>The classic on-ramp &mdash; and the easiest win you'll ever get, because the pain is already acute and they've already given up. They don't need a platform strategy, they need the file to open.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Land the data as a Delta table and point them at the SQL endpoint from Excel. Same tool they know, no row limit. Takes an hour and looks like magic.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Proper gold-layer model plus a semantic model so the aggregations are done for them, and they stop pulling millions of rows to sum one column.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Assuming they want a dashboard. Many people genuinely want a grid they can pivot. Give them what they'll use, not what demos well.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">Can you just add a column?</p>
+      <div class="row"><span class="lab">What it really is</span><p>Sometimes it's just a column. Often it's a <b>question they can't answer</b> and a column is their guess at the fix. Ask what they'd do with it &mdash; the answer frequently reveals a measure, a different grain, or an entirely different report.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>If it's genuinely a column and it's already in the source, add it. Small requests answered fast are how you earn the right to say "let's talk" on big ones.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>If it's a new grain or a new source, treat it as its own small project with its own conversation. Don't smuggle it in as a tweak.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Saying yes to twenty "just a columns" until the model is a swamp nobody can reason about. Each one was reasonable; the sum is not.</div>
+    </div>
+  </div>
+
+  <!-- ===== TRUST IT ===== -->
+  <div class="g-trust">
+    <div class="grouphead"><span class="gdot"></span><h3>Making numbers believable</h3><span class="gsub">the trust problems &mdash; usually the highest-value work</span></div>
+
+    <div class="pat">
+      <p class="said">These two systems don't agree and nobody knows which is right.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>reconciliation</b> problem, and it's the most valuable pattern in this entire page because it's the one people actively fear. The deliverable is not "which one is right" &mdash; it's <b>a repeatable, explainable difference</b>. Once the gap is itemised and each line has a reason, the argument stops.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Pull both sides into one place, join on the key, and produce a difference table with the ten biggest gaps. Show it to them. The reasons will start pouring out of them unprompted.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A scheduled reconciliation with categorised difference reasons (timing, mapping, missing, genuine), a tolerance threshold, and an alert when the unexplained portion exceeds it.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Trying to make the difference zero. It won't be, and chasing it makes you look like you failed. Aim for <em>every difference has a name</em> &mdash; that's the win, and it's achievable.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">Nobody trusts the numbers.</p>
+      <div class="row"><span class="lab">What it really is</span><p>Usually not accuracy &mdash; usually <b>ambiguity</b>. Four reports say "revenue" and mean four things, so people quietly stop believing all of them. The fix is definition and provenance, not more validation.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Take the three most argued-about measures and write one sentence each: what's included, what's excluded, as-of when. Circulate it. Watch the arguments change shape immediately.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>One certified semantic model as the definition of record, endorsement so people can see which one to trust, lineage so they can see where it came from, and retirement of the duplicates.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Building a fifth version of the truth to fix the problem of four versions of the truth. If you're not deleting something, you're probably making it worse.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">This number looks wrong but I can't prove it.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>lineage and drill-through</b> problem. They can see the total but not the rows behind it, so they can't self-serve the answer and have to ask you &mdash; which is why you keep getting asked.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Give them one drill-through page or a saved query that returns the underlying rows for any given total. Their next three questions answer themselves.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Keep a bronze layer so you can always show the raw as-arrived record, plus the load timestamp and source. The ability to say "here's exactly what we received" ends most disputes.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Answering the specific question and not giving them the means to answer the next one. You're training people to depend on you, which feels good and scales terribly.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">The data's a mess.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>data quality</b> problem that nobody has ever quantified. "A mess" is a feeling. Your job is to turn it into a count &mdash; because a count can be tracked, targeted and fixed, and a feeling can't.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Write one query that counts the issues: nulls in key fields, duplicate keys, orphan references, values outside a sane range. Report it as a table. That table is now the project.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Quality checks as a scheduled step between bronze and silver, with a trend over time and an alert when a threshold breaks. Bad data stops silently, loudly.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Cleaning it in your pipeline forever instead of pushing the fix upstream. Some cleaning belongs to you; some is a source-system problem you're quietly subsidising.</div>
+    </div>
+  </div>
+
+  <!-- ===== WATCH IT ===== -->
+  <div class="g-watch">
+    <div class="grouphead"><span class="gdot"></span><h3>Noticing things in time</h3><span class="gsub">the monitoring problems</span></div>
+
+    <div class="pat">
+      <p class="said">We only found out a week later.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>detection</b> problem, not a reporting problem. A dashboard doesn't solve it &mdash; a dashboard requires someone to look. The fix pushes to them: a rule and a message.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>One threshold, one alert into Teams or email. Genuinely an hour's work, and it changes how people experience your team.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Rules on a stream or a refreshed table, with severity levels, an owner per alert, and enough context in the message to act without opening anything.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Alert fatigue. An alert that fires daily gets muted in a fortnight and is then worse than nothing, because everyone believes it's watching. Tune the threshold until it's rare.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">It broke and nobody noticed.</p>
+      <div class="row"><span class="lab">What it really is</span><p><b>Pipeline observability</b> &mdash; and specifically the nastiest version, where it didn't fail loudly, it succeeded with nothing in it. Silent partial failure is the one that reaches a board pack.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Add a failure notification to your most important pipeline, plus a row-count check that fails deliberately if the load is suspiciously small.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A run log table (what ran, when, how many rows, how long), a small monitoring page over it, and freshness expectations per table so "stale" is detectable.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Only alerting on failure. The dangerous outcome is a <em>successful</em> run with zero rows &mdash; everything green, nothing there.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">We need this in real time.</p>
+      <div class="row"><span class="lab">What it really is</span><p>Usually a <b>latency mismatch</b>, not a streaming requirement. Ask what decision changes if they see it now versus in an hour. If nothing changes, they don't want real time &mdash; they want <em>fresh</em>, which is far cheaper.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Increase the refresh frequency and see if the complaint stops. Often it does, and you just saved a quarter of engineering.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>If a decision genuinely changes in seconds &mdash; operational monitoring, fraud, capacity &mdash; then it's a real streaming case and worth building as one.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Building a streaming architecture to satisfy a preference. It's ten times the operational burden and someone has to keep it alive at 2am. Make sure the decision justifies it.</div>
+    </div>
+  </div>
+
+  <!-- ===== DECIDE ===== -->
+  <div class="g-decide">
+    <div class="grouphead"><span class="gdot"></span><h3>Helping people decide</h3><span class="gsub">the analysis problems</span></div>
+
+    <div class="pat">
+      <p class="said">Can we predict what next quarter looks like?</p>
+      <div class="row"><span class="lab">What it really is</span><p>Nine times in ten: <b>they want a trend, not a model.</b> "Predict" is how non-technical people say "help me see where this is going." A well-built trend with seasonality beats a black box they won't trust.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Plot the history properly &mdash; same period last year, rolling average, and the run rate. Show it to them. Frequently that <em>is</em> the answer.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>If there's a real forecast case, start with something explainable and measure it against actuals openly. A forecast nobody can interrogate gets ignored the first time it's wrong.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Reaching for ML because it's interesting. If you can't explain why the number moved, finance will not use it &mdash; and they're right not to.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">I need to be able to slice this myself.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>self-service modelling</b> problem. They're not asking for a report, they're asking to stop asking you. That's a compliment and an opportunity &mdash; it's also the thing that scales your influence past your own hours.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Give them a clean table with sensible names and let them pivot it in Excel. Then watch which slices they actually use.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A star-schema semantic model with named measures and friendly field names. What you observed them doing manually becomes the dimensions.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Handing over a model with cryptic column names and forty raw measures. Self-service fails on vocabulary far more often than on capability.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">We keep getting asked the same question.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>question-answering</b> problem, and the newest pattern here. If the same handful of questions arrive weekly, that's a data agent or a well-named model &mdash; but only if the underlying data is modelled well. Agents expose bad modelling ruthlessly.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Write the top ten questions down. Half will be answerable from one existing table &mdash; make that table findable and say so.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A data agent over a clean gold layer, tested against those ten questions, with the failures fed back as modelling and naming fixes.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Pointing an agent at a messy lakehouse and blaming the AI when it's confidently wrong. The agent is a mirror for your model quality.</div>
+    </div>
+  </div>
+
+  <!-- ===== TOUCH IT ===== -->
+  <div class="g-touch">
+    <div class="grouphead"><span class="gdot"></span><h3>Letting people put data in</h3><span class="gsub">the write-back problems</span></div>
+
+    <div class="pat">
+      <p class="said">The mapping lives in Dave's spreadsheet.</p>
+      <div class="row"><span class="lab">What it really is</span><p><b>Unmastered reference data</b> &mdash; and a bus-factor risk wearing a spreadsheet costume. Cost-centre mappings, account groupings, entity hierarchies. It's small data with enormous blast radius.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Get a copy into a governed table and point a pipeline at it. Even reading from Dave's file on a schedule beats a copy pasted quarterly from memory.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A small write-back app or governed table with an owner, change history, and validation &mdash; so a bad mapping is caught at entry, not at close.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Taking it off Dave without giving him a way to maintain it. He'll keep the spreadsheet, you'll diverge within a month, and now there are two.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">We do this by hand every close.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>process automation</b> problem. Careful here: manual steps often encode judgement that nobody wrote down. Automating the mechanics is great; automating away the judgement quietly is how you get an error nobody catches.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Watch them do it once and write down every step, marking each as mechanical or judgement. That document is valuable on its own, whatever you build.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Automate the mechanical steps; keep the judgement steps as an explicit human approval in the flow. Faster and still signed off.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Automating an inefficient process instead of fixing it. Sometimes the right answer is that three of the eight steps shouldn't exist at all.</div>
+    </div>
+
+    <div class="pat">
+      <p class="said">Only one person knows how to do this.</p>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>bus-factor</b> problem, and it's rarely presented as a request &mdash; you'll usually spot it yourself. It's also the easiest way to be genuinely useful without anyone having asked, which makes it disproportionately good for your reputation.</p></div>
+      <div class="build">
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Sit with them and document it while they do it. One page. The act of writing it down usually surfaces two steps even they had forgotten.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Move the logic into version-controlled, scheduled, monitored code &mdash; so the knowledge lives in a repo instead of a person, and can be reviewed.</p></div>
+      </div>
+      <div class="trap"><b>Trap</b>Making yourself the new single point of failure. If it's now in a notebook only you understand, you've moved the risk, not removed it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIZING ============ -->
+<section id="size">
+  <div class="shead"><span class="snum">03</span><h2>Sizing it before you commit</h2></div>
+  <p class="slede">The question you'll be asked in the corridor is "how long would that take?" Being roughly right, fast, is a genuine professional skill &mdash; and these are the factors that actually drive the answer.</p>
+
+  <div class="tscroll"><table>
+    <tr><th>Factor</th><th>Cheap when&hellip;</th><th>Expensive when&hellip;</th></tr>
+    <tr><td><b>Source access</b></td><td>Already in the lake, or shortcut-able</td><td>New system, new credentials, security review</td></tr>
+    <tr><td><b>Grain</b></td><td>Matches something you already model</td><td>New grain &mdash; new fact table, new conversations</td></tr>
+    <tr><td><b>Latency</b></td><td>Daily or weekly is genuinely fine</td><td>Sub-minute, and it must be right</td></tr>
+    <tr><td><b>Write-back</b></td><td>Read-only</td><td>Humans typing values &mdash; validation, audit, permissions</td></tr>
+    <tr><td><b>Consumers</b></td><td>One team who'll tell you when it's wrong</td><td>Executives, or anything external-facing</td></tr>
+    <tr><td><b>Correctness bar</b></td><td>Directionally right is useful</td><td>It's going in a statutory return</td></tr>
+  </table></div>
+
+  <div class="tip"><b>The honest estimate formula</b>Find the row that's most expensive and let it set the size &mdash; the hardest constraint dominates, not the average. Then say a range and name the assumption: "two or three days if the data's already in the lake; a couple of weeks if I need a new connection." People remember that you were clear far longer than they remember the number.</div>
+
+  <div class="card">
+    <h3>Always build the scrappy version first</h3>
+    <p>Not because it's all they deserve &mdash; because it's the fastest way to find out you misunderstood. A rough version in front of someone on day one generates more useful correction than three weeks of careful specification. For a vibe coder this is your native advantage: <b>you can get to a wrong thing quickly, and wrong things in front of users are how right things get built.</b></p>
+    <p>Just be explicit that it's scrappy, and be equally explicit about what "proper" would add. The failure mode isn't building it fast &mdash; it's letting a prototype quietly become production because nobody said out loud that it wasn't.</p>
+  </div>
+</section>
+
+<!-- ============ SAYING NO ============ -->
+<section id="no">
+  <div class="shead"><span class="snum">04</span><h2>Saying no without being the person who says no</h2></div>
+  <p class="slede">Becoming the person who builds things means becoming the person everyone asks. Reputation is built as much on what you decline well as on what you deliver.</p>
+
+  <ul class="plain">
+    <li><b>"Yes, and here's what it would cost."</b> Convert a no into a trade-off and hand the decision back. You're not refusing, you're pricing.</li>
+    <li><b>"Can we do the 20% version first?"</b> Almost always accepted, and it frequently turns out to be all they needed.</li>
+    <li><b>"Who owns this once it exists?"</b> Anything with no owner shouldn't be built. Asking early is a kindness, not an obstacle.</li>
+    <li><b>"What should I stop doing to fit this in?"</b> Makes your capacity visible without complaining about it, and moves prioritisation to whoever should own it.</li>
+    <li><b>"Let's do it manually one more time and see."</b> A perfectly good answer for anything that happens twice a year. Automation is not always the right instinct.</li>
+  </ul>
+
+  <div class="tip"><b>The thing that actually builds the reputation</b>Go back a month later and ask whether it's still being used. Almost nobody does this. It tells you which of your instincts were right, it surfaces the next problem before anyone else hears about it, and it makes you the person who cares whether it worked &mdash; not just the person who built it.</div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>Field notes on turning vague requests into things worth building. Stack-agnostic by design &mdash; the patterns outlive the tools, though the build suggestions assume Fabric, Power BI and Snowflake.</p>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#f59e0b">◆</span> The Solution Playbook</p>
+</footer>
+
+</div>
+</body>
+</html>

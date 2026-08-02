@@ -71,6 +71,12 @@ a{color:inherit;text-decoration:none}
 .card.palewood{--cardaccent:#9bbc0f}
 .card.brick{--cardaccent:#f5b81b}
 .card.excel{--cardaccent:#217346}
+.card.fabric{--cardaccent:#2ec4b6}
+.card.fabapps{--cardaccent:#a78bfa}
+.card.playbook{--cardaccent:#f59e0b}
+.card.patterns{--cardaccent:#4ade80}
+.card.git{--cardaccent:#0098ff}
+.card.rti{--cardaccent:#f472b6}
 
 /* tags on cards */
 .ctags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
@@ -156,10 +162,76 @@ footer .fp{font-family:var(--mono);font-size:.74rem;margin-top:8px}
       </span>
     </a>
 
+    <a class="card fabric" href="roadmaps/fabric-data-engineering-7-day.html">
+      <span class="accent"></span>
+      <p class="kicker">Microsoft Fabric · Data engineering</p>
+      <h2>Fabric in 7 Days</h2>
+      <p>Ten minutes a day for a week: OneLake and the engines over it, the shortcut-vs-mirror-vs-copy ladder, picking a store, notebooks that survive production, medallion and Direct Lake, CI/CD with variable libraries, and the serving layer. One idea, one hands-on, one question for your org per day.</p>
+      <div class="ctags"><span class="ctag">7 days</span><span class="ctag">10 min each</span><span class="ctag">Capstone</span></div>
+      <span class="go">Start day 1
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <a class="card fabapps" href="roadmaps/fabric-apps.html">
+      <span class="accent"></span>
+      <p class="kicker">Microsoft Fabric · Application layer</p>
+      <h2>Fabric Apps</h2>
+      <p>Fabric became an application platform in 2026. What the new item type is, operational apps vs data apps, how the managed backend and Entra auth fit together, when it beats a report or a Power App — and what to line up before access lands in your tenant.</p>
+      <div class="ctags"><span class="ctag">Preview</span><span class="ctag">Orientation</span><span class="ctag">5 sections</span></div>
+      <span class="go">Open primer
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <a class="card playbook" href="roadmaps/solution-playbook.html">
+      <span class="accent"></span>
+      <p class="kicker">Problem shaping · For people who build</p>
+      <h2>The Solution Playbook</h2>
+      <p>Sixteen business problems in the words people actually say them — "I export this every month and email it round", "these two systems don't agree", "we only found out a week later" — each with what it really is underneath, what to build, the scrappy version you could ship this afternoon, and the trap.</p>
+      <div class="ctags"><span class="ctag">16 patterns</span><span class="ctag">Stack-agnostic</span><span class="ctag">Field notes</span></div>
+      <span class="go">Open playbook
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <a class="card patterns" href="roadmaps/sql-python-patterns.html">
+      <span class="accent"></span>
+      <p class="kicker">SQL · Python · Vocabulary</p>
+      <h2>SQL &amp; Python Patterns</h2>
+      <p>The twelve shapes that solve most real data work — dedup, LAG, running totals, gaps and islands, unpivot, date spines, slowly changing dimensions, anti-joins, full reconciliation. Named in plain English first, then the code. You can't ask for what you can't name.</p>
+      <div class="ctags"><span class="ctag">12 patterns</span><span class="ctag">Copy-paste</span><span class="ctag">Naming sheet</span></div>
+      <span class="go">Open patterns
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <a class="card git" href="roadmaps/git-vscode-gui.html">
+      <span class="accent"></span>
+      <p class="kicker">Git · VS Code · GUI-first</p>
+      <h2>Git Without the Terminal</h2>
+      <p>The whole workflow through VS Code's Source Control panel — no command line. The mental model in four ideas, a labelled tour of the panel, the six-click daily loop, what a merge conflict actually is and how to resolve one, and how to undo almost anything safely.</p>
+      <div class="ctags"><span class="ctag">GUI only</span><span class="ctag">Conflict walkthrough</span><span class="ctag">Undo table</span></div>
+      <span class="go">Open guide
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <a class="card rti" href="roadmaps/fabric-real-time-intelligence.html">
+      <span class="accent"></span>
+      <p class="kicker">Microsoft Fabric · Streaming · KQL</p>
+      <h2>Real-Time Intelligence</h2>
+      <p>The half of Fabric that Power BI people skip, which is exactly why it's worth learning. Eventstream, Eventhouse, Real-Time Dashboards and Activator — plus KQL in ten minutes (it's genuinely easier than SQL) and the alert nobody builds: the one for when data stops arriving.</p>
+      <div class="ctags"><span class="ctag">KQL crash course</span><span class="ctag">Activator</span><span class="ctag">Build-first</span></div>
+      <span class="go">Open guide
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
     <div class="card soon" aria-disabled="true">
       <span class="accent"></span>
       <p class="kicker">More on the way</p>
-      <h2>Data Engineering · Git / VS Code · more</h2>
+      <h2>Data modelling · Purview · more</h2>
       <p>Additional roadmaps from the tool-belt series will land here as they're brought over.</p>
     </div>
 
@@ -216,7 +288,7 @@ footer .fp{font-family:var(--mono);font-size:.74rem;margin-top:8px}
 
   <footer>
     <p>Built with Claude Code. Each roadmap tracks your progress locally in the browser.</p>
-    <p class="fp">timmyjfly.pages.dev · <span style="color:var(--amber)">■</span> DAX &middot; <span style="color:var(--flake)">❄</span> Snowflake &middot; <span style="color:#8b5cf6">◆</span> Prompt Engineering &middot; <span style="color:#217346">◆</span> Copilot Skills in Excel &middot; <span style="color:#c084fc">▲</span> Compute Cluster Tycoon &middot; <span style="color:#34d399">▲</span> AI Colony Builder &middot; <span style="color:#9bbc0f">▲</span> Palewood Quest &middot; <span style="color:#f5b81b">▲</span> Brick Dash</p>
+    <p class="fp">timmyjfly.pages.dev · <span style="color:var(--amber)">■</span> DAX &middot; <span style="color:var(--flake)">❄</span> Snowflake &middot; <span style="color:#8b5cf6">◆</span> Prompt Engineering &middot; <span style="color:#217346">◆</span> Copilot Skills in Excel &middot; <span style="color:#2ec4b6">◆</span> Fabric in 7 Days &middot; <span style="color:#a78bfa">◆</span> Fabric Apps &middot; <span style="color:#f472b6">◆</span> Real-Time Intelligence &middot; <span style="color:#f59e0b">◆</span> Solution Playbook &middot; <span style="color:#4ade80">◆</span> SQL &amp; Python &middot; <span style="color:#0098ff">◆</span> Git &middot; <span style="color:#c084fc">▲</span> Compute Cluster Tycoon &middot; <span style="color:#34d399">▲</span> AI Colony Builder &middot; <span style="color:#9bbc0f">▲</span> Palewood Quest &middot; <span style="color:#f5b81b">▲</span> Brick Dash</p>
   </footer>
 
 </div>
