@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Without the Terminal — VS Code's Source Control Panel, Explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a1a1c;
+  --panel:#232326;
+  --panel2:#1e1e21;
+  --line:#37373d;
+  --ink:#e9e9ec;
+  --mut:#a6a6ae;
+  --dim:#72727c;
+  --vs:#0098ff;
+  --vs-hi:#4fb8ff;
+  --vs-soft:rgba(0,152,255,.12);
+  --green:#4ec9b0;
+  --green-soft:rgba(78,201,176,.12);
+  --amber:#dcb67a;
+  --amber-soft:rgba(220,182,122,.12);
+  --rose:#f14c4c;
+  --rose-soft:rgba(241,76,76,.12);
+  --violet:#c586c0;
+  --violet-soft:rgba(197,134,192,.12);
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.63;min-height:100vh;
+  background-image:radial-gradient(900px 420px at 12% -6%, rgba(0,152,255,.10), transparent 62%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(0,152,255,.3)}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(26,26,28,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:9px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--vs)}
+.navlinks{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font-family:var(--mono);font-size:.71rem;color:var(--mut);text-decoration:none;padding:4px 9px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{color:var(--ink);background:var(--panel)}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 22px}
+
+.hero{padding:56px 0 14px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:13px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5.2vw,2.85rem);line-height:1.12;letter-spacing:-.018em}
+.hero h1 .b{color:var(--vs-hi)}
+.hero .sub{color:var(--mut);max-width:65ch;margin-top:16px;font-size:1.04rem}
+
+.premise{margin:28px 0 6px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--vs);
+  border-radius:12px;padding:20px 22px}
+.premise h2{font-family:var(--disp);font-size:.84rem;letter-spacing:.07em;text-transform:uppercase;color:var(--vs-hi);margin-bottom:9px}
+.premise p{color:var(--mut);font-size:.96rem;margin-bottom:8px}
+.premise p:last-child{margin-bottom:0}
+.premise b{color:var(--ink);font-weight:600}
+
+section{margin-top:50px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.snum{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--vs-hi);border:1.5px solid var(--vs);
+  background:var(--vs-soft);border-radius:7px;padding:3px 10px;flex-shrink:0}
+.shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.28rem,3.4vw,1.68rem);line-height:1.2}
+.slede{color:var(--mut);font-size:1rem;max-width:72ch;margin-bottom:14px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:21px 23px;margin-top:15px}
+.card h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--mut);font-size:.95rem}
+.card p + p{margin-top:9px}
+.card b{color:var(--ink);font-weight:600}
+
+/* analogy cards */
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}
+@media (max-width:780px){.trio{grid-template-columns:1fr}}
+.trio .card{margin-top:0}
+.trio .term{font-family:var(--mono);font-size:.72rem;color:var(--vs);letter-spacing:.06em;text-transform:uppercase;
+  font-weight:600;margin-bottom:5px;display:block}
+
+/* mockups */
+.mock{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;
+  box-shadow:0 2px 14px rgba(0,0,0,.4)}
+.mock svg{display:block;width:100%;height:auto}
+.mockcap{font-family:var(--mono);font-size:.7rem;color:var(--dim);padding:9px 14px;border-top:1px solid var(--line);
+  background:var(--panel2);line-height:1.6}
+.mockcap b{color:var(--amber)}
+
+/* button steps */
+ol.steps{list-style:none;counter-reset:s;margin-top:16px}
+ol.steps li{counter-increment:s;position:relative;padding:15px 20px 15px 58px;background:var(--panel);
+  border:1px solid var(--line);border-radius:11px;margin-bottom:10px}
+ol.steps li::before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:7px;
+  background:var(--vs-soft);border:1px solid var(--vs);color:var(--vs-hi);font-family:var(--mono);
+  font-size:.85rem;font-weight:600;display:grid;place-items:center}
+ol.steps h4{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:3px}
+ol.steps p{color:var(--mut);font-size:.93rem}
+ol.steps p + p{margin-top:6px}
+
+ul.plain{list-style:none;margin-top:11px}
+ul.plain li{position:relative;padding-left:21px;margin-bottom:8px;color:var(--mut);font-size:.95rem}
+ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--vs)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+.tip{margin-top:16px;border-left:3px solid var(--vs);background:var(--vs-soft);border-radius:0 10px 10px 0;
+  padding:12px 16px;font-size:.93rem;color:var(--mut)}
+.tip b{color:var(--vs-hi);font-weight:600;font-family:var(--mono);font-size:.71rem;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:4px}
+.tip.warn{border-left-color:var(--rose);background:var(--rose-soft)}
+.tip.warn b{color:var(--rose)}
+.tip.ok{border-left-color:var(--green);background:var(--green-soft)}
+.tip.ok b{color:var(--green)}
+
+/* UI element inline */
+.ui{font-family:var(--mono);font-size:.82em;background:var(--panel2);border:1px solid var(--line);
+  border-radius:4px;padding:1px 6px;color:var(--ink);white-space:nowrap}
+kbd{font-family:var(--mono);font-size:.78em;background:#2d2d32;border:1px solid #45454d;border-bottom-width:2px;
+  border-radius:4px;padding:1px 6px;color:var(--ink)}
+
+pre{background:#141416;border:1px solid #303036;border-radius:9px;padding:13px 15px;overflow-x:auto;margin-top:11px}
+code{font-family:var(--mono);font-size:.78rem;line-height:1.58;color:#d4d4d4;white-space:pre-wrap;word-break:break-word}
+pre .c{color:#6a9955} pre .m{color:#f14c4c} pre .p{color:#4ec9b0} pre .h{color:#dcb67a}
+p code,li code,td code{background:var(--vs-soft);color:var(--vs-hi);border-radius:5px;padding:1px 6px;font-size:.85em;white-space:normal}
+
+table{width:100%;border-collapse:collapse;margin-top:15px;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{color:var(--ink);font-weight:600}
+.tscroll{overflow-x:auto}
+
+footer{margin:56px 0 38px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.86rem}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .topbar{gap:8px;padding:8px 14px}
+  .navlinks{margin-left:0}
+  .hero{padding:38px 0 12px}
+  .card{padding:18px 16px}
+  ol.steps li{padding:14px 15px 14px 52px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{body{background:#fff;color:#111;background-image:none}.topbar{display:none}.card,.mock,ol.steps li{background:#fff;border-color:#ccc;box-shadow:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand"><span class="fl">&#9670;</span> Git without the terminal</span>
+  <nav class="navlinks">
+    <a href="#model">Mental model</a>
+    <a href="#panel">The panel</a>
+    <a href="#loop">Daily loop</a>
+    <a href="#conflict">Conflicts</a>
+    <a href="#undo">Undo</a>
+    <a href="#fabric">Fabric</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Git &middot; VS Code &middot; GUI-first</p>
+  <h1>Git, entirely through<br>the <span class="b">buttons</span>.</h1>
+  <p class="sub">Every Git tutorial is written for people who live in a terminal. You don't, and you don't need to &mdash; VS Code's Source Control panel does everything you'll actually do, and the GUI is genuinely better for the two things that matter most: <b>reading a diff before you commit</b> and <b>resolving a merge conflict</b>. This page is the mental model plus the five buttons, with no command line required.</p>
+
+  <div class="premise">
+    <h2>Why bother understanding it at all</h2>
+    <p>You can click Commit and Sync without knowing what they do &mdash; right up until something goes sideways, and then you're stuck. The model underneath is genuinely simple: <b>four concepts, five buttons.</b> An hour here means you never again lose work, never again fear a conflict, and can undo almost anything.</p>
+    <p>Everything below is the GUI. There's a short table at the end mapping each button to the command it runs, purely so that when you paste an error into a chat and something suggests a command, you know which button you already pressed.</p>
+  </div>
+</header>
+
+<!-- ============ MENTAL MODEL ============ -->
+<section id="model">
+  <div class="shead"><span class="snum">01</span><h2>The mental model &mdash; four things, in plain English</h2></div>
+  <p class="slede">Forget the jargon for a moment. Git is a save system for a folder, with the ability to run parallel versions and merge them back. That's genuinely all it is.</p>
+
+  <div class="trio">
+    <div class="card">
+      <span class="term">Commit</span>
+      <p>A <b>save point</b> for the whole folder, with a note attached. Not a file save &mdash; a snapshot of everything, at a moment, that you can return to. Making one is cheap and you should make lots.</p>
+    </div>
+    <div class="card">
+      <span class="term">Branch</span>
+      <p>A <b>parallel version</b> of the folder. You go off, make save points, and the original is untouched the whole time. When you're happy, you merge it back. If you're not, you bin it and nothing was lost.</p>
+    </div>
+    <div class="card">
+      <span class="term">Remote</span>
+      <p>The <b>shared copy</b> on GitHub. Your machine has its own complete copy; nothing you do is visible to anyone else until you push. This is why you can experiment freely.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>And the fourth: the staging area &mdash; the one that confuses everybody</h3>
+    <p>Between "I changed a file" and "I made a save point" there's a middle step: <b>staging</b>. You're saying <em>these particular changes</em> go in this commit. In VS Code it's the <span class="ui">+</span> next to each file &mdash; the difference between <b>Changes</b> (edited, not included) and <b>Staged Changes</b> (going into the next commit).</p>
+    <p>Why it exists: you often edit five files and only three belong to the thing you're describing. Staging lets you commit those three with an honest message, and the other two separately. If you never care, VS Code will offer to stage everything for you when you commit &mdash; and that's a perfectly reasonable way to work.</p>
+    <div class="tip"><b>The sentence that makes it click</b><b>Changes</b> = what you've edited. <b>Staged</b> = what's going into the next save point. <b>Commit</b> = make the save point. <b>Sync</b> = share it. That's the whole flow, and everything else in the panel is a variation on it.</div>
+  </div>
+</section>
+
+<!-- ============ THE PANEL ============ -->
+<section id="panel">
+  <div class="shead"><span class="snum">02</span><h2>The Source Control panel &mdash; a guided tour</h2></div>
+  <p class="slede">Third icon down the left-hand activity bar &mdash; the one that looks like a branching line. Or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>. Nearly everything lives here.</p>
+
+  <div class="mock">
+    <svg viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of the VS Code Source Control panel with numbered callouts">
+      <rect width="880" height="420" fill="#1e1e21"/>
+      <!-- activity bar -->
+      <rect x="0" y="0" width="48" height="420" fill="#28282c"/>
+      <g fill="#72727c">
+        <rect x="16" y="18" width="16" height="14" rx="2"/>
+        <rect x="16" y="52" width="16" height="14" rx="2"/>
+      </g>
+      <!-- source control icon highlighted -->
+      <rect x="0" y="82" width="2.5" height="26" fill="#0098ff"/>
+      <g stroke="#e9e9ec" stroke-width="1.6" fill="none">
+        <circle cx="20" cy="90" r="3.2"/><circle cx="20" cy="103" r="3.2"/><circle cx="31" cy="96" r="3.2"/>
+        <path d="M20,93.2 V99.8"/><path d="M23.2,90 H27.8 V92.8"/>
+      </g>
+      <circle cx="34" cy="86" r="6.5" fill="#0098ff"/>
+      <text x="34" y="89" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#fff">3</text>
+
+      <!-- panel -->
+      <rect x="48" y="0" width="292" height="420" fill="#232326"/>
+      <text x="64" y="24" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="#a6a6ae" letter-spacing="0.6">SOURCE CONTROL</text>
+      <g fill="#a6a6ae" font-family="Inter,sans-serif" font-size="13">
+        <text x="252" y="25">⟳</text><text x="276" y="25">✓</text><text x="300" y="25">⋯</text>
+      </g>
+
+      <!-- message box -->
+      <rect x="60" y="38" width="264" height="34" rx="4" fill="#1a1a1c" stroke="#0098ff" stroke-width="1.3"/>
+      <text x="70" y="59" font-family="Inter,sans-serif" font-size="10.5" fill="#72727c">Message (Ctrl+Enter to commit)</text>
+
+      <!-- commit button -->
+      <rect x="60" y="80" width="264" height="27" rx="4" fill="#0098ff"/>
+      <text x="192" y="97" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="600" fill="#fff">✓ Commit</text>
+
+      <!-- staged section -->
+      <text x="64" y="132" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="#a6a6ae">Staged Changes</text>
+      <circle cx="310" cy="128" r="8" fill="#37373d"/><text x="310" y="131.5" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#e9e9ec">1</text>
+      <g font-family="Inter,sans-serif" font-size="11">
+        <text x="76" y="154" fill="#4ec9b0">index.html</text>
+        <text x="146" y="154" fill="#72727c" font-size="9.5">roadmaps</text>
+        <text x="300" y="154" fill="#4ec9b0" font-size="10">M</text>
+        <text x="282" y="154" fill="#a6a6ae" font-size="11">−</text>
+      </g>
+
+      <!-- changes section -->
+      <text x="64" y="188" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="#a6a6ae">Changes</text>
+      <circle cx="310" cy="184" r="8" fill="#37373d"/><text x="310" y="187.5" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#e9e9ec">2</text>
+      <g font-family="Inter,sans-serif" font-size="11">
+        <text x="76" y="210" fill="#dcb67a">fabric-apps.html</text>
+        <text x="300" y="210" fill="#dcb67a" font-size="10">M</text>
+        <text x="282" y="210" fill="#a6a6ae" font-size="11">+</text>
+        <text x="264" y="210" fill="#a6a6ae" font-size="11">↺</text>
+
+        <text x="76" y="232" fill="#4ec9b0">new-page.html</text>
+        <text x="300" y="232" fill="#4ec9b0" font-size="10">U</text>
+        <text x="282" y="232" fill="#a6a6ae" font-size="11">+</text>
+      </g>
+
+      <!-- callouts -->
+      <g font-family="Inter,sans-serif" font-size="10.5">
+        <circle cx="352" cy="55" r="10" fill="#0098ff"/><text x="352" y="59" text-anchor="middle" font-weight="700" fill="#fff" font-size="10">1</text>
+        <text x="370" y="53" fill="#e9e9ec" font-weight="600">Describe what you changed</text>
+        <text x="370" y="68" fill="#a6a6ae" font-size="9.5">One sentence. "Fix mobile nav" beats "updates".</text>
+
+        <circle cx="352" cy="93" r="10" fill="#0098ff"/><text x="352" y="97" text-anchor="middle" font-weight="700" fill="#fff" font-size="10">2</text>
+        <text x="370" y="91" fill="#e9e9ec" font-weight="600">Commit — make the save point</text>
+        <text x="370" y="106" fill="#a6a6ae" font-size="9.5">Local only. Nothing is shared yet.</text>
+
+        <circle cx="352" cy="145" r="10" fill="#4ec9b0"/><text x="352" y="149" text-anchor="middle" font-weight="700" fill="#1e1e21" font-size="10">3</text>
+        <text x="370" y="143" fill="#e9e9ec" font-weight="600">Staged — going into this commit</text>
+        <text x="370" y="158" fill="#a6a6ae" font-size="9.5">The − button takes it back out.</text>
+
+        <circle cx="352" cy="203" r="10" fill="#dcb67a"/><text x="352" y="207" text-anchor="middle" font-weight="700" fill="#1e1e21" font-size="10">4</text>
+        <text x="370" y="201" fill="#e9e9ec" font-weight="600">Changes — edited, not included yet</text>
+        <text x="370" y="216" fill="#a6a6ae" font-size="9.5">+ stages it. ↺ discards it (careful — see §5).</text>
+
+        <circle cx="352" cy="258" r="10" fill="#c586c0"/><text x="352" y="262" text-anchor="middle" font-weight="700" fill="#1e1e21" font-size="10">5</text>
+        <text x="370" y="256" fill="#e9e9ec" font-weight="600">Click any filename to see the diff</text>
+        <text x="370" y="271" fill="#a6a6ae" font-size="9.5">Side-by-side: old on the left, yours on the right.</text>
+        <text x="370" y="286" fill="#a6a6ae" font-size="9.5">Do this every single time before committing.</text>
+
+        <circle cx="352" cy="322" r="10" fill="#0098ff"/><text x="352" y="326" text-anchor="middle" font-weight="700" fill="#fff" font-size="10">6</text>
+        <text x="370" y="320" fill="#e9e9ec" font-weight="600">Letters: M = modified, U = untracked (new),</text>
+        <text x="370" y="335" fill="#a6a6ae" font-size="9.5">D = deleted, C = conflict</text>
+      </g>
+
+      <!-- status bar -->
+      <rect x="0" y="396" width="880" height="24" fill="#0098ff"/>
+      <text x="12" y="412" font-family="Inter,sans-serif" font-size="10.5" fill="#fff">⑂ add-fabric-pages*</text>
+      <text x="150" y="412" font-family="Inter,sans-serif" font-size="10.5" fill="#fff">↻ 1↑ 0↓</text>
+      <circle cx="466" cy="408" r="10" fill="#1e1e21"/><text x="466" y="412" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#fff">7</text>
+      <text x="484" y="412" font-family="Inter,sans-serif" font-size="10.5" fill="#fff">Bottom-left = your branch. Click it to switch or create one.</text>
+    </svg>
+    <p class="mockcap"><b>Illustration of the layout</b> &mdash; your VS Code will differ slightly by version and theme, but every element shown is in the same place.</p>
+  </div>
+
+  <div class="tip ok"><b>The habit worth building first</b>Callout 5. <b>Click every changed file and read the diff before you commit.</b> Green is added, red is removed. Ten seconds per file, and it catches the accidental deletion, the debug line you left in, and the file you didn't mean to touch. This one habit is most of what "being careful with Git" means.</div>
+</section>
+
+<!-- ============ DAILY LOOP ============ -->
+<section id="loop">
+  <div class="shead"><span class="snum">03</span><h2>The daily loop &mdash; six clicks, every time</h2></div>
+  <p class="slede">This is the whole workflow. It doesn't get more complicated than this for 95% of what you do.</p>
+
+  <ol class="steps">
+    <li>
+      <h4>Start from a fresh copy &mdash; <span class="ui">Sync Changes</span></h4>
+      <p>Before you touch anything, pull down what's changed. The <span class="ui">↻</span> in the bottom-left status bar, or <span class="ui">⋯</span> &rarr; <span class="ui">Pull</span>. Starting stale is the number one cause of the conflicts in section 4.</p>
+    </li>
+    <li>
+      <h4>Make a branch &mdash; click the branch name, bottom-left</h4>
+      <p>Click the branch name in the status bar &rarr; <span class="ui">Create new branch&hellip;</span> &rarr; type a name like <code>fix-mobile-nav</code>. You're now working in a parallel copy and <code>main</code> is safe no matter what you do.</p>
+      <p>Do this <em>every time</em>, even for small things. It costs three seconds and it means you can always abandon an idea cleanly.</p>
+    </li>
+    <li>
+      <h4>Change things &mdash; normally</h4>
+      <p>Edit files, let Claude Code edit files, whatever. Files appear under <b>Changes</b> as you go. Nothing is recorded yet.</p>
+    </li>
+    <li>
+      <h4>Read the diffs, then stage &mdash; the <span class="ui">+</span> buttons</h4>
+      <p>Click each file, read the diff, then <span class="ui">+</span> to stage it. To stage everything at once, hover <b>Changes</b> and click the <span class="ui">+</span> on that header row.</p>
+    </li>
+    <li>
+      <h4>Write a message and hit <span class="ui">Commit</span></h4>
+      <p>One line describing <em>what changed and why</em>. Your future self reads these when hunting for when something broke &mdash; "updates" tells them nothing.</p>
+      <p>Still local. Nothing has left your machine yet, and you can still change your mind.</p>
+    </li>
+    <li>
+      <h4><span class="ui">Publish Branch</span> / <span class="ui">Sync Changes</span> &rarr; then the PR in the browser</h4>
+      <p>The blue button becomes <span class="ui">Publish Branch</span> the first time, then <span class="ui">Sync Changes</span> afterwards. Once pushed, GitHub shows a <b>Compare &amp; pull request</b> banner &mdash; click it, write a sentence, create the PR, merge it. That's the workflow you're already using.</p>
+    </li>
+  </ol>
+
+  <div class="tip"><b>Commit more often than feels necessary</b>A commit is a save point you can return to, not a formal statement of completion. Ten small commits with clear messages are far more useful than one giant one at the end &mdash; and if something breaks, you can find the exact one that did it.</div>
+</section>
+
+<!-- ============ CONFLICTS ============ -->
+<section id="conflict">
+  <div class="shead"><span class="snum">04</span><h2>Merge conflicts &mdash; what they actually are</h2></div>
+  <p class="slede">The thing everyone dreads, and it's genuinely not that bad once you know what Git is asking you. Worth reading properly, because you hit this every time two branches touch the same card grid.</p>
+
+  <div class="card">
+    <h3>What's actually happening</h3>
+    <p>Git merges automatically whenever it can. It only stops when <b>two branches changed the same lines of the same file</b> and it can't tell which one you meant. That's the entire cause.</p>
+    <p>It is not an error, and nothing is broken or lost. Git is asking you one question: <b>"which of these do you want &mdash; or both?"</b> You answer, you commit, it's over.</p>
+    <p>This is exactly what happens when two feature branches each add a card to the same grid in <code>index.html</code>: both edited the same spot, and both changes are wanted. The answer is nearly always <b>both</b>.</p>
+  </div>
+
+  <div class="mock">
+    <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of an inline merge conflict in VS Code with Accept Current, Accept Incoming and Accept Both buttons">
+      <rect width="880" height="300" fill="#1e1e21"/>
+      <rect x="0" y="0" width="880" height="26" fill="#28282c"/>
+      <text x="14" y="18" font-family="Inter,sans-serif" font-size="10.5" fill="#dcb67a">⚠ index.html — 1 conflict</text>
+      <rect x="700" y="4" width="168" height="18" rx="4" fill="#0098ff"/>
+      <text x="784" y="17" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#fff">Resolve in Merge Editor</text>
+
+      <!-- action links -->
+      <g font-family="Inter,sans-serif" font-size="10.5">
+        <text x="60" y="52" fill="#0098ff">Accept Current Change</text>
+        <text x="196" y="52" fill="#0098ff">Accept Incoming Change</text>
+        <text x="348" y="52" fill="#0098ff">Accept Both Changes</text>
+        <text x="482" y="52" fill="#0098ff">Compare Changes</text>
+      </g>
+
+      <!-- line numbers -->
+      <g font-family="JetBrains Mono,monospace" font-size="10" fill="#72727c">
+        <text x="20" y="76">147</text><text x="20" y="94">148</text><text x="20" y="112">149</text><text x="20" y="130">150</text>
+        <text x="20" y="148">151</text><text x="20" y="166">152</text><text x="20" y="184">153</text><text x="20" y="202">154</text>
+        <text x="20" y="220">155</text><text x="20" y="238">156</text>
+      </g>
+
+      <!-- current block -->
+      <rect x="48" y="64" width="832" height="18" fill="rgba(78,201,176,.16)"/>
+      <text x="60" y="76" font-family="JetBrains Mono,monospace" font-size="10" fill="#4ec9b0">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (Current Change — what's on YOUR branch)</text>
+      <rect x="48" y="82" width="832" height="36" fill="rgba(78,201,176,.09)"/>
+      <text x="60" y="94" font-family="JetBrains Mono,monospace" font-size="10" fill="#d4d4d4">    &lt;a class="card fabric" href="roadmaps/fabric-7-day.html"&gt;</text>
+      <text x="60" y="112" font-family="JetBrains Mono,monospace" font-size="10" fill="#d4d4d4">      &lt;h2&gt;Fabric in 7 Days&lt;/h2&gt;&lt;/a&gt;</text>
+
+      <!-- separator -->
+      <rect x="48" y="118" width="832" height="18" fill="rgba(114,114,124,.2)"/>
+      <text x="60" y="130" font-family="JetBrains Mono,monospace" font-size="10" fill="#a6a6ae">=======</text>
+
+      <!-- incoming block -->
+      <rect x="48" y="136" width="832" height="36" fill="rgba(0,152,255,.10)"/>
+      <text x="60" y="148" font-family="JetBrains Mono,monospace" font-size="10" fill="#d4d4d4">    &lt;a class="card excel" href="roadmaps/excel-skills.html"&gt;</text>
+      <text x="60" y="166" font-family="JetBrains Mono,monospace" font-size="10" fill="#d4d4d4">      &lt;h2&gt;Copilot Skills in Excel&lt;/h2&gt;&lt;/a&gt;</text>
+      <rect x="48" y="172" width="832" height="18" fill="rgba(0,152,255,.18)"/>
+      <text x="60" y="184" font-family="JetBrains Mono,monospace" font-size="10" fill="#4fb8ff">&gt;&gt;&gt;&gt;&gt;&gt;&gt; main (Incoming Change — what's already on main)</text>
+
+      <!-- annotation -->
+      <rect x="48" y="206" width="832" height="76" rx="8" fill="#232326" stroke="#37373d"/>
+      <text x="64" y="228" font-family="Inter,sans-serif" font-size="11.5" font-weight="600" fill="#e9e9ec">Both cards belong on the page — so click "Accept Both Changes".</text>
+      <text x="64" y="248" font-family="Inter,sans-serif" font-size="10.5" fill="#a6a6ae">The &lt;&lt;&lt;&lt;&lt;&lt;&lt;, ======= and &gt;&gt;&gt;&gt;&gt;&gt;&gt; marker lines vanish automatically. Tidy the</text>
+      <text x="64" y="266" font-family="Inter,sans-serif" font-size="10.5" fill="#a6a6ae">blank lines, save, stage the file, and commit. The conflict is over.</text>
+    </svg>
+    <p class="mockcap"><b>Illustration of the inline conflict view.</b> The four blue links appear above every conflict block. <span style="color:#4ec9b0">Green</span> = your branch, <span style="color:#4fb8ff">blue</span> = what you're merging in.</p>
+  </div>
+
+  <div class="card">
+    <h3>Resolving one, click by click</h3>
+    <ol class="steps" style="margin-top:12px">
+      <li>
+        <h4>Open the file &mdash; it's marked <span class="ui">C</span> in Source Control</h4>
+        <p>VS Code jumps you to the conflict and colours the two competing blocks.</p>
+      </li>
+      <li>
+        <h4>Read both sides and decide</h4>
+        <p><b>Current</b> is your branch. <b>Incoming</b> is what you're merging in. Ask plainly: which of these should the file end up with?</p>
+      </li>
+      <li>
+        <h4>Click the answer</h4>
+        <p><span class="ui">Accept Current</span>, <span class="ui">Accept Incoming</span>, or <span class="ui">Accept Both</span>. For two cards in a grid, it's <b>Accept Both</b> nearly every time. If neither is right, just edit the text by hand and delete the marker lines yourself &mdash; that's completely legitimate.</p>
+      </li>
+      <li>
+        <h4>Check no markers survive</h4>
+        <p>Search the file for <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>. If any remain, you missed a conflict further down the file &mdash; a big file can have several.</p>
+      </li>
+      <li>
+        <h4>Save, stage, commit</h4>
+        <p>Staging a conflicted file is how you tell Git it's resolved. Commit, and the merge completes.</p>
+      </li>
+    </ol>
+    <div class="tip"><b>The three-way Merge Editor</b>Click <span class="ui">Resolve in Merge Editor</span> for a nicer view: your version left, theirs right, the result at the bottom, with checkboxes to include either side. For anything more complicated than two added blocks, use it &mdash; it's much easier to see what you're producing.</div>
+  </div>
+
+  <div class="tip warn"><b>How to stop having them</b>Conflicts come from branches drifting apart. Three habits kill most of them: <b>sync before you start</b>, <b>keep branches short-lived</b> (merge within a day or two), and <b>merge main into your branch</b> if it's been open a while, so you deal with a small conflict now instead of a big one later. Two branches that both edit one shared file for a week will always fight.</div>
+</section>
+
+<!-- ============ UNDO ============ -->
+<section id="undo">
+  <div class="shead"><span class="snum">05</span><h2>Undoing things &mdash; ranked by how much you'll want them</h2></div>
+  <p class="slede">The real confidence unlock. Once you know you can undo anything, you stop being cautious in the ways that slow you down.</p>
+
+  <div class="tscroll"><table>
+    <tr><th>You want to&hellip;</th><th>Do this in the GUI</th><th>Safe?</th></tr>
+    <tr>
+      <td><b>Throw away edits to one file</b> (not committed)</td>
+      <td>The <span class="ui">↺</span> icon next to the file in <b>Changes</b></td>
+      <td><b style="color:#f14c4c">No undo</b> &mdash; the edits are gone. See below.</td>
+    </tr>
+    <tr>
+      <td><b>Unstage a file</b></td>
+      <td>The <span class="ui">−</span> next to it under <b>Staged Changes</b></td>
+      <td>Totally safe &mdash; your edits stay</td>
+    </tr>
+    <tr>
+      <td><b>Fix the message you just wrote</b></td>
+      <td><span class="ui">⋯</span> &rarr; <b>Commit</b> &rarr; <b>Undo Last Commit</b>, retype, commit again</td>
+      <td>Safe if you haven't pushed</td>
+    </tr>
+    <tr>
+      <td><b>Undo a commit that's already pushed</b></td>
+      <td>Right-click the commit in the <b>Graph</b> / history &rarr; <b>Revert</b></td>
+      <td>Safest option &mdash; adds an opposite commit, rewrites nothing</td>
+    </tr>
+    <tr>
+      <td><b>Get back a file version from this morning</b></td>
+      <td>Open the file &rarr; <b>Timeline</b> view at the bottom of Explorer &rarr; click a point &rarr; copy what you need</td>
+      <td>Read-only browsing &mdash; completely safe</td>
+    </tr>
+    <tr>
+      <td><b>Abandon a branch entirely</b></td>
+      <td>Switch to <code>main</code>, then delete the branch from the branch list</td>
+      <td>Safe &mdash; main was never touched</td>
+    </tr>
+  </table></div>
+
+  <div class="tip warn"><b>The one genuinely dangerous button</b><span class="ui">Discard Changes</span> (the <span class="ui">↺</span>) deletes uncommitted work with no way back &mdash; Git never had a copy, so there's nothing to restore. VS Code's own local file history sometimes saves you, but don't rely on it. <b>If you're unsure, commit first.</b> A messy commit you delete later is free; lost work isn't.</div>
+
+  <div class="card">
+    <h3>The safety net worth knowing about</h3>
+    <p>Committed work is <b>extremely</b> hard to lose permanently &mdash; Git keeps a log of where every branch has pointed for weeks, so even a "deleted" commit is usually recoverable by someone who knows where to look. Uncommitted work has no such protection.</p>
+    <p>Which reduces to one rule: <b>commit early, commit messily.</b> Tidy history is a nice-to-have. Not losing an afternoon's work is not.</p>
+  </div>
+</section>
+
+<!-- ============ FABRIC ============ -->
+<section id="fabric">
+  <div class="shead"><span class="snum">06</span><h2>The same buttons, in Fabric</h2></div>
+  <p class="slede">You've already connected a workspace to GitHub, so this will look familiar &mdash; Fabric's Git integration is deliberately the same model with fewer buttons.</p>
+
+  <div class="card">
+    <h3>What the workspace source control panel gives you</h3>
+    <ul class="plain">
+      <li><b>Source control</b> in the workspace shows changed items with the same status idea &mdash; edited here, edited in the repo, or both (which is a conflict).</li>
+      <li><b>Commit</b> pushes your workspace changes up. <b>Update</b> pulls repo changes down into the workspace. Same push/pull, different words.</li>
+      <li><b>Branch out to a new workspace</b> is the killer feature and has no VS Code equivalent: it creates a whole isolated workspace from a branch, so you can develop without touching what anyone else is using.</li>
+      <li>PRs still happen on GitHub in the browser &mdash; Fabric doesn't do the review step, which is fine, because that's the part the browser is good at.</li>
+    </ul>
+    <div class="tip"><b>Where it differs from code</b>Fabric items are serialised into folders of JSON and metadata, so a conflict inside a semantic model is much harder to read than a conflict in HTML. Practical rule: <b>avoid conflicts in Fabric rather than resolving them.</b> One person per item at a time, short-lived branches, update before you start.</div>
+  </div>
+</section>
+
+<!-- ============ CLI FOOTNOTE ============ -->
+<section id="cli">
+  <div class="shead"><span class="snum">07</span><h2>What each button runs &mdash; for translation only</h2></div>
+  <p class="slede">You don't need these. They're here so that when documentation or an AI answer mentions a command, you can map it to the button you already know.</p>
+
+  <div class="tscroll"><table>
+    <tr><th>The button you click</th><th>What it runs</th></tr>
+    <tr><td><span class="ui">+</span> on a file</td><td><code>git add file</code></td></tr>
+    <tr><td><span class="ui">Commit</span></td><td><code>git commit -m "your message"</code></td></tr>
+    <tr><td><span class="ui">Sync Changes</span></td><td><code>git pull</code> then <code>git push</code></td></tr>
+    <tr><td><span class="ui">Publish Branch</span></td><td><code>git push -u origin branch-name</code></td></tr>
+    <tr><td>Create new branch</td><td><code>git checkout -b branch-name</code></td></tr>
+    <tr><td>Switch branch</td><td><code>git checkout branch-name</code></td></tr>
+    <tr><td><span class="ui">↺</span> Discard Changes</td><td><code>git restore file</code> &mdash; the irreversible one</td></tr>
+    <tr><td>Revert (right-click a commit)</td><td><code>git revert &lt;commit&gt;</code></td></tr>
+  </table></div>
+
+  <div class="tip ok"><b>Where the GUI genuinely beats the terminal</b>Reading a diff and resolving a conflict. Side-by-side colour and click-to-accept are objectively better than staring at markers in a text file &mdash; plenty of people who are fluent in the command line still switch to VS Code for exactly these two jobs. Using the GUI isn't a beginner compromise; for these tasks it's the better tool.</div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>A GUI-first guide. Everything here is clickable in VS Code's Source Control panel, the GitHub web interface, or Fabric's workspace source control &mdash; no terminal required.</p>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#0098ff">◆</span> Git without the terminal</p>
+</footer>
+
+</div>
+</body>
+</html>

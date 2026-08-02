@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL &amp; Python Patterns — The Dozen Shapes That Solve Most Data Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b120f;
+  --panel:#111b16;
+  --panel2:#0d1713;
+  --line:#1f3229;
+  --ink:#e4f0e9;
+  --mut:#9ab3a6;
+  --dim:#5f7d6e;
+  --green:#4ade80;
+  --green-hi:#86efac;
+  --green-soft:rgba(74,222,128,.11);
+  --cyan:#22d3ee;
+  --cyan-soft:rgba(34,211,238,.11);
+  --amber:#fbbf24;
+  --amber-soft:rgba(251,191,36,.11);
+  --rose:#fb7185;
+  --rose-soft:rgba(251,113,133,.11);
+  --violet:#c4b5fd;
+  --violet-soft:rgba(196,181,253,.11);
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.63;min-height:100vh;
+  background-image:radial-gradient(900px 420px at 88% -6%, rgba(74,222,128,.09), transparent 62%),
+                   radial-gradient(900px 420px at 8% -4%, rgba(34,211,238,.08), transparent 62%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(74,222,128,.28)}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(11,18,15,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:9px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--green)}
+.navlinks{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font-family:var(--mono);font-size:.71rem;color:var(--mut);text-decoration:none;padding:4px 9px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{color:var(--ink);background:var(--panel)}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 22px}
+
+.hero{padding:56px 0 14px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:13px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5.2vw,2.85rem);line-height:1.12;letter-spacing:-.018em}
+.hero h1 .g{color:var(--green-hi)}
+.hero .sub{color:var(--mut);max-width:65ch;margin-top:16px;font-size:1.04rem}
+
+.premise{margin:28px 0 6px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--green);
+  border-radius:12px;padding:20px 22px}
+.premise h2{font-family:var(--disp);font-size:.84rem;letter-spacing:.07em;text-transform:uppercase;color:var(--green-hi);margin-bottom:9px}
+.premise p{color:var(--mut);font-size:.96rem;margin-bottom:8px}
+.premise p:last-child{margin-bottom:0}
+.premise b{color:var(--ink);font-weight:600}
+
+section{margin-top:50px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.snum{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--green-hi);border:1.5px solid var(--green);
+  background:var(--green-soft);border-radius:7px;padding:3px 10px;flex-shrink:0}
+.shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.28rem,3.4vw,1.68rem);line-height:1.2}
+.slede{color:var(--mut);font-size:1rem;max-width:72ch;margin-bottom:14px}
+
+/* pattern card */
+.pat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:14px}
+.pat .ptop{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.pat .pn{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--green);background:var(--green-soft);
+  border:1px solid var(--green);border-radius:5px;padding:2px 8px;flex-shrink:0}
+.pat h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;line-height:1.3}
+.pat .want{color:var(--mut);font-size:.95rem;margin-top:11px}
+.pat .want b{color:var(--ink);font-weight:600}
+.pat .want em{color:var(--green-hi);font-style:normal}
+.mini{font-family:var(--mono);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);
+  font-weight:600;margin:15px 0 -4px;display:block}
+
+pre{background:#050a08;border:1px solid #16241d;border-radius:9px;padding:13px 15px;overflow-x:auto;margin-top:11px}
+code{font-family:var(--mono);font-size:.785rem;line-height:1.58;color:#cfe3d9;white-space:pre;word-break:normal}
+pre .c{color:#4d7a63} pre .k{color:#22d3ee} pre .s{color:#fbbf24} pre .f{color:#c4b5fd} pre .n{color:#86efac}
+:not(pre) > code{background:var(--green-soft);color:var(--green-hi);border-radius:5px;padding:1px 6px;font-size:.85em;
+  white-space:normal;word-break:break-word}
+
+.note{margin-top:13px;border-left:3px solid var(--cyan);background:var(--cyan-soft);border-radius:0 9px 9px 0;
+  padding:11px 15px;font-size:.9rem;color:var(--mut)}
+.note b{color:var(--cyan);font-weight:600;font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:3px}
+.note.warn{border-left-color:var(--rose);background:var(--rose-soft)}
+.note.warn b{color:var(--rose)}
+.note.py{border-left-color:var(--violet);background:var(--violet-soft)}
+.note.py b{color:var(--violet)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:21px 23px;margin-top:16px}
+.card h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--mut);font-size:.95rem}
+.card p + p{margin-top:9px}
+.card b{color:var(--ink);font-weight:600}
+
+ul.plain{list-style:none;margin-top:11px}
+ul.plain li{position:relative;padding-left:21px;margin-bottom:8px;color:var(--mut);font-size:.95rem}
+ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--green)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+table{width:100%;border-collapse:collapse;margin-top:15px;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{color:var(--ink);font-weight:600}
+.tscroll{overflow-x:auto}
+
+footer{margin:56px 0 38px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.86rem}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .topbar{gap:8px;padding:8px 14px}
+  .navlinks{margin-left:0}
+  .hero{padding:38px 0 12px}
+  .pat{padding:17px 15px}
+  code{font-size:.73rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{body{background:#fff;color:#111;background-image:none}.topbar{display:none}.pat,.card{background:#fff;border-color:#ccc}pre{background:#f5f5f5}code{color:#111}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand"><span class="fl">&#9670;</span> SQL &amp; Python Patterns</span>
+  <nav class="navlinks">
+    <a href="#window">Window functions</a>
+    <a href="#shape">Reshaping</a>
+    <a href="#compare">Comparing</a>
+    <a href="#python">When Python</a>
+    <a href="#ref">Cheat sheet</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; SQL &middot; Python &middot; Vocabulary</p>
+  <h1>Twelve shapes that solve<br>most of the <span class="g">actual work</span>.</h1>
+  <p class="sub">Every real data problem is a recombination of about a dozen patterns. This page names each one in plain English first &mdash; what you're trying to do and how to recognise it &mdash; then gives you the SQL, then the Python where Python is genuinely better. The point isn't to memorise syntax. It's <b>vocabulary</b>: you can't ask an AI, a colleague, or a search box for something you can't name.</p>
+
+  <div class="premise">
+    <h2>How to use this if you learn by doing</h2>
+    <p>Don't read it end to end. Skim the twelve headings once so the names land, then come back when you hit a problem and think "this is the one where&hellip;". <b>Naming the pattern is 80% of solving it</b> &mdash; once you know you need a window function, the syntax is a two-minute lookup or one prompt away.</p>
+    <p>The SQL is written to run on Fabric's SQL endpoint, a Warehouse, or Snowflake with minimal changes. Where a dialect differs meaningfully, it says so.</p>
+  </div>
+</header>
+
+<!-- ============ WINDOW FUNCTIONS ============ -->
+<section id="window">
+  <div class="shead"><span class="snum">01</span><h2>Window functions &mdash; the single highest-leverage thing to learn</h2></div>
+  <p class="slede">If you learn one thing on this page, learn these. A window function looks at other rows <em>while staying on the current row</em> &mdash; that's the whole idea, and it's what separates people who write awkward self-joins from people who write four clean lines. Five of the twelve patterns below are just window functions wearing different hats.</p>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">01</span><h3>Deduplicate &mdash; keep one row per thing</h3></div>
+    <p class="want"><b>You want this when:</b> an extract has the same record more than once and you need exactly one &mdash; usually <em>the most recent</em>. This is the most-used pattern in this entire page.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">Number the rows within each group, ordered so the one you want is number 1. Then keep number 1. That's it &mdash; and once you see it, you'll use it constantly.</p>
+    <pre><code><span class="k">WITH</span> ranked <span class="k">AS</span> (
+  <span class="k">SELECT</span> *,
+    <span class="f">ROW_NUMBER</span>() <span class="k">OVER</span> (
+      <span class="k">PARTITION BY</span> customer_id        <span class="c">-- one per customer</span>
+      <span class="k">ORDER BY</span> updated_at <span class="k">DESC</span>       <span class="c">-- newest wins</span>
+    ) <span class="k">AS</span> rn
+  <span class="k">FROM</span> raw_customer
+)
+<span class="k">SELECT</span> * <span class="k">FROM</span> ranked <span class="k">WHERE</span> rn = <span class="n">1</span>;</code></pre>
+    <div class="note"><b>Read it aloud</b>"Partition by" = start counting again for each. "Order by" = which one gets to be number 1. Change those two lines and this same shape solves a dozen different問 problems.</div>
+    <div class="note warn"><b>Watch out</b>If two rows tie on <code>updated_at</code>, which one wins is arbitrary and can change between runs &mdash; producing a table that differs each load for no visible reason. Add a tiebreaker to the ORDER BY (a surrogate key, a load timestamp) whenever the result has to be stable.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">02</span><h3>Compare to the previous period</h3></div>
+    <p class="want"><b>You want this when:</b> anyone says "versus last month", "change on prior", "movement", or "delta". Which in a finance org is roughly every second request.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">Reach backwards a fixed number of rows and pull that value onto the current row, so you can subtract them side by side. <code>LAG</code> looks back; <code>LEAD</code> looks forward.</p>
+    <pre><code><span class="k">SELECT</span>
+  period,
+  cost_centre,
+  amount,
+  <span class="f">LAG</span>(amount) <span class="k">OVER</span> (<span class="k">PARTITION BY</span> cost_centre <span class="k">ORDER BY</span> period) <span class="k">AS</span> prior_amount,
+  amount - <span class="f">LAG</span>(amount) <span class="k">OVER</span> (<span class="k">PARTITION BY</span> cost_centre <span class="k">ORDER BY</span> period) <span class="k">AS</span> movement
+<span class="k">FROM</span> monthly_actuals;</code></pre>
+    <div class="note warn"><b>The classic bug</b>If a cost centre has no rows in March, LAG gives you February &mdash; and silently calls it "prior month". If gaps are possible, join to a date spine first (pattern 07) so missing periods exist as zero rather than vanishing.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">03</span><h3>Running totals and rolling averages</h3></div>
+    <p class="want"><b>You want this when:</b> "cumulative year to date", "3-month rolling average", "balance over time". Anything that accumulates.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">Same window, but instead of one specific row you define a <em>range</em> of rows to aggregate over &mdash; "everything up to here", or "these three".</p>
+    <pre><code><span class="k">SELECT</span>
+  period, amount,
+  <span class="f">SUM</span>(amount) <span class="k">OVER</span> (
+    <span class="k">ORDER BY</span> period
+    <span class="k">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>      <span class="c">-- running total</span>
+  ) <span class="k">AS</span> ytd,
+  <span class="f">AVG</span>(amount) <span class="k">OVER</span> (
+    <span class="k">ORDER BY</span> period
+    <span class="k">ROWS BETWEEN</span> <span class="n">2</span> <span class="k">PRECEDING AND CURRENT ROW</span>            <span class="c">-- 3-month rolling</span>
+  ) <span class="k">AS</span> rolling_3m
+<span class="k">FROM</span> monthly_actuals;</code></pre>
+    <div class="note"><b>In Power BI, don't</b>If the destination is a semantic model, do this in DAX with time-intelligence measures instead &mdash; it stays responsive to whatever the user filters. Precompute it in SQL only when the grain is fixed and the cost of recalculating is real.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">04</span><h3>Rank within a group &mdash; top N per category</h3></div>
+    <p class="want"><b>You want this when:</b> "top 5 customers per region", "biggest three variances per department". Note this is pattern 01 with a different filter &mdash; same machinery.</p>
+    <pre><code><span class="k">WITH</span> r <span class="k">AS</span> (
+  <span class="k">SELECT</span> region, customer, revenue,
+    <span class="f">DENSE_RANK</span>() <span class="k">OVER</span> (<span class="k">PARTITION BY</span> region <span class="k">ORDER BY</span> revenue <span class="k">DESC</span>) <span class="k">AS</span> rk
+  <span class="k">FROM</span> sales
+)
+<span class="k">SELECT</span> * <span class="k">FROM</span> r <span class="k">WHERE</span> rk &lt;= <span class="n">5</span>;</code></pre>
+    <div class="note"><b>Which ranking function</b><code>ROW_NUMBER</code> never ties (1,2,3,4). <code>RANK</code> ties then skips (1,1,3). <code>DENSE_RANK</code> ties without skipping (1,1,2). For "top 5" you almost always want DENSE_RANK, otherwise a tie silently costs you a row.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">05</span><h3>Gaps and islands &mdash; find consecutive runs</h3></div>
+    <p class="want"><b>You want this when:</b> "how many days in a row was this breached", "find the missing invoice numbers", "how long was each outage". Sounds exotic, comes up constantly once you can name it.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">The trick that makes it click: if you number the rows sequentially and subtract that from the date, <b>every row in a consecutive run gets the same answer</b>. Group by that answer and you've found your runs. It's a genuinely clever trick and it's worth sitting with for a minute.</p>
+    <pre><code><span class="k">WITH</span> g <span class="k">AS</span> (
+  <span class="k">SELECT</span> breach_date,
+    <span class="f">DATEADD</span>(day,
+      -<span class="f">ROW_NUMBER</span>() <span class="k">OVER</span> (<span class="k">ORDER BY</span> breach_date),
+      breach_date) <span class="k">AS</span> grp                    <span class="c">-- constant within a run</span>
+  <span class="k">FROM</span> daily_breaches
+)
+<span class="k">SELECT</span> <span class="f">MIN</span>(breach_date) <span class="k">AS</span> run_start,
+       <span class="f">MAX</span>(breach_date) <span class="k">AS</span> run_end,
+       <span class="f">COUNT</span>(*)        <span class="k">AS</span> days_in_run
+<span class="k">FROM</span> g <span class="k">GROUP BY</span> grp
+<span class="k">ORDER BY</span> run_start;</code></pre>
+  </div>
+</section>
+
+<!-- ============ RESHAPING ============ -->
+<section id="shape">
+  <div class="shead"><span class="snum">02</span><h2>Reshaping &mdash; making data the right shape</h2></div>
+  <p class="slede">Most "the data's wrong" problems are actually "the data's the wrong shape" problems. These four fix that.</p>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">06</span><h3>Unpivot &mdash; columns that should be rows</h3></div>
+    <p class="want"><b>You want this when:</b> a finance extract has a column per month (<code>Jan</code>, <code>Feb</code>, <code>Mar</code>&hellip;). Humans love this layout; every analytical tool hates it. Almost every spreadsheet-sourced dataset needs this first.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">Turn twelve columns into two: one saying <em>which month</em>, one saying <em>the value</em>. Long and boring beats wide and clever &mdash; every time, for anything downstream.</p>
+    <pre><code><span class="c">-- portable version: works everywhere</span>
+<span class="k">SELECT</span> account, <span class="s">'Jan'</span> <span class="k">AS</span> period, jan <span class="k">AS</span> amount <span class="k">FROM</span> budget
+<span class="k">UNION ALL SELECT</span> account, <span class="s">'Feb'</span>, feb <span class="k">FROM</span> budget
+<span class="k">UNION ALL SELECT</span> account, <span class="s">'Mar'</span>, mar <span class="k">FROM</span> budget;
+
+<span class="c">-- T-SQL has a built-in for it</span>
+<span class="k">SELECT</span> account, period, amount
+<span class="k">FROM</span> budget
+<span class="k">UNPIVOT</span> (amount <span class="k">FOR</span> period <span class="k">IN</span> (jan, feb, mar)) <span class="k">AS</span> u;</code></pre>
+    <div class="note py"><b>Python is better here</b>If there are 36 columns, don't write 36 UNION ALLs. One line of pandas: <code>df.melt(id_vars=['account'], var_name='period', value_name='amount')</code>. This is exactly the kind of job where a notebook beats SQL.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">07</span><h3>Date spine &mdash; make the missing rows exist</h3></div>
+    <p class="want"><b>You want this when:</b> a month with no activity vanishes from your report instead of showing zero, so charts have gaps and prior-period comparisons quietly lie (see pattern 02).</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">Build a table of every date you care about, then <code>LEFT JOIN</code> your data onto it. Now absence is visible as a zero rather than invisible as a missing row &mdash; which is nearly always what people actually meant.</p>
+    <pre><code><span class="k">WITH</span> spine <span class="k">AS</span> (
+  <span class="k">SELECT</span> <span class="f">CAST</span>(<span class="s">'2024-01-01'</span> <span class="k">AS</span> date) <span class="k">AS</span> d
+  <span class="k">UNION ALL</span>
+  <span class="k">SELECT</span> <span class="f">DATEADD</span>(month, <span class="n">1</span>, d) <span class="k">FROM</span> spine <span class="k">WHERE</span> d &lt; <span class="s">'2026-12-01'</span>
+)
+<span class="k">SELECT</span> s.d <span class="k">AS</span> period, <span class="f">COALESCE</span>(a.amount, <span class="n">0</span>) <span class="k">AS</span> amount
+<span class="k">FROM</span> spine s
+<span class="k">LEFT JOIN</span> monthly_actuals a <span class="k">ON</span> a.period = s.d
+<span class="k">OPTION</span> (MAXRECURSION <span class="n">0</span>);</code></pre>
+    <div class="note"><b>Do it once, properly</b>Better still: keep a permanent date dimension table with month, quarter, fiscal year and period-end flags. Every model you build will use it, and your fiscal calendar lives in exactly one place instead of being reinvented in each report.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">08</span><h3>Banding &mdash; turn numbers into categories</h3></div>
+    <p class="want"><b>You want this when:</b> "group these into small / medium / large", ageing buckets, materiality tiers. Any time a continuous number needs to become something you can group by.</p>
+    <pre><code><span class="k">SELECT</span> invoice_id, days_overdue,
+  <span class="k">CASE</span>
+    <span class="k">WHEN</span> days_overdue &lt;= <span class="n">0</span>  <span class="k">THEN</span> <span class="s">'Current'</span>
+    <span class="k">WHEN</span> days_overdue &lt;= <span class="n">30</span> <span class="k">THEN</span> <span class="s">'1-30'</span>
+    <span class="k">WHEN</span> days_overdue &lt;= <span class="n">60</span> <span class="k">THEN</span> <span class="s">'31-60'</span>
+    <span class="k">ELSE</span> <span class="s">'60+'</span>
+  <span class="k">END</span> <span class="k">AS</span> ageing_bucket
+<span class="k">FROM</span> receivables;</code></pre>
+    <div class="note warn"><b>Better as a table</b>Hard-coded CASE logic gets copied into six reports and then diverges. Put the bands in a small lookup table and join to it &mdash; then changing "60+" to "90+" is one row, not a search across your estate.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">09</span><h3>Slowly changing dimensions &mdash; keeping history</h3></div>
+    <p class="want"><b>You want this when:</b> a customer moves region, a cost centre is renamed, an account is remapped &mdash; and last year's report must still show what was true <em>then</em>. This is the pattern that makes you sound senior, because most people never learn it.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want">Instead of overwriting the row, close the old one off with an end date and insert a new one. Each row becomes "this was true between these dates", and you join on the date to get the version that applied at the time.</p>
+    <pre><code><span class="c">-- one row per version, not per entity</span>
+customer_key | customer_id | region | valid_from | valid_to   | is_current
+<span class="n">1</span>            | C100        | North  | 2024-01-01 | 2025-06-30 | 0
+<span class="n">2</span>            | C100        | South  | 2025-07-01 | 9999-12-31 | 1
+
+<span class="c">-- "what was true when the transaction happened"</span>
+<span class="k">SELECT</span> t.*, c.region
+<span class="k">FROM</span> transactions t
+<span class="k">JOIN</span> dim_customer c
+  <span class="k">ON</span> c.customer_id = t.customer_id
+ <span class="k">AND</span> t.txn_date <span class="k">BETWEEN</span> c.valid_from <span class="k">AND</span> c.valid_to;</code></pre>
+    <div class="note"><b>Decide deliberately</b>Overwriting (type 1) is fine for typos. Versioning (type 2) is required when history must be restatement-proof. Getting asked "why did last year's number change?" is what happens when you picked type 1 and should have picked type 2.</div>
+  </div>
+</section>
+
+<!-- ============ COMPARING ============ -->
+<section id="compare">
+  <div class="shead"><span class="snum">03</span><h2>Comparing &mdash; the reconciliation toolkit</h2></div>
+  <p class="slede">Three patterns for "these two things should match and don't" &mdash; the most valuable class of work you can do in a finance organisation.</p>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">10</span><h3>Anti-join &mdash; what's in A but not B</h3></div>
+    <p class="want"><b>You want this when:</b> "which invoices didn't make it across", "which employees have no cost centre", "what's missing". The single fastest way to find a data problem.</p>
+    <pre><code><span class="c">-- readable and fast: no rows on the right</span>
+<span class="k">SELECT</span> a.*
+<span class="k">FROM</span> source_system a
+<span class="k">LEFT JOIN</span> target_system b <span class="k">ON</span> b.doc_id = a.doc_id
+<span class="k">WHERE</span> b.doc_id <span class="k">IS NULL</span>;</code></pre>
+    <div class="note warn"><b>NOT IN will hurt you</b><code>WHERE id NOT IN (SELECT id FROM b)</code> returns <em>zero rows</em> if that subquery contains a single NULL. It's silent, it's baffling, and it has burned everyone once. Use LEFT JOIN&hellip;IS NULL or NOT EXISTS instead.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">11</span><h3>Full reconciliation &mdash; both sides, with reasons</h3></div>
+    <p class="want"><b>You want this when:</b> two systems disagree and you need to explain the gap, not just measure it. This is the deliverable that ends arguments &mdash; and the one people remember you for.</p>
+    <span class="mini">The idea in words</span>
+    <p class="want"><code>FULL OUTER JOIN</code> keeps rows that exist on either side, so you catch all three failure modes at once: missing on the left, missing on the right, and present on both but different. Then <b>categorise every difference</b> &mdash; that categorisation is the actual product.</p>
+    <pre><code><span class="k">SELECT</span>
+  <span class="f">COALESCE</span>(a.doc_id, b.doc_id)          <span class="k">AS</span> doc_id,
+  a.amount                              <span class="k">AS</span> source_amount,
+  b.amount                              <span class="k">AS</span> target_amount,
+  <span class="f">COALESCE</span>(a.amount,<span class="n">0</span>) - <span class="f">COALESCE</span>(b.amount,<span class="n">0</span>) <span class="k">AS</span> diff,
+  <span class="k">CASE</span>
+    <span class="k">WHEN</span> b.doc_id <span class="k">IS NULL</span>            <span class="k">THEN</span> <span class="s">'Missing in target'</span>
+    <span class="k">WHEN</span> a.doc_id <span class="k">IS NULL</span>            <span class="k">THEN</span> <span class="s">'Missing in source'</span>
+    <span class="k">WHEN</span> <span class="f">ABS</span>(a.amount-b.amount) &lt; <span class="n">0.01</span> <span class="k">THEN</span> <span class="s">'Match'</span>
+    <span class="k">WHEN</span> a.posted_date &lt;&gt; b.posted_date <span class="k">THEN</span> <span class="s">'Timing difference'</span>
+    <span class="k">ELSE</span> <span class="s">'Unexplained — investigate'</span>
+  <span class="k">END</span> <span class="k">AS</span> reason
+<span class="k">FROM</span> source_ledger a
+<span class="k">FULL OUTER JOIN</span> target_ledger b <span class="k">ON</span> b.doc_id = a.doc_id;</code></pre>
+    <div class="note"><b>Why this wins</b>Nobody expects zero difference. What they want is that <em>every</em> difference has a name, and the "Unexplained" bucket is small and shrinking. Report that bucket as your metric &mdash; it's honest, trackable, and it makes the work visible.</div>
+  </div>
+
+  <div class="pat">
+    <div class="ptop"><span class="pn">12</span><h3>Cleaning keys before you join</h3></div>
+    <p class="want"><b>You want this when:</b> a join returns far fewer rows than expected and you can't see why. The answer is almost always invisible characters &mdash; and you'll lose an hour to this if you don't check it first.</p>
+    <pre><code><span class="c">-- the usual suspects, in order of how often they're the culprit</span>
+<span class="k">SELECT</span>
+  <span class="f">UPPER</span>(<span class="f">TRIM</span>(doc_id))                      <span class="k">AS</span> clean_id,   <span class="c">-- case + spaces</span>
+  <span class="f">LEN</span>(doc_id) - <span class="f">LEN</span>(<span class="f">TRIM</span>(doc_id))          <span class="k">AS</span> pad_chars,  <span class="c">-- hidden padding</span>
+  <span class="f">TRY_CAST</span>(amount_text <span class="k">AS</span> decimal(<span class="n">18</span>,<span class="n">2</span>))     <span class="k">AS</span> amount      <span class="c">-- NULL = bad rows</span>
+<span class="k">FROM</span> raw_extract;
+
+<span class="c">-- diagnose a bad join fast: how many keys actually overlap?</span>
+<span class="k">SELECT</span>
+  (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> doc_id) <span class="k">FROM</span> a)                        <span class="k">AS</span> keys_a,
+  (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> doc_id) <span class="k">FROM</span> b)                        <span class="k">AS</span> keys_b,
+  (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> a.doc_id) <span class="k">FROM</span> a <span class="k">JOIN</span> b <span class="k">ON</span> b.doc_id=a.doc_id) <span class="k">AS</span> overlap;</code></pre>
+    <div class="note warn"><b>The row-count explosion</b>If a join returns <em>more</em> rows than you started with, you have duplicates on one side &mdash; you've made a many-to-many by accident. Check the count before and after every join; when it jumps, go back to pattern 01.</div>
+  </div>
+</section>
+
+<!-- ============ PYTHON ============ -->
+<section id="python">
+  <div class="shead"><span class="snum">04</span><h2>When to reach for Python instead</h2></div>
+  <p class="slede">You have a notebook. The useful question isn't "which is better" &mdash; it's "which one is this job shaped like?"</p>
+
+  <div class="tscroll"><table>
+    <tr><th>Use SQL when</th><th>Use Python when</th></tr>
+    <tr>
+      <td>Set-based work: joining, filtering, aggregating<br>The data's already in tables<br>Others will need to read and maintain it<br>The engine can optimise it better than you can</td>
+      <td>Looping over files, folders or API pages<br>Anything with 30+ columns to reshape<br>Calling an API, parsing JSON, reading Excel<br>Fuzzy matching, regex, or genuine algorithms<br>Anything you'd struggle to express as one set operation</td>
+    </tr>
+  </table></div>
+
+  <div class="card">
+    <h3>The four Python moves worth having by heart</h3>
+    <p>You don't need to learn Python properly to be effective in a notebook. These four cover most of what a data job actually needs, and the rest you can prompt your way through.</p>
+    <pre><code><span class="c"># 1. read many files as one table — the folder loop, done properly</span>
+df = spark.read.option(<span class="s">"header"</span>,<span class="k">True</span>).csv(<span class="s">"Files/landing/2026/*.csv"</span>)
+
+<span class="c"># 2. reshape wide to long — the unpivot from pattern 06, in one line</span>
+long = wide.melt(id_vars=[<span class="s">"account"</span>], var_name=<span class="s">"period"</span>, value_name=<span class="s">"amount"</span>)
+
+<span class="c"># 3. sanity-check anything before you trust it</span>
+<span class="f">print</span>(df.count(), <span class="f">len</span>(df.columns))
+df.groupBy(<span class="s">"source_system"</span>).count().show()      <span class="c"># where did rows come from?</span>
+df.summary().show()                              <span class="c"># ranges, nulls, outliers</span>
+
+<span class="c"># 4. write it back as a table others can use</span>
+df.write.mode(<span class="s">"overwrite"</span>).saveAsTable(<span class="s">"silver_invoices"</span>)</code></pre>
+    <div class="note py"><b>The vibe coder's edge</b>You don't have to know the syntax &mdash; you have to know that the pattern exists and what it's called. "Unpivot these month columns into rows" gets you working code from any assistant instantly. "Fix this spreadsheet" does not. <b>The vocabulary is the skill</b>, and that's what this page is for.</div>
+  </div>
+
+  <div class="card">
+    <h3>Mixing them in one notebook</h3>
+    <p>You don't have to choose. In a Fabric notebook you can run SQL against your lakehouse and hand the result to Python, or register a dataframe so SQL can see it. Use each for what it's good at within a single job.</p>
+    <pre><code><span class="c"># SQL for the set-based part…</span>
+df = spark.sql(<span class="s">"""
+  SELECT customer_id, SUM(amount) AS total
+  FROM silver_invoices
+  WHERE posted_date >= '2026-01-01'
+  GROUP BY customer_id
+"""</span>)
+
+<span class="c"># …Python for the part SQL is bad at</span>
+df.createOrReplaceTempView(<span class="s">"totals"</span>)      <span class="c"># and back to SQL again</span>
+spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).show()</code></pre>
+  </div>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section id="ref">
+  <div class="shead"><span class="snum">05</span><h2>The naming sheet</h2></div>
+  <p class="slede">The actual deliverable of this page: symptom on the left, name on the right. When you can say the right-hand column, you can ask anyone &mdash; human or AI &mdash; for exactly what you need.</p>
+
+  <div class="tscroll"><table>
+    <tr><th>When you catch yourself saying&hellip;</th><th>You want&hellip;</th></tr>
+    <tr><td>"There are duplicates" / "I only want the latest one"</td><td><b>ROW_NUMBER + PARTITION BY</b> (01)</td></tr>
+    <tr><td>"Versus last month" / "movement" / "change on prior"</td><td><b>LAG</b> (02)</td></tr>
+    <tr><td>"Year to date" / "rolling three months"</td><td><b>Windowed SUM/AVG with a frame</b> (03)</td></tr>
+    <tr><td>"Top 5 per region"</td><td><b>DENSE_RANK</b> (04)</td></tr>
+    <tr><td>"How many days in a row" / "find the missing numbers"</td><td><b>Gaps and islands</b> (05)</td></tr>
+    <tr><td>"There's a column for every month"</td><td><b>Unpivot / melt</b> (06)</td></tr>
+    <tr><td>"Empty months disappear from the chart"</td><td><b>Date spine + LEFT JOIN</b> (07)</td></tr>
+    <tr><td>"Group these into buckets"</td><td><b>Banding, ideally via a lookup table</b> (08)</td></tr>
+    <tr><td>"Last year's number changed and it shouldn't have"</td><td><b>Type 2 slowly changing dimension</b> (09)</td></tr>
+    <tr><td>"What's missing?"</td><td><b>Anti-join</b> (10)</td></tr>
+    <tr><td>"These two systems don't agree"</td><td><b>FULL OUTER JOIN + reason categories</b> (11)</td></tr>
+    <tr><td>"The join isn't matching and I can't see why"</td><td><b>Key cleaning + overlap count</b> (12)</td></tr>
+  </table></div>
+
+  <div class="card">
+    <h3>Three habits that prevent most bugs</h3>
+    <ul class="plain">
+      <li><b>Count before and after every join.</b> A row count that grows means accidental many-to-many; one that shrinks means a key problem. Thirty seconds, catches most silent errors.</li>
+      <li><b>Never trust a number you haven't seen at row level.</b> Before you publish a total, look at ten of the rows behind it. It's astonishing how often that alone finds the problem.</li>
+      <li><b>Write the check query alongside the build query.</b> If you can't write a query that would prove it's wrong, you don't yet understand what "right" means here.</li>
+    </ul>
+  </div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>A vocabulary page, not a syntax reference. SQL is written for Fabric's SQL endpoint, Warehouse or Snowflake; dialect differences are noted where they matter.</p>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#4ade80">◆</span> SQL &amp; Python Patterns</p>
+</footer>
+
+</div>
+</body>
+</html>
