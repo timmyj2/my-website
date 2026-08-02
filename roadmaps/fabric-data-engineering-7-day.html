@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fabric Data Engineering — A 7-Day Course, 10 Minutes a Day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08131a;
+  --panel:#0f1e26;
+  --panel2:#0b1820;
+  --line:#1d343e;
+  --ink:#e6f1f5;
+  --mut:#95acb7;
+  --dim:#5f7a86;
+  --teal:#2ec4b6;
+  --teal-hi:#5eead4;
+  --teal-soft:rgba(46,196,182,.13);
+  --cyan:#38bdf8;
+  --cyan-hi:#7dd3fc;
+  --cyan-soft:rgba(56,189,248,.13);
+  --lime:#a3e635;
+  --lime-hi:#bef264;
+  --lime-soft:rgba(163,230,53,.12);
+  --amber:#fbbf24;
+  --amber-hi:#fcd34d;
+  --amber-soft:rgba(251,191,36,.12);
+  --violet:#a78bfa;
+  --violet-hi:#c4b5fd;
+  --violet-soft:rgba(167,139,250,.13);
+  --rose:#fb7185;
+  --rose-soft:rgba(251,113,133,.12);
+  --ok:#4ade80;
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.62;min-height:100vh;
+  background-image:radial-gradient(900px 440px at 88% -6%, rgba(46,196,182,.11), transparent 62%),
+                   radial-gradient(900px 440px at 6% -4%, rgba(56,189,248,.10), transparent 62%);
+  background-attachment:fixed;}
+a{color:inherit}
+::selection{background:rgba(46,196,182,.3)}
+
+/* day accents */
+.d1{--acc:var(--teal);--acc-hi:var(--teal-hi);--soft:var(--teal-soft)}
+.d2{--acc:var(--cyan);--acc-hi:var(--cyan-hi);--soft:var(--cyan-soft)}
+.d3{--acc:var(--lime);--acc-hi:var(--lime-hi);--soft:var(--lime-soft)}
+.d4{--acc:var(--amber);--acc-hi:var(--amber-hi);--soft:var(--amber-soft)}
+.d5{--acc:var(--violet);--acc-hi:var(--violet-hi);--soft:var(--violet-soft)}
+.d6{--acc:var(--cyan);--acc-hi:var(--cyan-hi);--soft:var(--cyan-soft)}
+.d7{--acc:var(--teal);--acc-hi:var(--teal-hi);--soft:var(--teal-soft)}
+
+/* ---------- sticky bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,19,26,.88);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--teal)}
+.obar{flex:1;min-width:120px;height:8px;border-radius:99px;background:#10222b;border:1px solid var(--line);overflow:hidden}
+.obar>div{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--lime));transition:width .35s ease}
+.opct{font-family:var(--mono);font-size:.77rem;color:var(--mut);min-width:8.5ch;text-align:right}
+.dchip{font-family:var(--mono);font-size:.71rem;padding:3px 8px;border-radius:6px;border:1px solid var(--line);
+  color:var(--mut);text-decoration:none;background:var(--panel);white-space:nowrap}
+.dchip:hover{border-color:var(--teal);color:var(--ink)}
+.dchip.done{border-color:var(--ok);color:var(--ok)}
+.tbtn{font-family:var(--mono);font-size:.7rem;background:var(--panel);border:1px solid var(--line);color:var(--mut);
+  padding:3px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{color:var(--ink);border-color:var(--dim)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+
+/* ---------- hero ---------- */
+.hero{padding:58px 0 24px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:13px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5.2vw,2.95rem);line-height:1.12;letter-spacing:-.018em}
+.hero h1 .t{color:var(--teal)}
+.hero h1 .l{color:var(--lime)}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:16px;font-size:1.03rem}
+
+/* start-here box */
+.startbox{margin:28px 0 6px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--lime);
+  border-radius:12px;padding:20px 22px}
+.startbox h2{font-family:var(--disp);font-size:.86rem;letter-spacing:.06em;text-transform:uppercase;color:var(--lime);margin-bottom:9px}
+.startbox p{color:var(--mut);font-size:.95rem;margin-bottom:8px}
+.startbox p:last-child{margin-bottom:0}
+.startbox b{color:var(--ink);font-weight:600}
+#persistNote{font-family:var(--mono);font-size:.77rem;color:var(--dim)}
+
+/* stack diagram */
+.stack{margin:30px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px 14px;
+  box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.stack svg{display:block;width:100%;height:auto}
+.stack-cap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:9px}
+.stack-cap .g{color:var(--teal)}
+
+/* ---------- day cards ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.24)}
+.sec.done{border-color:var(--acc)}
+.sec-head{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;background:none;border:none;color:inherit;
+  font-family:inherit;text-align:left;cursor:pointer}
+.sec-head:hover{background:var(--panel2)}
+.sec-head:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.snum{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--acc);border:1.5px solid var(--acc);background:var(--soft);
+  border-radius:9px;padding:6px 8px;min-width:52px;text-align:center;flex-shrink:0;line-height:1.15}
+.snum b{display:block;font-size:.95rem}
+.stitle{flex:1;min-width:0}
+.stitle h3{font-family:var(--disp);font-weight:600;font-size:1.06rem;line-height:1.28}
+.stitle .ssub{color:var(--dim);font-size:.83rem;margin-top:2px}
+.mins{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;
+  border:1px solid var(--line);color:var(--mut);flex-shrink:0;background:var(--panel2)}
+.cnt{font-family:var(--mono);font-size:.74rem;color:var(--dim);flex-shrink:0;min-width:4ch;text-align:right}
+.cnt.full{color:var(--ok)}
+.chev{flex-shrink:0;transition:transform .25s ease;color:var(--dim)}
+.sec[data-open="true"] .chev{transform:rotate(180deg)}
+.sec-body{display:none;padding:4px 20px 22px;border-top:1px solid var(--line)}
+.sec[data-open="true"] .sec-body{display:block}
+
+.blurb{color:var(--mut);font-size:.95rem;margin:16px 0 4px;max-width:72ch}
+.blurb b{color:var(--ink);font-weight:600}
+.blurb em{color:var(--acc-hi);font-style:normal}
+
+.gh{font-family:var(--mono);font-size:.69rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);font-weight:600;margin:20px 0 9px;
+  display:flex;align-items:center;gap:9px}
+.gh::after{content:"";flex:1;height:1px;background:var(--line)}
+
+ul.checks{list-style:none}
+ul.checks li{margin-bottom:2px}
+ul.checks label{display:flex;gap:12px;align-items:flex-start;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.94rem}
+ul.checks label:hover{background:var(--panel2)}
+ul.checks input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;margin-top:3px;border-radius:5px;
+  border:1.5px solid var(--dim);background:var(--panel2);cursor:pointer;position:relative}
+ul.checks input:checked{background:var(--acc);border-color:var(--acc)}
+ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #08131a;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.checks input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(230,241,245,.26)}
+ul.checks b{color:var(--ink);font-weight:600}
+
+ul.plain{list-style:none;margin-top:10px}
+ul.plain li{position:relative;padding-left:20px;margin-bottom:7px;color:var(--mut);font-size:.94rem}
+ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--acc)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+.tip{margin-top:16px;border-left:3px solid var(--acc);background:var(--soft);border-radius:0 10px 10px 0;padding:12px 16px;font-size:.9rem;color:var(--mut)}
+.tip b{color:var(--acc-hi);font-weight:600;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+.tip.gotcha{border-left-color:var(--rose);background:var(--rose-soft)}
+.tip.gotcha b{color:var(--rose)}
+.tip.org{border-left-color:var(--lime);background:var(--lime-soft)}
+.tip.org b{color:var(--lime-hi)}
+
+pre{background:#050d12;border:1px solid #162b34;border-radius:10px;padding:13px 15px;overflow-x:auto;margin-top:12px}
+code{font-family:var(--mono);font-size:.79rem;line-height:1.58;color:#cfe3ea;white-space:pre-wrap;word-break:break-word}
+pre .c{color:#5c8a7a} pre .k{color:#7dd3fc} pre .s{color:#bef264} pre .f{color:#fcd34d}
+p code, li code, td code{background:var(--teal-soft);color:var(--teal-hi);border-radius:5px;padding:1px 6px;font-size:.85em;white-space:normal}
+
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.88rem}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{color:var(--ink);font-weight:600}
+.tscroll{overflow-x:auto}
+
+/* capstone / closing */
+.close{margin-top:52px;background:linear-gradient(180deg,var(--teal-soft),var(--panel) 76%);border:1px solid var(--line);
+  border-radius:14px;padding:26px 24px}
+.close h2{font-family:var(--disp);font-weight:700;font-size:1.45rem;margin-bottom:6px}
+.close .cdesc{color:var(--mut);font-size:.96rem;max-width:68ch}
+
+footer{margin:60px 0 40px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer a{color:var(--cyan);text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
+.srcs{margin-top:10px;font-size:.82rem;line-height:1.9}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  .topbar{gap:8px;padding:9px 14px}
+  .opct{display:none}
+  .hero{padding:42px 0 20px}
+  .sec-head{padding:14px 13px;gap:10px}
+  .stitle .ssub{display:none}
+  .sec-body{padding:4px 14px 18px}
+  .stack{padding:14px 14px 10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff;color:#111;background-image:none}
+  .topbar,.chev,.tbtn{display:none}
+  .sec-body{display:block!important}
+  .sec,.stack,.startbox,.close{border-color:#bbb;background:#fff;box-shadow:none}
+  pre{background:#f5f5f5}code{color:#111}a{color:#111}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ STICKY PROGRESS ============ -->
+<div class="topbar">
+  <span class="brand"><span class="fl">&#9670;</span> Fabric &middot; 7-day course</span>
+  <div class="obar"><div id="obarFill"></div></div>
+  <span class="opct" id="opct">0% done</span>
+  <a class="dchip" href="#day1" data-for="day1">D1</a>
+  <a class="dchip" href="#day2" data-for="day2">D2</a>
+  <a class="dchip" href="#day3" data-for="day3">D3</a>
+  <a class="dchip" href="#day4" data-for="day4">D4</a>
+  <a class="dchip" href="#day5" data-for="day5">D5</a>
+  <a class="dchip" href="#day6" data-for="day6">D6</a>
+  <a class="dchip" href="#day7" data-for="day7">D7</a>
+  <button class="tbtn" id="toggleAll" type="button">Collapse all</button>
+  <button class="tbtn" id="resetBtn" type="button">Reset</button>
+</div>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Microsoft Fabric &middot; Data engineering</p>
+  <h1>Seven days to the person<br>who <span class="t">actually knows</span> how <span class="l">Fabric</span> fits together.</h1>
+  <p class="sub">Ten minutes a day. One idea, one thing you do in your own tenant, one question to ask about your organisation. By Day 7 you can defend an architecture in a meeting &mdash; not just build a pipeline. Written for someone who has already put a Delta table in a lakehouse from a notebook and wired a workspace to Git, and wants the layer above that.</p>
+
+  <div class="stack" aria-hidden="true">
+    <svg viewBox="0 0 880 244" xmlns="http://www.w3.org/2000/svg">
+      <!-- OneLake base -->
+      <rect x="8" y="176" width="864" height="58" rx="12" fill="#0f1e26" stroke="#2ec4b6" stroke-width="1.6"/>
+      <text x="28" y="200" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#5eead4">OneLake</text>
+      <text x="28" y="220" font-family="JetBrains Mono,monospace" font-size="10" fill="#95acb7">one tenant-wide store &middot; Delta &amp; Parquet &middot; open format &middot; no copies required</text>
+      <text x="800" y="212" font-family="JetBrains Mono,monospace" font-size="9" fill="#5f7a86">storage</text>
+
+      <!-- engines -->
+      <g font-family="JetBrains Mono,monospace" font-size="9" fill="#95acb7">
+        <rect x="8" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#38bdf8" stroke-width="1.4"/>
+        <text x="24" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#7dd3fc">Spark</text>
+        <text x="24" y="145">notebooks &middot; jobs</text>
+
+        <rect x="182" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#a3e635" stroke-width="1.4"/>
+        <text x="198" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#bef264">T-SQL</text>
+        <text x="198" y="145">warehouse &middot; endpoint</text>
+
+        <rect x="356" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#fbbf24" stroke-width="1.4"/>
+        <text x="372" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#fcd34d">KQL</text>
+        <text x="372" y="145">eventhouse &middot; RTI</text>
+
+        <rect x="530" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#a78bfa" stroke-width="1.4"/>
+        <text x="546" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#c4b5fd">DAX / VertiPaq</text>
+        <text x="546" y="145">Direct Lake models</text>
+
+        <rect x="704" y="104" width="168" height="56" rx="10" fill="#0b1820" stroke="#fb7185" stroke-width="1.4"/>
+        <text x="720" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#fb7185">Power Query</text>
+        <text x="720" y="145">Dataflow Gen2</text>
+      </g>
+      <!-- connectors -->
+      <g stroke="#2a4a56" stroke-width="1.4">
+        <line x1="90" y1="160" x2="90" y2="176"/><line x1="264" y1="160" x2="264" y2="176"/>
+        <line x1="438" y1="160" x2="438" y2="176"/><line x1="612" y1="160" x2="612" y2="176"/><line x1="788" y1="160" x2="788" y2="176"/>
+      </g>
+      <text x="800" y="140" font-family="JetBrains Mono,monospace" font-size="9" fill="#5f7a86">compute</text>
+
+      <!-- top: experiences -->
+      <rect x="8" y="10" width="864" height="74" rx="12" fill="none" stroke="#1d343e" stroke-width="1.4" stroke-dasharray="4 4"/>
+      <text x="28" y="32" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.4" fill="#5f7a86">WHAT PEOPLE ACTUALLY TOUCH</text>
+      <g font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="600" fill="#e6f1f5">
+        <text x="28" y="56">Reports</text><text x="112" y="56">Data agents</text><text x="222" y="56">Fabric Apps</text><text x="332" y="56">Activator alerts</text>
+        <text x="460" y="56">Excel / SQL</text><text x="570" y="56">Notebooks</text><text x="674" y="56">APIs &amp; GraphQL</text>
+      </g>
+      <text x="28" y="74" font-family="JetBrains Mono,monospace" font-size="9" fill="#5f7a86">the point of all of it &mdash; if nothing here changes, the pipeline did not matter</text>
+    </svg>
+    <div class="stack-cap"><span>one copy of the data</span><span class="g">many engines, same files</span><span>many ways to consume</span></div>
+  </div>
+
+  <div class="startbox">
+    <h2>How to run this</h2>
+    <p>One day per sitting, in order &mdash; each is <b>5&ndash;10 minutes</b>. Every day has the same three parts: <b>the idea</b> (why this exists and when it's the wrong choice), <b>do this</b> (something small in your own tenant &mdash; that's where it sticks), and <b>for your org</b> (a question to bring to work). Tick items as you go; <span id="persistNote">progress and collapsed days save in this browser on this device.</span></p>
+    <p>You need a Fabric-enabled workspace on any capacity, including a trial. Everything here works on an F2 or a trial SKU &mdash; nothing requires a big capacity. Where a feature is preview or still rolling out, it says so.</p>
+  </div>
+</header>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 1 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d1" data-open="true" id="day1">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>1</b></span>
+    <span class="stitle"><h3>One store, many engines &mdash; the only diagram that matters</h3><span class="ssub">why the thing you already built was a bigger deal than it felt</span></span>
+    <span class="mins">7 min</span>
+    <span class="cnt">0/5</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">You already did the thing this whole platform is built around, and it probably felt routine: a notebook wrote a Delta table into a lakehouse. Here's what actually happened. That table landed in <b>OneLake</b> &mdash; one storage account for the entire tenant &mdash; as open Delta/Parquet files. The moment it landed, it became queryable by <em>every other engine in Fabric without being copied</em>: T-SQL through the lakehouse's SQL analytics endpoint, DAX through a Direct Lake semantic model, Spark from any other notebook, and external tools through the OneLake APIs.</p>
+    <p class="blurb">That is the whole pitch. Traditional stacks copy data between a lake, a warehouse, and a BI model &mdash; three copies, three refresh windows, three chances to disagree. Fabric separates <b>storage</b> (OneLake, one copy, open format) from <b>compute</b> (Spark, T-SQL, KQL, DAX, Power Query). Every Fabric item you see in the portal is one of those engines pointed at that store, or something that orchestrates them.</p>
+
+    <p class="gh">The item zoo, grouped so it stops being noise</p>
+    <div class="tscroll"><table>
+      <tr><th>Group</th><th>Items</th><th>What it's for</th></tr>
+      <tr><td><b>Store</b></td><td>Lakehouse, Warehouse, Eventhouse, SQL database, Mirrored database</td><td>Where tables live. Differ by engine and by who's meant to write to them.</td></tr>
+      <tr><td><b>Move</b></td><td>Data pipeline, Dataflow Gen2, Copy job, Eventstream, Shortcut, Mirroring</td><td>Getting data in &mdash; or deliberately <em>not</em> moving it (Day 2).</td></tr>
+      <tr><td><b>Transform</b></td><td>Notebook, Spark job definition, Stored procedure, Materialized lake view</td><td>Turning raw into usable.</td></tr>
+      <tr><td><b>Serve</b></td><td>Semantic model, Report, SQL endpoint, GraphQL API, Data agent, Fabric App</td><td>How humans and systems actually consume it.</td></tr>
+      <tr><td><b>React</b></td><td>Activator, Alerts</td><td>Doing something when a number crosses a line.</td></tr>
+      <tr><td><b>Govern</b></td><td>Domains, Workspaces, Deployment pipelines, Variable libraries, OneLake catalog</td><td>Keeping it findable, shippable and trustworthy (Day 6).</td></tr>
+    </table></div>
+
+    <p class="gh">Do this &mdash; 4 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d1-1"><span>Open the lakehouse you already built. Switch the top-right selector from <b>Lakehouse</b> to <b>SQL analytics endpoint</b> and run <code>SELECT TOP 10 * FROM your_table</code>. Same bytes, different engine, zero copies.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-2"><span>In the lakehouse explorer, note the path: <code>Tables/</code> vs <code>Files/</code>. <b>Tables</b> is the managed Delta area the SQL endpoint sees; <b>Files</b> is raw storage it doesn't.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-3"><span>Install <b>OneLake File Explorer</b> (or open the item's OneLake path) and see your table as actual Parquet files in folders. Demystifies the whole thing.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-4"><span>Say out loud which engine each of these uses: a Power BI report, a SQL endpoint query, your notebook, a Dataflow Gen2. If you hesitate on any, re-read the diagram above.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-5"><span>Write down, in one sentence, the difference between an <b>item</b> and a <b>workspace</b>. You'll need this vocabulary all week.</span></label></li>
+    </ul>
+
+    <div class="tip gotcha"><b>The distinction people get wrong</b>A lakehouse's <b>SQL analytics endpoint is read-only</b>. If someone says "we'll just write back through SQL," they mean a <b>Warehouse</b>, not a lakehouse. Getting this wrong picks the wrong item for a project &mdash; it's the single most common early Fabric mistake.</div>
+    <div class="tip org"><b>For your org</b>Where does your organisation copy the same numbers between systems today &mdash; a lake, then a warehouse, then an import model? Each hop is a refresh window and a reconciliation argument. That list is your business case, and it's more persuasive than any feature demo.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 2 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d2" data-open="true" id="day2">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>2</b></span>
+    <span class="stitle"><h3>Getting data in &mdash; and the art of not moving it</h3><span class="ssub">shortcuts, mirroring, pipelines, dataflows: pick correctly</span></span>
+    <span class="mins">8 min</span>
+    <span class="cnt">0/5</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Most people's instinct is "write a pipeline to copy it in." In Fabric that should be your <em>third</em> instinct. The first question is always: <b>do I need a copy at all?</b> Every copy you avoid is a schedule you don't maintain, a latency you don't explain, and storage you don't pay for.</p>
+
+    <p class="gh">The ladder &mdash; work down it, stop at the first one that fits</p>
+    <div class="tscroll"><table>
+      <tr><th>Option</th><th>What it does</th><th>Reach for it when</th></tr>
+      <tr><td><b>Shortcut</b></td><td>A pointer. Data stays where it is (another lakehouse, ADLS Gen2, S3, Google Cloud Storage, Dataverse) and appears in your lakehouse as if local.</td><td>The data already sits in a lake somewhere and you just need to read it. <b>Zero copy, zero schedule.</b></td></tr>
+      <tr><td><b>Mirroring</b></td><td>Near-real-time managed replication of an operational database (Azure SQL, SQL Server, Cosmos DB, Snowflake, Databricks catalog, PostgreSQL) into OneLake as Delta.</td><td>You need an operational system's data continuously, without building or owning CDC yourself.</td></tr>
+      <tr><td><b>Copy job</b></td><td>A guided copy with batch or incremental modes, no pipeline authoring.</td><td>Straight source-to-destination movement where a full pipeline is overkill.</td></tr>
+      <tr><td><b>Data pipeline</b></td><td>Orchestration: copy activities, notebook/stored-proc invocation, control flow, parameters, scheduling, failure handling.</td><td>You need <em>orchestration</em> &mdash; several steps in order, with dependencies and retries.</td></tr>
+      <tr><td><b>Dataflow Gen2</b></td><td>Power Query in the service. Now on a modern .NET-based evaluation engine with far better performance across 80+ connectors.</td><td>Messy connector-shaped sources and Power Query is genuinely the fastest way to shape it &mdash; or the author lives in Power Query, not Python.</td></tr>
+      <tr><td><b>Eventstream</b></td><td>Streaming ingestion into Eventhouse/lakehouse from event sources.</td><td>The data arrives continuously and lateness matters in seconds, not hours.</td></tr>
+    </table></div>
+
+    <p class="blurb">A rule that holds up in review meetings: <b>shortcut what you can, mirror what you must, pipeline what you have to transform, and only use a dataflow when Power Query is genuinely the right tool.</b> "Notebook everything" is as wrong as "dataflow everything" &mdash; the skill is matching the tool to the shape of the source and to who has to maintain it after you.</p>
+
+    <p class="gh">Do this &mdash; 5 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d2-1"><span>In a second lakehouse, create a <b>shortcut</b> to the Delta table you already built. Query it. Notice you didn't schedule anything and the data isn't duplicated.</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-2"><span>Open the <b>New shortcut</b> dialog and read the full source list &mdash; ADLS, S3, GCS, Dataverse, OneLake. Knowing what's on that list changes what you propose at work.</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-3"><span>Open <b>Mirroring</b> and read the supported sources, even if you can't set one up. This is the answer to "can we get the ERP data without a nightly extract?"</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-4"><span>Take one existing copy job in your org and ask honestly: could this be a shortcut or a mirror instead?</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-5"><span>Note the ownership question: a shortcut means <em>someone else</em> controls that data's lifecycle. Decide whether that's a feature or a risk in your case.</span></label></li>
+    </ul>
+
+    <div class="tip gotcha"><b>Gotcha worth knowing early</b><b>Shortcuts are not carried by deployment pipelines.</b> Promote dev to test and the shortcut doesn't come with it &mdash; you recreate it per workspace, or automate it via REST/SDK/notebook. This surprises teams the first time they promote, and knowing it in advance makes you look like you've done this before.</div>
+    <div class="tip org"><b>For your org</b>Ask where your source systems physically are. If finance data already lands in an ADLS account, a shortcut may deliver in an afternoon what a copy pipeline delivers in a fortnight &mdash; with nothing to keep in sync afterwards.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 3 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d3" data-open="true" id="day3">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>3</b></span>
+    <span class="stitle"><h3>Lakehouse, Warehouse, Eventhouse, SQL DB &mdash; and what Delta really is</h3><span class="ssub">choosing a store, and the file mechanics underneath</span></span>
+    <span class="mins">9 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Four things in Fabric hold tables. They are not interchangeable, and picking correctly is most of what "architecture" means day to day.</p>
+    <div class="tscroll"><table>
+      <tr><th>Store</th><th>Write with</th><th>Choose it when</th></tr>
+      <tr><td><b>Lakehouse</b></td><td>Spark, pipelines, dataflows</td><td>Files <em>and</em> tables, Python/Spark transformation, semi-structured or large data. Its SQL endpoint is <b>read-only</b>.</td></tr>
+      <tr><td><b>Warehouse</b></td><td>T-SQL (full DML)</td><td>The team is SQL-first, or you need multi-table transactions and stored procedures. Full read/write T-SQL over the same OneLake Delta.</td></tr>
+      <tr><td><b>Eventhouse / KQL</b></td><td>Eventstream, KQL</td><td>High-volume time-series, logs, telemetry &mdash; append-heavy data queried by time window.</td></tr>
+      <tr><td><b>SQL database</b></td><td>T-SQL, apps</td><td>You need genuine <b>OLTP</b> &mdash; an application writing rows. It auto-replicates into OneLake for analytics.</td></tr>
+    </table></div>
+    <p class="blurb">The honest heuristic: <em>Lakehouse if your team writes Python, Warehouse if your team writes SQL, Eventhouse if the data is events, SQL database if an application needs to write.</em> All four end up as Delta in OneLake, so the choice is about the authoring experience and the write pattern &mdash; not about where the bytes go.</p>
+
+    <p class="gh">What Delta actually is &mdash; the 90-second version</p>
+    <p class="blurb">A Delta table is a folder of <b>Parquet</b> files plus a <b>transaction log</b> (<code>_delta_log</code>) recording every commit. That log is what gives you ACID transactions, time travel, and safe concurrent writes on plain cloud storage. Consequences you actually feel:</p>
+    <ul class="plain">
+      <li><b>Small files kill you.</b> Thousands of tiny Parquet files from frequent appends make every read slow. <code>OPTIMIZE</code> compacts them.</li>
+      <li><b>Deletes aren't immediate.</b> Old files linger for time travel until <code>VACUUM</code> removes them &mdash; which also sets how far back you can look.</li>
+      <li><b>V-Order</b> is Fabric's write optimisation that makes Parquet dramatically faster to read from VertiPaq/Direct Lake. On by default; worth knowing the name.</li>
+      <li><b>Time travel</b> is now available from the SQL analytics endpoint too, using a <code>TIMESTAMP</code> clause &mdash; query the table as it looked before last night's load.</li>
+      <li><b>Don't partition small tables.</b> Under a few GB, partitioning usually makes things worse by creating exactly the small-file problem above.</li>
+    </ul>
+    <pre><code><span class="c"># in your notebook — run these on the table you already built</span>
+spark.sql(<span class="s">"DESCRIBE HISTORY your_table"</span>).show(<span class="f">10</span>, truncate=<span class="k">False</span>)   <span class="c"># every commit</span>
+spark.sql(<span class="s">"OPTIMIZE your_table"</span>)                                  <span class="c"># compact small files</span>
+spark.sql(<span class="s">"DESCRIBE DETAIL your_table"</span>).show(truncate=<span class="k">False</span>)      <span class="c"># file count &amp; size</span>
+
+<span class="c"># read it as it was 3 versions ago</span>
+df = spark.read.format(<span class="s">"delta"</span>).option(<span class="s">"versionAsOf"</span>, <span class="f">3</span>).table(<span class="s">"your_table"</span>)</code></pre>
+
+    <p class="gh">Do this &mdash; 5 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d3-1"><span>Run <code>DESCRIBE HISTORY</code> on your table. Read the operation column &mdash; that's your table's audit trail, free.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-2"><span>Run <code>DESCRIBE DETAIL</code> and look at <code>numFiles</code> versus <code>sizeInBytes</code>. That ratio is the small-file problem, quantified.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-3"><span>Run <code>OPTIMIZE</code>, then <code>DESCRIBE DETAIL</code> again and compare. You just did performance tuning.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-4"><span>Read your table at an earlier version with <code>versionAsOf</code>. This is the answer to "what did the report say on Tuesday?"</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-5"><span>Create a Warehouse in the same workspace. Note you can write to it with plain <code>INSERT</code> &mdash; the thing the lakehouse endpoint won't let you do.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-6"><span>Decide which of the four stores your org's main use case should sit in, and be able to say why in one sentence.</span></label></li>
+    </ul>
+
+    <div class="tip"><b>Expert framing</b>When someone asks "lakehouse or warehouse?", the useful answer isn't a feature list &mdash; it's a question back: "who is writing to it, and in what language?" That reframe is what makes you sound senior, and it gets to the right answer faster.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 4 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d4" data-open="true" id="day4">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>4</b></span>
+    <span class="stitle"><h3>Notebooks that behave like production</h3><span class="ssub">environments, parameters, incremental loads, and cost</span></span>
+    <span class="mins">9 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Your notebook works. The gap between that and a notebook that runs unattended at 3am is four things: <b>where its dependencies come from, how it gets its inputs, how it loads data the second time, and what it costs.</b></p>
+
+    <p class="gh">1. Environments &mdash; stop installing libraries in cell one</p>
+    <p class="blurb">An <b>Environment</b> is a Fabric item holding your Spark runtime version, libraries, and Spark configuration, attachable to notebooks and Spark job definitions. It's how you stop <code>%pip install</code> at the top of every notebook and get reproducible runs. It's also the honest answer to "why did it work yesterday?"</p>
+
+    <p class="gh">2. Parameters &mdash; the toggle cell that makes it callable</p>
+    <p class="blurb">Mark a cell as the <b>parameter cell</b> (cell menu &rarr; Toggle parameter cell). Values declared there are overridden when a pipeline or another notebook calls it. This is the single change that turns a script into a component.</p>
+    <pre><code><span class="c"># parameter cell — defaults for interactive runs, overridden by the caller</span>
+load_date = <span class="s">"2026-08-01"</span>
+source_system = <span class="s">"sap"</span>
+full_reload = <span class="k">False</span>
+
+<span class="c"># elsewhere: chain notebooks and read pipeline values</span>
+<span class="k">import</span> notebookutils
+notebookutils.notebook.run(<span class="s">"transform_silver"</span>, <span class="f">300</span>, {<span class="s">"load_date"</span>: load_date})
+notebookutils.notebook.exit(<span class="s">"success"</span>)   <span class="c"># returned to the calling pipeline</span></code></pre>
+
+    <p class="gh">3. Incremental loads &mdash; MERGE, not overwrite</p>
+    <p class="blurb">The move from beginner to practitioner is loading <em>changes</em> rather than rewriting the table. Delta's <code>MERGE</code> does upserts in one atomic commit:</p>
+    <pre><code><span class="k">from</span> delta.tables <span class="k">import</span> DeltaTable
+
+target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
+(target.alias(<span class="s">"t"</span>)
+  .merge(updates.alias(<span class="s">"s"</span>), <span class="s">"t.customer_id = s.customer_id"</span>)
+  .whenMatchedUpdateAll()
+  .whenNotMatchedInsertAll()
+  .execute())</code></pre>
+    <p class="blurb">Add <code>.option("mergeSchema", "true")</code> on writes when upstream columns legitimately change &mdash; but know that you've just made schema drift silent. Most teams want it on in bronze and off in gold.</p>
+
+    <p class="gh">4. Cost &mdash; because someone will ask</p>
+    <p class="blurb">Everything in Fabric consumes <b>Capacity Units</b> from one shared pool: Spark, SQL, pipelines, Power BI, all of it. Spark sessions are the classic silent burner &mdash; an idle attached session still holds resources. Autoscale billing for Spark lets Spark jobs bill serverlessly rather than competing for the capacity, which is worth knowing exists when a Spark job starts throttling everyone's reports.</p>
+
+    <p class="gh">Do this &mdash; 6 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d4-1"><span>Create an <b>Environment</b>, attach it to your notebook, and move any <code>%pip install</code> into it.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-2"><span>Add a <b>parameter cell</b> to your existing notebook with a date parameter.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-3"><span>Create a <b>data pipeline</b> with one notebook activity, pass the date parameter in, and run it. That's your first orchestrated job.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-4"><span>Rewrite one <code>overwrite</code> write as a <code>MERGE</code>. This is the most transferable skill this week.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-5"><span>Open the <b>Fabric Capacity Metrics</b> app and find what consumed the most CUs in the last day. Even on a trial.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-6"><span>Stop your Spark session manually when you finish. Then notice how rarely anyone does.</span></label></li>
+    </ul>
+
+    <div class="tip gotcha"><b>Cost trap</b>An attached notebook session left open all afternoon burns capacity doing nothing. On a shared F-SKU that's not just money &mdash; capacity smoothing and throttling mean one careless Spark session can slow other people's reports. Knowing this makes you the person who diagnoses it rather than causes it.</div>
+    <div class="tip org"><b>For your org</b>Find out what SKU your organisation runs, whether it's shared across teams, and who watches the metrics app. In most companies the honest answer is "nobody" &mdash; and that's an open lane for you.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 5 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d5" data-open="true" id="day5">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>5</b></span>
+    <span class="stitle"><h3>Architecture: medallion, star schema, and Direct Lake</h3><span class="ssub">the day that turns you into the person who designs it</span></span>
+    <span class="mins">10 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Medallion architecture is three layers, and the value is entirely in the discipline of not skipping one:</p>
+    <ul class="plain">
+      <li><b>Bronze &mdash; raw, as it arrived.</b> No cleaning, no business logic. Append-only, with the load timestamp and source. You keep it so you can rebuild everything downstream without going back to the source system.</li>
+      <li><b>Silver &mdash; cleaned and conformed.</b> Types fixed, duplicates resolved, keys standardised, entities from different systems reconciled into one shape. Still fairly granular.</li>
+      <li><b>Gold &mdash; shaped for consumption.</b> Business-ready, aggregated where it makes sense, and modelled as a <b>star schema</b>: fact tables of numbers, dimension tables of the things you slice by.</li>
+    </ul>
+    <p class="blurb">Why star schema, still, in 2026? Because <b>VertiPaq &mdash; the engine behind every Power BI semantic model &mdash; is built for it.</b> One wide flat table looks simpler and performs worse: it compresses badly, it makes measures ambiguous, and it makes every filter scan more data. If your organisation is on Power BI, gold being a star schema is not a stylistic preference, it's the difference between a report that returns instantly and one that doesn't.</p>
+
+    <p class="gh">Materialized lake views &mdash; the layer that automates the layers</p>
+    <p class="blurb">Rather than hand-orchestrating bronze&rarr;silver&rarr;gold refreshes, <b>materialized lake views</b> let you declare the transformation and let Fabric manage materialisation and lineage. As of mid-2026 lineage extends across layers and workspaces: define one refresh schedule on your gold lakehouse and it cascades back through silver and bronze automatically. That's a meaningful reduction in pipeline plumbing &mdash; and a very current thing to be able to name.</p>
+
+    <p class="gh">Direct Lake &mdash; and the trap that will bite you</p>
+    <p class="blurb">A <b>Direct Lake</b> semantic model reads Delta files from OneLake straight into memory. No import refresh, no DirectQuery round-trip &mdash; import-like speed on data that's current as of the last commit. It's the reason gold-layer modelling matters so much.</p>
+    <div class="tip gotcha"><b>The Direct Lake trap</b>Views cannot be framed by Direct Lake &mdash; they're SQL objects resolved at query time, not Delta tables in OneLake. Add <em>one</em> view to a Direct Lake model and it falls back to DirectQuery &mdash; and the fallback is <b>not</b> isolated to that table: the <b>entire model</b> switches to DirectQuery, for every table. Reports get slower and nobody can see why. The fix: materialise the view as a Delta table (notebook, stored procedure, or materialized lake view) so the model only ever reads Delta.</div>
+    <p class="blurb">Knowing that one paragraph puts you ahead of most people who use Fabric daily. It is the most common invisible performance regression in the platform.</p>
+
+    <p class="gh">Do this &mdash; 6 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d5-1"><span>Sketch your org's current reporting flow on one page and label each step bronze, silver or gold. Note which layer is missing &mdash; there's almost always one.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-2"><span>Take the Delta table you built. Which layer is it? Be honest &mdash; most first tables are bronze wearing a gold badge.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-3"><span>Create a Direct Lake semantic model over a lakehouse table and open it in Power BI. Note there's no refresh to schedule.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-4"><span>Check an existing semantic model in your org for views feeding a Direct Lake model &mdash; the trap above.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-5"><span>Read the <b>materialized lake views</b> docs page. Ten minutes of reading, permanently useful vocabulary.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-6"><span>Write down one fact table and three dimensions for your main subject area. That's a gold-layer design.</span></label></li>
+    </ul>
+
+    <div class="tip org"><b>For your org</b>The bronze layer is the argument you'll have to win. It looks like pointless duplication until the day a source system changes and you can rebuild history without re-extracting. Have that argument ready before you need it.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 6 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d6" data-open="true" id="day6">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>6</b></span>
+    <span class="stitle"><h3>Shipping it: Git, deployment pipelines, variable libraries</h3><span class="ssub">you've done step one already — here's the rest of the lifecycle</span></span>
+    <span class="mins">9 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">You've connected a workspace to GitHub, which is further than most Fabric users ever get. Here's the shape of the full lifecycle, and specifically what Git <em>doesn't</em> solve.</p>
+
+    <p class="gh">The three pieces</p>
+    <ul class="plain">
+      <li><b>Git integration</b> &mdash; source of truth for item <em>definitions</em>. Notebooks, pipelines, semantic models, reports serialise to files you can branch, review and revert. Use <b>branch out to a new workspace</b> to get an isolated dev sandbox per feature instead of everyone editing one workspace.</li>
+      <li><b>Deployment pipelines</b> &mdash; promoting items between dev, test and prod workspaces, with <b>deployment rules</b> to swap connections and parameters per stage.</li>
+      <li><b>Variable libraries</b> &mdash; the newer piece, and the one that makes the other two usable. A workspace item holding values per stage: connection strings, item references, lakehouse IDs. Pipelines, notebooks and shortcuts read from it, so nothing is hardcoded and deployment stops rewriting IDs by hand. Recent releases added <b>connection</b> and <b>item reference</b> types, so a pipeline can bind dynamically to a lakehouse or connection per environment.</li>
+    </ul>
+
+    <p class="gh">What Git does not capture &mdash; the part people learn painfully</p>
+    <ul class="plain">
+      <li><b>Data.</b> Obviously, but worth saying: Git versions definitions, not table contents.</li>
+      <li><b>Shortcuts.</b> Not carried by deployment pipelines &mdash; recreate per workspace or automate them.</li>
+      <li><b>Bindings to specific items.</b> A notebook's default lakehouse or a pipeline's connection points at a specific ID that differs per environment &mdash; exactly what variable libraries exist to solve.</li>
+      <li><b>Capacity and workspace settings.</b> Assignment, permissions and capacity settings live outside the repo.</li>
+    </ul>
+    <p class="blurb">For automation beyond the UI there's the <b>Fabric REST API</b>, the <b>Fabric CLI</b>, and the <code>fabric-cicd</code> Python library for deploying items from a repo in a build pipeline. You don't need these on day one, but knowing they exist is what separates "we click Deploy" from "we have a release process."</p>
+
+    <p class="gh">Do this &mdash; 6 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d6-1"><span>In your Git-connected workspace, use <b>branch out to a new workspace</b> and watch a full isolated dev environment appear from a branch.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-2"><span>Open the repo and look at how a notebook and a pipeline are actually serialised. That's what you'll be reviewing in PRs.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-3"><span>Create a <b>variable library</b> with one variable &mdash; a lakehouse name or a connection &mdash; and reference it from a pipeline.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-4"><span>Create a <b>deployment pipeline</b> with dev and test stages, even with one item, so you've seen the promotion flow.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-5"><span>List everything in your workspace that would break on promotion because it names a specific environment. That list is your CI/CD backlog.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-6"><span>Skim the <b>Fabric CLI</b> docs for five minutes. Enough to say "we could automate this" credibly.</span></label></li>
+    </ul>
+
+    <div class="tip"><b>Where this makes you valuable</b>Almost every organisation adopting Fabric has a lifecycle problem, not a technology problem: everything is built in one workspace by one person and nobody can promote anything safely. Being the person who introduces branch-per-feature, variable libraries and a promotion path is a bigger contribution than any single pipeline you'll write.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================= DAY 7 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec d7" data-open="true" id="day7">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">DAY<b>7</b></span>
+    <span class="stitle"><h3>The last mile: serving, agents, alerts and apps</h3><span class="ssub">where data engineering stops being invisible</span></span>
+    <span class="mins">9 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">A pipeline nobody consumes is a cost centre. Fabric has five distinct ways to serve what you've built, and knowing all five means you can answer "how would people use this?" before someone asks.</p>
+    <ul class="plain">
+      <li><b>Semantic model + report</b> &mdash; the default. Direct Lake over your gold layer.</li>
+      <li><b>SQL analytics endpoint</b> &mdash; anyone with SQL or Excel can query it directly. Wildly underused; often the fastest way to make analysts happy.</li>
+      <li><b>Data agents</b> &mdash; a natural-language agent grounded in <em>your</em> data. Buildable over lakehouses, warehouses, semantic models, eventhouses, SQL and mirrored databases; publishing and sharing is generally available, and they now support Git integration and deployment pipelines like any other item. The quality depends almost entirely on how well-modelled and well-named your gold layer is &mdash; which makes your modelling work suddenly very visible.</li>
+      <li><b>Activator</b> &mdash; rules on streams or report visuals that fire a Teams message, email or Power Automate flow when a condition holds. This is how data becomes an action instead of a dashboard nobody opens.</li>
+      <li><b>Fabric Apps</b> &mdash; new in 2026, a first-class item for building real web applications on Fabric data with Entra auth built in. Covered on its own page.</li>
+    </ul>
+
+    <p class="gh">Governance, briefly, because it's what makes any of it trustworthy</p>
+    <ul class="plain">
+      <li><b>Domains</b> group workspaces by business area, with their own admins &mdash; how you avoid one flat list of 400 workspaces.</li>
+      <li><b>OneLake catalog</b> is where people find data, and <b>endorsement</b> (Promoted / Certified) is how they know which copy to trust.</li>
+      <li><b>Purview</b> integration brings sensitivity labels and lineage across the estate.</li>
+      <li><b>Workspace roles</b> (Admin/Member/Contributor/Viewer) plus OneLake security decide who sees what &mdash; and mirrored data can now carry security that follows it through shortcuts downstream.</li>
+    </ul>
+
+    <p class="gh">Do this &mdash; 6 minutes</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="d7-1"><span>Connect <b>Excel</b> to your lakehouse's SQL endpoint. Watch a finance colleague's face when you show them.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-2"><span>Create a <b>data agent</b> over your table and ask it a question in English. Note where it gets confused &mdash; that's a modelling or naming problem, not an AI problem.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-3"><span>Set an <b>Activator</b> alert on a report visual so a threshold breach messages you in Teams.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-4"><span>Open the <b>OneLake catalog</b> and see what's discoverable in your tenant. Usually revealing.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-5"><span>Check whether your org uses <b>domains</b> and <b>endorsement</b>. If not, that's a concrete, low-risk proposal you can own.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-6"><span>Pick which of the five serving routes fits your org's biggest current pain, and write one sentence on why.</span></label></li>
+    </ul>
+
+    <div class="tip org"><b>For your org</b>The fastest credibility win in Fabric is rarely a new pipeline. It's taking something people already wait for &mdash; a manual extract, a spreadsheet someone emails &mdash; and making it a governed table plus an alert. Small surface, visible result, easy to explain in a meeting.</div>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ CAPSTONE ============================== -->
+<!-- ==================================================================== -->
+<div class="close">
+  <h2>Day 8 and beyond &mdash; making it stick</h2>
+  <p class="cdesc">Seven days gets you the map. These turn it into the reputation you're actually after.</p>
+
+  <div class="sec d3" data-open="true" id="cap1" style="margin-top:20px">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">NEXT<b>&#9670;</b></span>
+      <span class="stitle"><h3>The capstone &mdash; build this one thing end to end</h3><span class="ssub">a weekend project that exercises all seven days</span></span>
+      <span class="cnt">0/7</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">Pick any real dataset your team cares about &mdash; small is fine. Build it properly, once. Doing this end to end teaches more than another twenty hours of reading, and it gives you something to show.</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="cap-1"><span>Land it raw into a <b>bronze</b> lakehouse table, keeping load timestamp and source system.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-2"><span>Build <b>silver</b> with a parameterised notebook that uses <code>MERGE</code>, not overwrite.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-3"><span>Build <b>gold</b> as a proper star schema &mdash; one fact, two or three dimensions.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-4"><span>Orchestrate the lot with a <b>pipeline</b> on a schedule, with a failure alert.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-5"><span>Put a <b>Direct Lake</b> semantic model on gold &mdash; and confirm no views are feeding it.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-6"><span>Commit the whole workspace to <b>Git</b> and promote it through a <b>deployment pipeline</b> with a variable library.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-7"><span>Add one <b>Activator</b> alert or <b>data agent</b> so a human gets value without opening Fabric.</span></label></li>
+      </ul>
+      <div class="tip"><b>Then write it up</b>One page: the architecture, the choices you made, and what you'd do differently. That document is what gets you treated as the Fabric person &mdash; more reliably than the build itself.</div>
+    </div>
+  </div>
+
+  <div class="sec d4" data-open="true" id="cap2">
+    <button class="sec-head" type="button" aria-expanded="true">
+      <span class="snum">FREE<b>&#9670;</b></span>
+      <span class="stitle"><h3>Certification-level depth without paying for a certification</h3><span class="ssub">use the exam as a syllabus, not a purchase</span></span>
+      <span class="cnt">0/5</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="sec-body">
+      <p class="blurb">You don't want to pay for a certification &mdash; fine. The genuinely valuable part of <b>DP-700 (Fabric Data Engineer Associate)</b> is free anyway: the <b>skills-measured outline</b> in the study guide is a published syllabus of everything Microsoft thinks a Fabric data engineer should know, and every linked Learn module is free. Read the outline, tick off what you can already do, and let the gaps set your next month.</p>
+      <p class="blurb">DP-700 covers three roughly equal areas: implementing and managing an analytics solution (workspaces, security, lifecycle), ingesting and transforming data (batch and streaming, SQL/PySpark/KQL), and monitoring and optimising. If Power BI modelling is more your angle, <b>DP-600</b> covers the analytics-engineer side &mdash; semantic models, DAX, Direct Lake &mdash; and the same trick applies.</p>
+      <ul class="checks">
+        <li><label><input type="checkbox" data-k="cap2-1"><span>Open the DP-700 study guide and copy the skills-measured list into a doc. Mark each line confident / shaky / never heard of it.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-2"><span>Work the "never heard of it" lines first &mdash; those are the ones that make you look unprepared in a design review.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-3"><span>Subscribe to the <b>monthly Fabric feature summary</b> on the Fabric blog. Fifteen minutes a month keeps you permanently current &mdash; this is the single highest-leverage habit here.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-4"><span>Re-read the KQL and real-time sections specifically. Streaming is where most Power BI people are weakest, so it's where the differentiation is.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-5"><span>Teach one of these seven days to a colleague. Nothing exposes a shaky mental model faster.</span></label></li>
+      </ul>
+      <div class="tip org"><b>Becoming the expert in your group</b>Expertise reads as three things: you know what exists, you know what <em>not</em> to use, and you know the failure modes. Days 2, 3 and 5 gave you all three &mdash; the shortcut-vs-copy ladder, the read-only endpoint, the Direct Lake fallback. Deploy them in conversation and people conclude you've been doing this for years.</div>
+    </div>
+  </div>
+</div>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>Built with Claude Code. Progress on this page is stored locally in your browser. Fabric moves monthly &mdash; details here reflect Microsoft's published documentation as of August 2026, and preview features are marked as such.</p>
+  <div class="srcs">
+    Worth bookmarking &mdash;
+    <a href="https://learn.microsoft.com/en-us/fabric/data-engineering/lakehouse-overview">Lakehouse overview (Microsoft Learn)</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-overview">Direct Lake overview</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-storage-tiers">OneLake storage tiers</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/data-factory/variable-library-integration-with-data-pipelines">Variable libraries in pipelines</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700">DP-700 study guide (free syllabus)</a> &middot;
+    <a href="https://blog.fabric.microsoft.com/">Monthly Fabric feature summaries</a>
+  </div>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#2ec4b6">◆</span> Fabric &middot; 7-day course</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  var KEY = 'fabric_7day_v1';
+  var mem = {};
+  var canStore = true;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ mem = JSON.parse(raw) || {}; }
+    }catch(e){
+      canStore = false; mem = {};
+      var n = document.getElementById('persistNote');
+      if(n){ n.textContent = 'saving is unavailable in this view — open the file in your browser and progress will stick.'; }
+    }
+  }
+  function save(){
+    if(!canStore) return;
+    try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){ canStore = false; }
+  }
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+
+  function refresh(){
+    var total = boxes.length, done = 0;
+    boxes.forEach(function(b){ if(b.checked) done++; });
+
+    document.querySelectorAll('.sec').forEach(function(sec){
+      var sb = sec.querySelectorAll('input[type=checkbox][data-k]');
+      if(!sb.length) return;
+      var sd = 0;
+      sb.forEach(function(b){ if(b.checked) sd++; });
+      var cnt = sec.querySelector('.cnt');
+      if(cnt){
+        cnt.textContent = sd + '/' + sb.length;
+        cnt.classList.toggle('full', sd === sb.length);
+      }
+      sec.classList.toggle('done', sd === sb.length);
+      var chip = document.querySelector('.dchip[data-for="' + sec.id + '"]');
+      if(chip){ chip.classList.toggle('done', sd === sb.length); }
+    });
+
+    var opct = total ? Math.round(done / total * 100) : 0;
+    var ob = document.getElementById('obarFill');
+    var ot = document.getElementById('opct');
+    if(ob){ ob.style.width = opct + '%'; }
+    if(ot){ ot.textContent = opct + '% done'; }
+  }
+
+  load();
+  boxes.forEach(function(b){
+    var k = b.getAttribute('data-k');
+    if(mem[k]){ b.checked = true; }
+    b.addEventListener('change', function(){
+      if(b.checked){ mem[k] = 1; } else { delete mem[k]; }
+      save(); refresh();
+    });
+  });
+
+  document.querySelectorAll('.sec').forEach(function(sec){
+    if(sec.id && mem['open:' + sec.id] === 0){
+      sec.setAttribute('data-open', 'false');
+      var hh = sec.querySelector('.sec-head');
+      if(hh){ hh.setAttribute('aria-expanded', 'false'); }
+    }
+  });
+
+  document.querySelectorAll('.sec-head').forEach(function(h){
+    h.addEventListener('click', function(){
+      var sec = h.closest('.sec');
+      var open = sec.getAttribute('data-open') === 'true';
+      sec.setAttribute('data-open', open ? 'false' : 'true');
+      h.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if(sec.id){
+        if(open){ mem['open:' + sec.id] = 0; } else { delete mem['open:' + sec.id]; }
+        save();
+      }
+    });
+  });
+
+  var tAll = document.getElementById('toggleAll');
+  var allOpen = true;
+  if(tAll){
+    tAll.addEventListener('click', function(){
+      allOpen = !allOpen;
+      document.querySelectorAll('.sec').forEach(function(sec){
+        sec.setAttribute('data-open', allOpen ? 'true' : 'false');
+        var h = sec.querySelector('.sec-head');
+        if(h){ h.setAttribute('aria-expanded', allOpen ? 'true' : 'false'); }
+        if(sec.id){
+          if(allOpen){ delete mem['open:' + sec.id]; } else { mem['open:' + sec.id] = 0; }
+        }
+      });
+      save();
+      tAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  var rBtn = document.getElementById('resetBtn');
+  if(rBtn){
+    rBtn.addEventListener('click', function(){
+      if(!confirm('Clear all progress on this page?')) return;
+      mem = {};
+      boxes.forEach(function(b){ b.checked = false; });
+      save(); refresh();
+    });
+  }
+
+  refresh();
+})();
+</script>
+</body>
+</html>
