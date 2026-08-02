@@ -158,11 +158,21 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 @media print{body{background:#fff;color:#111;background-image:none}.topbar{display:none}.pat,.card,ol.qs li{background:#fff;border-color:#ccc}}
+
+/* back to index — self-contained, inherits topbar colour */
+.homebtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;
+  border:1px solid currentColor;border-radius:9px;color:inherit;opacity:.42;text-decoration:none;
+  transition:opacity .18s ease,transform .18s ease}
+.homebtn:hover{opacity:1;transform:translateX(-2px)}
+.homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
+.homebtn svg{width:14px;height:14px;display:block}
+@media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
 </style>
 </head>
 <body>
 
 <div class="topbar">
+  <a class="homebtn" href="../index.html" aria-label="Back to the tool belt" title="Back to the tool belt"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   <span class="brand"><span class="fl">&#9670;</span> The Solution Playbook</span>
   <nav class="navlinks">
     <a href="#first">First conversation</a>
