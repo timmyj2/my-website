@@ -68,6 +68,7 @@ a{color:inherit}
   color:var(--mut);text-decoration:none;background:var(--panel);white-space:nowrap}
 .dchip:hover{border-color:var(--teal);color:var(--ink)}
 .dchip.done{border-color:var(--ok);color:var(--ok)}
+.dchip.cheat{border-color:var(--lime);color:var(--lime-hi)}
 .tbtn{font-family:var(--mono);font-size:.7rem;background:var(--panel);border:1px solid var(--line);color:var(--mut);
   padding:3px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
 .tbtn:hover{color:var(--ink);border-color:var(--dim)}
@@ -165,6 +166,19 @@ th{background:var(--panel2);font-family:var(--mono);font-size:.68rem;letter-spac
 td b{color:var(--ink);font-weight:600}
 .tscroll{overflow-x:auto}
 
+/* cheat sheet */
+.sheet{margin-top:52px;background:linear-gradient(180deg,var(--lime-soft),var(--panel) 70%);border:1px solid var(--line);
+  border-radius:14px;padding:26px 24px 24px}
+.sheet-head h2{font-family:var(--disp);font-weight:700;font-size:1.42rem;margin-bottom:5px}
+.sheet-head p{color:var(--mut);font-size:.95rem;max-width:66ch}
+.sheet .chgh{font-family:var(--mono);font-size:.71rem;letter-spacing:.12em;text-transform:uppercase;color:var(--lime-hi);
+  font-weight:600;margin:26px 0 2px}
+.sheet table{margin-top:9px}
+.sheet .sayings{margin-top:12px}
+.sheet .sayings li{color:var(--mut);font-size:.96rem;padding-left:22px}
+.sheet .sayings li::before{background:var(--lime)}
+.sheet .sayings b{color:var(--ink)}
+
 /* capstone / closing */
 .close{margin-top:52px;background:linear-gradient(180deg,var(--teal-soft),var(--panel) 76%);border:1px solid var(--line);
   border-radius:14px;padding:26px 24px}
@@ -212,6 +226,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   <a class="dchip" href="#day5" data-for="day5">D5</a>
   <a class="dchip" href="#day6" data-for="day6">D6</a>
   <a class="dchip" href="#day7" data-for="day7">D7</a>
+  <a class="dchip cheat" href="#cheat">Cheat sheet</a>
   <button class="tbtn" id="toggleAll" type="button">Collapse all</button>
   <button class="tbtn" id="resetBtn" type="button">Reset</button>
 </div>
@@ -600,6 +615,53 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
 
     <div class="tip org"><b>For your org</b>The fastest credibility win in Fabric is rarely a new pipeline. It's taking something people already wait for &mdash; a manual extract, a spreadsheet someone emails &mdash; and making it a governed table plus an alert. Small surface, visible result, easy to explain in a meeting.</div>
   </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- =========================== CHEAT SHEET ============================ -->
+<!-- ==================================================================== -->
+<div class="sheet" id="cheat">
+  <div class="sheet-head">
+    <h2>The one-page answer sheet</h2>
+    <p>Everything above, compressed to what you'd actually say out loud in a design review. Screenshot this one.</p>
+  </div>
+
+  <p class="chgh">"Where should this data live?"</p>
+  <div class="tscroll"><table>
+    <tr><th>Signal</th><th>Answer</th></tr>
+    <tr><td>Team writes Python / Spark; files as well as tables</td><td><b>Lakehouse</b></td></tr>
+    <tr><td>Team writes SQL; needs INSERT/UPDATE and stored procs</td><td><b>Warehouse</b></td></tr>
+    <tr><td>Events, logs, telemetry; queried by time window</td><td><b>Eventhouse / KQL</b></td></tr>
+    <tr><td>An application writes single rows (OLTP)</td><td><b>SQL database</b></td></tr>
+  </table></div>
+
+  <p class="chgh">"How do we get it in?" &mdash; stop at the first yes</p>
+  <div class="tscroll"><table>
+    <tr><th>Ask</th><th>Then use</th></tr>
+    <tr><td>Is it already in a lake we can reach?</td><td><b>Shortcut</b> &mdash; no copy, no schedule</td></tr>
+    <tr><td>Is it an operational DB we need continuously?</td><td><b>Mirroring</b></td></tr>
+    <tr><td>Is it a straight A&rarr;B move?</td><td><b>Copy job</b></td></tr>
+    <tr><td>Are there several steps with dependencies?</td><td><b>Data pipeline</b></td></tr>
+    <tr><td>Is Power Query genuinely the right shaping tool?</td><td><b>Dataflow Gen2</b></td></tr>
+    <tr><td>Does lateness matter in seconds?</td><td><b>Eventstream</b></td></tr>
+  </table></div>
+
+  <p class="chgh">The five things that will bite you</p>
+  <div class="tscroll"><table>
+    <tr><th>Trap</th><th>What happens</th><th>Fix</th></tr>
+    <tr><td><b>A view in a Direct Lake model</b></td><td>The <em>whole model</em> silently falls back to DirectQuery &mdash; everything gets slower</td><td>Materialise the view as a Delta table</td></tr>
+    <tr><td><b>Lakehouse SQL endpoint is read-only</b></td><td>The "we'll write back through SQL" plan dies late</td><td>Use a Warehouse if you need writes</td></tr>
+    <tr><td><b>Shortcuts skip deployment pipelines</b></td><td>Promotion to test/prod quietly loses them</td><td>Recreate per workspace, or automate via API</td></tr>
+    <tr><td><b>Small files</b></td><td>Thousands of tiny Parquet files make reads crawl</td><td><code>OPTIMIZE</code>; don't partition small tables</td></tr>
+    <tr><td><b>Idle Spark sessions</b></td><td>Burn CUs and throttle other people's reports</td><td>Stop sessions; know about autoscale billing</td></tr>
+  </table></div>
+
+  <p class="chgh">Three sentences that make you sound like you've done this before</p>
+  <ul class="plain sayings">
+    <li>&ldquo;Before we build a pipeline &mdash; <b>can we just shortcut it?</b>&rdquo;</li>
+    <li>&ldquo;Lakehouse or warehouse depends on one thing: <b>who's writing to it, and in what language?</b>&rdquo;</li>
+    <li>&ldquo;If gold isn't a star schema, <b>we're paying for it in every report query.</b>&rdquo;</li>
+  </ul>
 </div>
 
 <!-- ==================================================================== -->
