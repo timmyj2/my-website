@@ -9,23 +9,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b120f;
-  --panel:#111b16;
-  --panel2:#0d1713;
-  --line:#1f3229;
-  --ink:#e4f0e9;
-  --mut:#9ab3a6;
-  --dim:#5f7d6e;
-  --green:#4ade80;
-  --green-hi:#86efac;
+  --bg:#fbfbfa;
+  --panel:#ffffff;
+  --panel2:#f7f8f7;
+  --line:rgba(0,0,0,.1);
+  --ink:#121316;
+  --mut:#5c6069;
+  --dim:#8b9098;
+  --green:#106631;
+  --green-hi:#15803d;
   --green-soft:rgba(74,222,128,.11);
-  --cyan:#22d3ee;
+  --cyan:#0e7490;
   --cyan-soft:rgba(34,211,238,.11);
-  --amber:#fbbf24;
+  --amber:#b45309;
   --amber-soft:rgba(251,191,36,.11);
-  --rose:#fb7185;
+  --rose:#be123c;
   --rose-soft:rgba(251,113,133,.11);
-  --violet:#c4b5fd;
+  --violet:#7c3aed;
   --violet-soft:rgba(196,181,253,.11);
   --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
   --body:'Inter',system-ui,'Segoe UI',sans-serif;
@@ -33,14 +33,11 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:74px}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.63;min-height:100vh;
-  background-image:radial-gradient(900px 420px at 88% -6%, rgba(74,222,128,.09), transparent 62%),
-                   radial-gradient(900px 420px at 8% -4%, rgba(34,211,238,.08), transparent 62%);
-  background-attachment:fixed;}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.63;min-height:100vh;}
 a{color:inherit}
 ::selection{background:rgba(74,222,128,.28)}
 
-.topbar{position:sticky;top:0;z-index:50;background:rgba(11,18,15,.9);backdrop-filter:blur(10px);
+.topbar{position:sticky;top:0;z-index:50;background:rgba(251,251,250,.9);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);padding:9px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
 .topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .brand .fl{color:var(--green)}
@@ -129,11 +126,32 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 @media print{body{background:#fff;color:#111;background-image:none}.topbar{display:none}.pat,.card{background:#fff;border-color:#ccc}pre{background:#f5f5f5}code{color:#111}}
+
+/* back to index — self-contained, inherits topbar colour */
+.homebtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;
+  border:1px solid currentColor;border-radius:9px;color:inherit;opacity:.42;text-decoration:none;
+  transition:opacity .18s ease,transform .18s ease}
+.homebtn:hover{opacity:1;transform:translateX(-2px)}
+.homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
+.homebtn svg{width:14px;height:14px;display:block}
+@media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
+
+/* ---- inline figures (hand-drawn schematics, not screenshots) ---- */
+.fig{margin:18px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px 14px}
+.fig svg{display:block;width:100%;height:auto}
+.fig svg text{font-family:var(--mono)}
+.fig svg .ff-disp{font-family:var(--disp)}
+.fig figcaption{font-family:var(--mono);font-size:.72rem;line-height:1.68;color:var(--dim);
+  margin-top:13px;padding-top:11px;border-top:1px solid var(--line)}
+.fig figcaption b{color:var(--green-hi);font-weight:600}
+@media (max-width:640px){.fig{padding:14px 12px 11px}}
+@media print{.fig{background:#fff;border-color:#ccc}}
 </style>
 </head>
 <body>
 
 <div class="topbar">
+  <a class="homebtn" href="../index.html" aria-label="Back to the tool belt" title="Back to the tool belt"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   <span class="brand"><span class="fl">&#9670;</span> SQL &amp; Python Patterns</span>
   <nav class="navlinks">
     <a href="#window">Window functions</a>
@@ -162,6 +180,57 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 <section id="window">
   <div class="shead"><span class="snum">01</span><h2>Window functions &mdash; the single highest-leverage thing to learn</h2></div>
   <p class="slede">If you learn one thing on this page, learn these. A window function looks at other rows <em>while staying on the current row</em> &mdash; that's the whole idea, and it's what separates people who write awkward self-joins from people who write four clean lines. Five of the twelve patterns below are just window functions wearing different hats.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 280" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>A worked table of two customers' monthly amounts, showing PARTITION BY as a coloured band per customer, ORDER BY as a downward arrow through the period column, and the frame as a bracket enclosing every row from the top of a partition down to the current row, feeding a running total column on the right.</title>
+
+      <text x="8" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">PARTITION BY customer &mdash; restarts every group</text>
+      <text x="752" y="12" text-anchor="end" font-size="10" fill="var(--dim)">ORDER BY period &#8595;</text>
+
+      <!-- table frame -->
+      <rect x="40" y="20" width="500" height="238" fill="none" stroke="var(--line)"/>
+      <rect x="40" y="20" width="320" height="102" fill="var(--green-soft)"/>
+      <rect x="40" y="122" width="320" height="102" fill="var(--cyan-soft)"/>
+      <rect x="378" y="20" width="162" height="204" fill="var(--amber-soft)"/>
+      <path d="M140,20 V224 M260,20 V224 M360,20 V224" stroke="var(--line)"/>
+      <path d="M40,54 H540 M40,88 H540 M40,122 H540 M40,156 H540 M40,190 H540" stroke="var(--line)"/>
+
+      <!-- headers -->
+      <g font-size="10.5" font-weight="600" fill="var(--mut)">
+        <text x="90" y="42" text-anchor="middle">customer</text>
+        <text x="200" y="42" text-anchor="middle">period</text>
+        <text x="310" y="42" text-anchor="middle">amount</text>
+        <text x="459" y="42" text-anchor="middle" fill="var(--ink)">running total</text>
+      </g>
+
+      <!-- partition dots -->
+      <circle cx="20" cy="71" r="10" fill="var(--green)"/><text x="20" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">A</text>
+      <circle cx="20" cy="173" r="10" fill="var(--cyan)"/><text x="20" y="177" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">B</text>
+
+      <!-- ORDER BY arrow -->
+      <path d="M150,60 V148" stroke="var(--dim)" stroke-width="1.4" fill="none"/>
+      <path d="M146,146 L150,156 L154,146 Z" fill="var(--dim)"/>
+
+      <!-- data rows -->
+      <g font-size="11" fill="var(--ink)">
+        <text x="90" y="76" text-anchor="middle">A</text><text x="200" y="76" text-anchor="middle">Jan</text><text x="346" y="76" text-anchor="end">60</text><text x="459" y="76" text-anchor="middle" font-weight="600">120</text>
+        <text x="90" y="110" text-anchor="middle">A</text><text x="200" y="110" text-anchor="middle">Feb</text><text x="346" y="110" text-anchor="end">90</text><text x="459" y="110" text-anchor="middle" font-weight="600">210</text>
+        <text x="90" y="144" text-anchor="middle">A</text><text x="200" y="144" text-anchor="middle">Mar</text><text x="346" y="144" text-anchor="end">60</text><text x="459" y="144" text-anchor="middle" font-weight="700" fill="var(--amber)">270</text>
+        <text x="90" y="178" text-anchor="middle">B</text><text x="200" y="178" text-anchor="middle">Jan</text><text x="346" y="178" text-anchor="end">200</text><text x="459" y="178" text-anchor="middle" font-weight="600">200</text>
+        <text x="90" y="212" text-anchor="middle">B</text><text x="200" y="212" text-anchor="middle">Feb</text><text x="346" y="212" text-anchor="end">50</text><text x="459" y="212" text-anchor="middle" font-weight="600">250</text>
+        <text x="90" y="246" text-anchor="middle">B</text><text x="200" y="246" text-anchor="middle">Mar</text><text x="346" y="246" text-anchor="end">80</text><text x="459" y="246" text-anchor="middle" font-weight="600">330</text>
+      </g>
+
+      <!-- current row + frame -->
+      <rect x="40" y="122" width="500" height="34" fill="none" stroke="var(--amber)" stroke-width="2" rx="3"/>
+      <path d="M548,20 H558 V156 H548" stroke="var(--amber)" stroke-width="1.6" fill="none"/>
+      <text x="566" y="72" class="ff-disp" font-size="12" font-weight="600" fill="var(--amber)">frame</text>
+      <text x="566" y="90" font-size="9.5" fill="var(--mut)">top of partition</text>
+      <text x="566" y="104" font-size="9.5" fill="var(--mut)">down to here &#8594;</text>
+    </svg>
+    <figcaption><b>Same shape, three settings.</b> PARTITION BY says where to restart counting &mdash; watch the running total drop back to 120 the moment customer B begins. ORDER BY says which row is first. The frame says how many rows feed the current row's answer; here it's "everything in this partition so far", which is what turns a plain SUM into a running total.</figcaption>
+  </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">01</span><h3>Deduplicate &mdash; keep one row per thing</h3></div>
@@ -252,6 +321,68 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   <div class="shead"><span class="snum">02</span><h2>Reshaping &mdash; making data the right shape</h2></div>
   <p class="slede">Most "the data's wrong" problems are actually "the data's the wrong shape" problems. These four fix that.</p>
 
+  <figure class="fig">
+    <svg viewBox="0 0 760 250" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>A wide table with one row per account and a column per month, next to the same data unpivoted into a long table with one row per account-period combination. Rows are colour-matched so each wide row's three cells map to the same three rows on the right.</title>
+
+      <text x="8" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">WIDE &mdash; one row per account</text>
+      <text x="440" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">LONG &mdash; one row per fact</text>
+
+      <!-- wide table -->
+      <rect x="8" y="20" width="292" height="102" fill="none" stroke="var(--line)"/>
+      <rect x="8" y="46" width="292" height="38" fill="var(--green-soft)"/>
+      <rect x="8" y="84" width="292" height="38" fill="var(--cyan-soft)"/>
+      <path d="M120,20 V122 M180,20 V122 M240,20 V122" stroke="var(--line)"/>
+      <path d="M8,46 H300 M8,84 H300" stroke="var(--line)"/>
+      <g font-size="10.5" font-weight="600" fill="var(--mut)">
+        <text x="64" y="38" text-anchor="middle">account</text>
+        <text x="150" y="38" text-anchor="middle">jan</text>
+        <text x="210" y="38" text-anchor="middle">feb</text>
+        <text x="270" y="38" text-anchor="middle">mar</text>
+      </g>
+      <g font-size="10.5" fill="var(--ink)">
+        <text x="64" y="70" text-anchor="middle" font-weight="600">Rent</text>
+        <text x="150" y="70" text-anchor="middle">4,200</text>
+        <text x="210" y="70" text-anchor="middle">4,200</text>
+        <text x="270" y="70" text-anchor="middle">4,350</text>
+        <text x="64" y="108" text-anchor="middle" font-weight="600">Payroll</text>
+        <text x="150" y="108" text-anchor="middle">18,500</text>
+        <text x="210" y="108" text-anchor="middle">19,100</text>
+        <text x="270" y="108" text-anchor="middle">18,900</text>
+      </g>
+
+      <!-- arrows -->
+      <path d="M316,58 H420" stroke="var(--green)" stroke-width="1.6" fill="none"/>
+      <path d="M416,52 L426,58 L416,64 Z" fill="var(--green)"/>
+      <text x="368" y="50" text-anchor="middle" font-size="9.5" font-weight="600" letter-spacing="0.06em" fill="var(--green-hi)">UNPIVOT</text>
+
+      <path d="M420,86 H316" stroke="var(--dim)" stroke-width="1.3" stroke-dasharray="3 4" fill="none"/>
+      <path d="M320,80 L310,86 L320,92 Z" fill="var(--dim)"/>
+      <text x="368" y="104" text-anchor="middle" font-size="9.5" fill="var(--dim)">PIVOT</text>
+
+      <!-- long table -->
+      <rect x="440" y="20" width="260" height="206" fill="none" stroke="var(--line)"/>
+      <rect x="440" y="46" width="260" height="90" fill="var(--green-soft)"/>
+      <rect x="440" y="136" width="260" height="90" fill="var(--cyan-soft)"/>
+      <path d="M540,20 V226 M610,20 V226" stroke="var(--line)"/>
+      <path d="M440,46 H700 M440,76 H700 M440,106 H700 M440,136 H700 M440,166 H700 M440,196 H700" stroke="var(--line)"/>
+      <g font-size="10.5" font-weight="600" fill="var(--mut)">
+        <text x="490" y="38" text-anchor="middle">account</text>
+        <text x="575" y="38" text-anchor="middle">period</text>
+        <text x="655" y="38" text-anchor="middle">amount</text>
+      </g>
+      <g font-size="10.5" fill="var(--ink)">
+        <text x="490" y="66" text-anchor="middle">Rent</text><text x="575" y="66" text-anchor="middle">Jan</text><text x="655" y="66" text-anchor="middle">4,200</text>
+        <text x="490" y="96" text-anchor="middle">Rent</text><text x="575" y="96" text-anchor="middle">Feb</text><text x="655" y="96" text-anchor="middle">4,200</text>
+        <text x="490" y="126" text-anchor="middle">Rent</text><text x="575" y="126" text-anchor="middle">Mar</text><text x="655" y="126" text-anchor="middle">4,350</text>
+        <text x="490" y="156" text-anchor="middle">Payroll</text><text x="575" y="156" text-anchor="middle">Jan</text><text x="655" y="156" text-anchor="middle">18,500</text>
+        <text x="490" y="186" text-anchor="middle">Payroll</text><text x="575" y="186" text-anchor="middle">Feb</text><text x="655" y="186" text-anchor="middle">19,100</text>
+        <text x="490" y="216" text-anchor="middle">Payroll</text><text x="575" y="216" text-anchor="middle">Mar</text><text x="655" y="216" text-anchor="middle">18,900</text>
+      </g>
+    </svg>
+    <figcaption><b>Same three numbers, colour-matched across both tables.</b> The Rent row's three cells become three rows on the right; Payroll's become three more. Long is three times as many rows and one third as many columns &mdash; which is exactly why every analytical tool downstream prefers it.</figcaption>
+  </figure>
+
   <div class="pat">
     <div class="ptop"><span class="pn">06</span><h3>Unpivot &mdash; columns that should be rows</h3></div>
     <p class="want"><b>You want this when:</b> a finance extract has a column per month (<code>Jan</code>, <code>Feb</code>, <code>Mar</code>&hellip;). Humans love this layout; every analytical tool hates it. Almost every spreadsheet-sourced dataset needs this first.</p>
@@ -324,6 +455,67 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
 <section id="compare">
   <div class="shead"><span class="snum">03</span><h2>Comparing &mdash; the reconciliation toolkit</h2></div>
   <p class="slede">Three patterns for "these two things should match and don't" &mdash; the most valuable class of work you can do in a finance organisation.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 700 320" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>A small source ledger and target ledger joined on doc_id, fanning out into three outcome buckets: Match, Mismatched, and Missing. Below, brackets show which join type surfaces which buckets: inner join sees Match and Mismatched, an anti-join sees only Missing, and a full outer join sees all three at once.</title>
+
+      <!-- sources -->
+      <rect x="30" y="20" width="190" height="78" rx="10" fill="var(--panel2)" stroke="var(--green)" stroke-width="1.4"/>
+      <text x="40" y="36" class="ff-disp" font-size="11.5" font-weight="600" fill="var(--green-hi)">Source Ledger</text>
+      <g font-size="10.5" fill="var(--mut)">
+        <text x="44" y="54">D1</text><text x="196" y="54" text-anchor="end">1,000</text>
+        <text x="44" y="70">D2</text><text x="196" y="70" text-anchor="end">500</text>
+        <text x="44" y="86">D3</text><text x="196" y="86" text-anchor="end">220</text>
+      </g>
+
+      <rect x="480" y="20" width="190" height="78" rx="10" fill="var(--panel2)" stroke="var(--cyan)" stroke-width="1.4"/>
+      <text x="490" y="36" class="ff-disp" font-size="11.5" font-weight="600" fill="var(--cyan)">Target Ledger</text>
+      <g font-size="10.5" fill="var(--mut)">
+        <text x="494" y="54">D1</text><text x="646" y="54" text-anchor="end">1,000</text>
+        <text x="494" y="70">D2</text><text x="646" y="70" text-anchor="end">650</text>
+        <text x="494" y="86">D4</text><text x="646" y="86" text-anchor="end">300</text>
+      </g>
+
+      <!-- join box -->
+      <path d="M125,98 L300,118" stroke="var(--dim)" stroke-width="1.3" fill="none"/>
+      <path d="M296,113 L306,117 L295,122 Z" fill="var(--dim)"/>
+      <path d="M575,98 L400,118" stroke="var(--dim)" stroke-width="1.3" fill="none"/>
+      <path d="M404,113 L394,117 L405,122 Z" fill="var(--dim)"/>
+      <rect x="270" y="118" width="160" height="44" rx="22" fill="var(--panel2)" stroke="var(--mut)" stroke-width="1.2"/>
+      <text x="350" y="136" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">FULL OUTER JOIN</text>
+      <text x="350" y="152" text-anchor="middle" font-size="9.5" fill="var(--dim)">on doc_id</text>
+
+      <path d="M350,166 V170 M350,166 L130,170 M350,166 L570,170" stroke="var(--dim)" stroke-width="1.2" fill="none"/>
+      <path d="M126,166 L134,166 L130,174 Z" fill="var(--dim)"/>
+      <path d="M346,166 L354,166 L350,174 Z" fill="var(--dim)"/>
+      <path d="M566,166 L574,166 L570,174 Z" fill="var(--dim)"/>
+
+      <!-- buckets -->
+      <rect x="40" y="170" width="180" height="70" rx="10" fill="var(--green-soft)" stroke="var(--green)" stroke-width="1.3"/>
+      <text x="50" y="192" font-size="12" font-weight="600" fill="var(--green-hi)">Match</text>
+      <text x="50" y="210" font-size="9.5" fill="var(--mut)">D1 &mdash; same on both sides</text>
+
+      <rect x="260" y="170" width="180" height="70" rx="10" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.3"/>
+      <text x="270" y="192" font-size="12" font-weight="600" fill="var(--amber)">Mismatched</text>
+      <text x="270" y="210" font-size="9.5" fill="var(--mut)">D2 &mdash; present, differs</text>
+
+      <rect x="480" y="170" width="180" height="70" rx="10" fill="var(--rose-soft)" stroke="var(--rose)" stroke-width="1.3"/>
+      <text x="490" y="192" font-size="12" font-weight="600" fill="var(--rose)">Missing</text>
+      <text x="490" y="210" font-size="9.5" fill="var(--mut)">D3 src-only &middot; D4 tgt-only</text>
+
+      <!-- join-type legend brackets -->
+      <path d="M40,250 V240 M440,250 V240 M40,250 H440" stroke="var(--mut)" stroke-width="1.1" fill="none"/>
+      <text x="240" y="264" text-anchor="middle" font-size="9.5" fill="var(--mut)">INNER JOIN &#8594; Match + Mismatched</text>
+
+      <path d="M480,250 V240 M660,250 V240 M480,250 H660" stroke="var(--mut)" stroke-width="1.1" fill="none"/>
+      <text x="570" y="264" text-anchor="middle" font-size="9.5" fill="var(--mut)">ANTI-JOIN &#8594; Missing only</text>
+
+      <path d="M40,286 V276 M660,286 V276 M40,286 H660" stroke="var(--dim)" stroke-width="1.1" fill="none"/>
+      <text x="350" y="300" text-anchor="middle" font-size="9.5" fill="var(--dim)">FULL OUTER JOIN &#8594; all three, in one pass</text>
+    </svg>
+    <figcaption><b>Pick the join by what you need to see.</b> An inner join is enough if you only care about rows on both sides. Reach for the anti-join (pattern 10) when the question is purely "what's missing". Use the full outer join (pattern 11) when you need to report all three buckets at once &mdash; which is almost always what "reconcile these" actually means.</figcaption>
+  </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">10</span><h3>Anti-join &mdash; what's in A but not B</h3></div>

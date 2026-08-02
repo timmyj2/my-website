@@ -9,41 +9,38 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#08131a;
-  --panel:#0f1e26;
-  --panel2:#0b1820;
-  --line:#1d343e;
-  --ink:#e6f1f5;
-  --mut:#95acb7;
-  --dim:#5f7a86;
-  --teal:#2ec4b6;
-  --teal-hi:#5eead4;
+  --bg:#fbfbfa;
+  --panel:#ffffff;
+  --panel2:#f6f7f6;
+  --line:rgba(0,0,0,.1);
+  --ink:#121316;
+  --mut:#5c6069;
+  --dim:#8b9098;
+  --teal:#1c786f;
+  --teal-hi:#057e6b;
   --teal-soft:rgba(46,196,182,.13);
-  --cyan:#38bdf8;
-  --cyan-hi:#7dd3fc;
+  --cyan:#0672a2;
+  --cyan-hi:#0075ad;
   --cyan-soft:rgba(56,189,248,.13);
-  --lime:#a3e635;
-  --lime-hi:#bef264;
+  --lime:#537d0f;
+  --lime-hi:#4e7a00;
   --lime-soft:rgba(163,230,53,.12);
-  --amber:#fbbf24;
-  --amber-hi:#fcd34d;
+  --amber:#8a6300;
+  --amber-hi:#8c6b00;
   --amber-soft:rgba(251,191,36,.12);
-  --violet:#a78bfa;
-  --violet-hi:#c4b5fd;
+  --violet:#511bf3;
+  --violet-hi:#724dff;
   --violet-soft:rgba(167,139,250,.13);
-  --rose:#fb7185;
+  --rose:#d21e39;
   --rose-soft:rgba(251,113,133,.12);
-  --ok:#4ade80;
+  --ok:#18823e;
   --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
   --body:'Inter',system-ui,'Segoe UI',sans-serif;
   --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:78px}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.62;min-height:100vh;
-  background-image:radial-gradient(900px 440px at 88% -6%, rgba(46,196,182,.11), transparent 62%),
-                   radial-gradient(900px 440px at 6% -4%, rgba(56,189,248,.10), transparent 62%);
-  background-attachment:fixed;}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.62;min-height:100vh;}
 a{color:inherit}
 ::selection{background:rgba(46,196,182,.3)}
 
@@ -57,11 +54,11 @@ a{color:inherit}
 .d7{--acc:var(--teal);--acc-hi:var(--teal-hi);--soft:var(--teal-soft)}
 
 /* ---------- sticky bar ---------- */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(8,19,26,.88);backdrop-filter:blur(10px);
+.topbar{position:sticky;top:0;z-index:50;background:rgba(251,251,250,.88);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
 .topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .brand .fl{color:var(--teal)}
-.obar{flex:1;min-width:120px;height:8px;border-radius:99px;background:#10222b;border:1px solid var(--line);overflow:hidden}
+.obar{flex:1;min-width:120px;height:8px;border-radius:99px;background:#eef0ee;border:1px solid var(--line);overflow:hidden}
 .obar>div{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--lime));transition:width .35s ease}
 .opct{font-family:var(--mono);font-size:.77rem;color:var(--mut);min-width:8.5ch;text-align:right}
 .dchip{font-family:var(--mono);font-size:.71rem;padding:3px 8px;border-radius:6px;border:1px solid var(--line);
@@ -95,14 +92,14 @@ a{color:inherit}
 
 /* stack diagram */
 .stack{margin:30px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px 14px;
-  box-shadow:0 2px 16px rgba(0,0,0,.3)}
+  box-shadow:0 2px 16px rgba(0,0,0,.06)}
 .stack svg{display:block;width:100%;height:auto}
 .stack-cap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-family:var(--mono);font-size:.68rem;
   letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:9px}
 .stack-cap .g{color:var(--teal)}
 
 /* ---------- day cards ---------- */
-.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.24)}
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
 .sec.done{border-color:var(--acc)}
 .sec-head{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;background:none;border:none;color:inherit;
   font-family:inherit;text-align:left;cursor:pointer}
@@ -138,9 +135,9 @@ ul.checks label:hover{background:var(--panel2)}
 ul.checks input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;margin-top:3px;border-radius:5px;
   border:1.5px solid var(--dim);background:var(--panel2);cursor:pointer;position:relative}
 ul.checks input:checked{background:var(--acc);border-color:var(--acc)}
-ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #08131a;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
 ul.checks input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(230,241,245,.26)}
+ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(18,19,22,.26)}
 ul.checks b{color:var(--ink);font-weight:600}
 
 ul.plain{list-style:none;margin-top:10px}
@@ -210,12 +207,22 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   .sec,.stack,.startbox,.close{border-color:#bbb;background:#fff;box-shadow:none}
   pre{background:#f5f5f5}code{color:#111}a{color:#111}
 }
+
+/* back to index — self-contained, inherits topbar colour */
+.homebtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;
+  border:1px solid currentColor;border-radius:9px;color:inherit;opacity:.42;text-decoration:none;
+  transition:opacity .18s ease,transform .18s ease}
+.homebtn:hover{opacity:1;transform:translateX(-2px)}
+.homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
+.homebtn svg{width:14px;height:14px;display:block}
+@media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
 </style>
 </head>
 <body>
 
 <!-- ============ STICKY PROGRESS ============ -->
 <div class="topbar">
+  <a class="homebtn" href="../index.html" aria-label="Back to the tool belt" title="Back to the tool belt"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   <span class="brand"><span class="fl">&#9670;</span> Fabric &middot; 7-day course</span>
   <div class="obar"><div id="obarFill"></div></div>
   <span class="opct" id="opct">0% done</span>
@@ -242,48 +249,48 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   <div class="stack" aria-hidden="true">
     <svg viewBox="0 0 880 244" xmlns="http://www.w3.org/2000/svg">
       <!-- OneLake base -->
-      <rect x="8" y="176" width="864" height="58" rx="12" fill="#0f1e26" stroke="#2ec4b6" stroke-width="1.6"/>
-      <text x="28" y="200" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#5eead4">OneLake</text>
-      <text x="28" y="220" font-family="JetBrains Mono,monospace" font-size="10" fill="#95acb7">one tenant-wide store &middot; Delta &amp; Parquet &middot; open format &middot; no copies required</text>
-      <text x="800" y="212" font-family="JetBrains Mono,monospace" font-size="9" fill="#5f7a86">storage</text>
+      <rect x="8" y="176" width="864" height="58" rx="12" fill="#eef8f6" stroke="#1e7e75" stroke-width="1.6"/>
+      <text x="28" y="200" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#057e6b">OneLake</text>
+      <text x="28" y="220" font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">one tenant-wide store &middot; Delta &amp; Parquet &middot; open format &middot; no copies required</text>
+      <text x="800" y="212" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b9098">storage</text>
 
       <!-- engines -->
-      <g font-family="JetBrains Mono,monospace" font-size="9" fill="#95acb7">
-        <rect x="8" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#38bdf8" stroke-width="1.4"/>
-        <text x="24" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#7dd3fc">Spark</text>
+      <g font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">
+        <rect x="8" y="104" width="164" height="56" rx="10" fill="#eaf6fc" stroke="#0678ab" stroke-width="1.4"/>
+        <text x="24" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#0075ad">Spark</text>
         <text x="24" y="145">notebooks &middot; jobs</text>
 
-        <rect x="182" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#a3e635" stroke-width="1.4"/>
-        <text x="198" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#bef264">T-SQL</text>
+        <rect x="182" y="104" width="164" height="56" rx="10" fill="#f5faec" stroke="#537d0f" stroke-width="1.4"/>
+        <text x="198" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#4e7a00">T-SQL</text>
         <text x="198" y="145">warehouse &middot; endpoint</text>
 
-        <rect x="356" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#fbbf24" stroke-width="1.4"/>
-        <text x="372" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#fcd34d">KQL</text>
+        <rect x="356" y="104" width="164" height="56" rx="10" fill="#fff9ec" stroke="#fbbf24" stroke-width="1.4"/>
+        <text x="372" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#8c6b00">KQL</text>
         <text x="372" y="145">eventhouse &middot; RTI</text>
 
-        <rect x="530" y="104" width="164" height="56" rx="10" fill="#0b1820" stroke="#a78bfa" stroke-width="1.4"/>
-        <text x="546" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#c4b5fd">DAX / VertiPaq</text>
+        <rect x="530" y="104" width="164" height="56" rx="10" fill="#f6f2fe" stroke="#a78bfa" stroke-width="1.4"/>
+        <text x="546" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#724dff">DAX / VertiPaq</text>
         <text x="546" y="145">Direct Lake models</text>
 
-        <rect x="704" y="104" width="168" height="56" rx="10" fill="#0b1820" stroke="#fb7185" stroke-width="1.4"/>
-        <text x="720" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#fb7185">Power Query</text>
+        <rect x="704" y="104" width="168" height="56" rx="10" fill="#fff1f3" stroke="#fb7185" stroke-width="1.4"/>
+        <text x="720" y="126" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="600" fill="#db0020">Power Query</text>
         <text x="720" y="145">Dataflow Gen2</text>
       </g>
       <!-- connectors -->
-      <g stroke="#2a4a56" stroke-width="1.4">
+      <g stroke="rgba(0,0,0,.18)" stroke-width="1.4">
         <line x1="90" y1="160" x2="90" y2="176"/><line x1="264" y1="160" x2="264" y2="176"/>
         <line x1="438" y1="160" x2="438" y2="176"/><line x1="612" y1="160" x2="612" y2="176"/><line x1="788" y1="160" x2="788" y2="176"/>
       </g>
-      <text x="800" y="140" font-family="JetBrains Mono,monospace" font-size="9" fill="#5f7a86">compute</text>
+      <text x="800" y="140" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b9098">compute</text>
 
       <!-- top: experiences -->
-      <rect x="8" y="10" width="864" height="74" rx="12" fill="none" stroke="#1d343e" stroke-width="1.4" stroke-dasharray="4 4"/>
-      <text x="28" y="32" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.4" fill="#5f7a86">WHAT PEOPLE ACTUALLY TOUCH</text>
-      <g font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="600" fill="#e6f1f5">
+      <rect x="8" y="10" width="864" height="74" rx="12" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1.4" stroke-dasharray="4 4"/>
+      <text x="28" y="32" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.4" fill="#8b9098">WHAT PEOPLE ACTUALLY TOUCH</text>
+      <g font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="600" fill="#121316">
         <text x="28" y="56">Reports</text><text x="112" y="56">Data agents</text><text x="222" y="56">Fabric Apps</text><text x="332" y="56">Activator alerts</text>
         <text x="460" y="56">Excel / SQL</text><text x="570" y="56">Notebooks</text><text x="674" y="56">APIs &amp; GraphQL</text>
       </g>
-      <text x="28" y="74" font-family="JetBrains Mono,monospace" font-size="9" fill="#5f7a86">the point of all of it &mdash; if nothing here changes, the pipeline did not matter</text>
+      <text x="28" y="74" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b9098">the point of all of it &mdash; if nothing here changes, the pipeline did not matter</text>
     </svg>
     <div class="stack-cap"><span>one copy of the data</span><span class="g">many engines, same files</span><span>many ways to consume</span></div>
   </div>
@@ -728,7 +735,7 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
     <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700">DP-700 study guide (free syllabus)</a> &middot;
     <a href="https://blog.fabric.microsoft.com/">Monthly Fabric feature summaries</a>
   </div>
-  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#2ec4b6">◆</span> Fabric &middot; 7-day course</p>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#1e7e75">◆</span> Fabric &middot; 7-day course</p>
 </footer>
 
 </div><!-- /wrap -->
