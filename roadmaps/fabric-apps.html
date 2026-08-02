@@ -53,39 +53,39 @@ a{color:inherit}
 .wrap{max-width:900px;margin:0 auto;padding:0 22px}
 
 /* ---------- hero ---------- */
-.hero{padding:56px 0 16px}
-.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:13px}
+.hero{padding:42px 0 12px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
 .hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5.2vw,2.9rem);line-height:1.12;letter-spacing:-.018em}
 .hero h1 .v{color:var(--violet)}
 .hero h1 .t{color:var(--teal-hi)}
-.hero .sub{color:var(--mut);max-width:64ch;margin-top:16px;font-size:1.04rem}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:12px;font-size:1.04rem}
 
 /* status */
-.statusbox{margin:28px 0 6px;background:var(--amber-soft);border:1px solid rgba(251,191,36,.34);border-left:4px solid var(--amber);
-  border-radius:12px;padding:19px 22px}
-.statusbox h2{font-family:var(--disp);font-size:.84rem;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
-.statusbox p{color:var(--mut);font-size:.95rem;margin-bottom:7px}
+.statusbox{margin:21px 0 5px;background:var(--amber-soft);border:1px solid rgba(251,191,36,.34);border-left:4px solid var(--amber);
+  border-radius:12px;padding:14px 22px}
+.statusbox h2{font-family:var(--disp);font-size:.84rem;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.statusbox p{color:var(--mut);font-size:.95rem;margin-bottom:5px}
 .statusbox p:last-child{margin-bottom:0}
 .statusbox b{color:var(--ink);font-weight:600}
 
 /* ---------- sections ---------- */
-section{margin-top:52px}
-.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+section{margin-top:39px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap}
 .snum{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--violet);border:1.5px solid var(--violet);
   background:var(--violet-soft);border-radius:7px;padding:3px 10px;flex-shrink:0}
 .shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.3rem,3.4vw,1.72rem);line-height:1.2}
-.slede{color:var(--mut);font-size:1rem;max-width:70ch;margin-bottom:16px}
+.slede{color:var(--mut);font-size:1rem;max-width:70ch;margin-bottom:12px}
 
-.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px 24px;margin-top:16px;
+.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:17px 24px;margin-top:12px;
   box-shadow:0 1px 8px rgba(0,0,0,.06)}
-.card h3{font-family:var(--disp);font-weight:600;font-size:1.06rem;margin-bottom:8px}
+.card h3{font-family:var(--disp);font-weight:600;font-size:1.06rem;margin-bottom:6px}
 .card h3 .badge{font-family:var(--mono);font-size:.63rem;letter-spacing:.08em;text-transform:uppercase;
   border-radius:99px;padding:3px 9px;margin-left:9px;vertical-align:middle;font-weight:500}
 .card p{color:var(--mut);font-size:.96rem}
-.card p + p{margin-top:9px}
+.card p + p{margin-top:7px}
 .card b{color:var(--ink);font-weight:600}
 
-.duo{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:14px}
 @media (max-width:740px){.duo{grid-template-columns:1fr}}
 .duo .card{margin-top:0}
 .duo .op{border-top:3px solid var(--teal)}
@@ -93,31 +93,31 @@ section{margin-top:52px}
 .op h3 .badge{background:var(--teal-soft);color:var(--teal-hi);border:1px solid var(--teal)}
 .da h3 .badge{background:var(--cyan-soft);color:var(--cyan);border:1px solid var(--cyan)}
 
-ul.plain{list-style:none;margin-top:11px}
-ul.plain li{position:relative;padding-left:21px;margin-bottom:7px;color:var(--mut);font-size:.95rem}
+ul.plain{list-style:none;margin-top:8px}
+ul.plain li{position:relative;padding-left:21px;margin-bottom:5px;color:var(--mut);font-size:.95rem}
 ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--violet)}
 ul.plain li b{color:var(--ink);font-weight:600}
 .op ul.plain li::before{background:var(--teal)}
 .da ul.plain li::before{background:var(--cyan)}
 
-ol.steps{list-style:none;counter-reset:s;margin-top:18px}
-ol.steps li{counter-increment:s;position:relative;padding:15px 20px 15px 60px;background:var(--panel);
-  border:1px solid var(--line);border-radius:11px;margin-bottom:11px}
-ol.steps li::before{content:counter(s);position:absolute;left:17px;top:14px;width:28px;height:28px;border-radius:7px;
+ol.steps{list-style:none;counter-reset:s;margin-top:14px}
+ol.steps li{counter-increment:s;position:relative;padding:11px 20px 11px 60px;background:var(--panel);
+  border:1px solid var(--line);border-radius:11px;margin-bottom:8px}
+ol.steps li::before{content:counter(s);position:absolute;left:17px;top:11px;width:28px;height:28px;border-radius:7px;
   background:var(--violet-soft);border:1px solid var(--violet);color:var(--violet-hi);font-family:var(--mono);
   font-size:.85rem;font-weight:600;display:grid;place-items:center}
 ol.steps h4{font-family:var(--disp);font-weight:600;font-size:1.01rem;margin-bottom:3px}
 ol.steps p{color:var(--mut);font-size:.94rem}
 
 /* architecture diagram */
-.arch{margin-top:20px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:20px 22px 13px;
+.arch{margin-top:15px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px 22px 10px;
   box-shadow:0 2px 14px rgba(0,0,0,.08)}
 .arch svg{display:block;width:100%;height:auto}
-.archcap{font-family:var(--mono);font-size:.69rem;color:var(--dim);margin-top:9px;line-height:1.6}
+.archcap{font-family:var(--mono);font-size:.69rem;color:var(--dim);margin-top:7px;line-height:1.6}
 .archcap b{color:var(--rose)}
 
-.tip{margin-top:17px;border-left:3px solid var(--violet);background:var(--violet-soft);border-radius:0 10px 10px 0;
-  padding:12px 16px;font-size:.92rem;color:var(--mut)}
+.tip{margin-top:13px;border-left:3px solid var(--violet);background:var(--violet-soft);border-radius:0 10px 10px 0;
+  padding:10px 16px;font-size:.92rem;color:var(--mut)}
 .tip b{color:var(--violet-hi);font-weight:600;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
   text-transform:uppercase;display:block;margin-bottom:4px}
 .tip.warn{border-left-color:var(--rose);background:var(--rose-soft)}
@@ -125,7 +125,7 @@ ol.steps p{color:var(--mut);font-size:.94rem}
 .tip.go{border-left-color:var(--teal);background:var(--teal-soft)}
 .tip.go b{color:var(--teal-hi)}
 
-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.9rem}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.9rem}
 th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
 th{background:var(--panel2);font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
 td b{color:var(--ink);font-weight:600}
@@ -133,22 +133,22 @@ td b{color:var(--ink);font-weight:600}
 
 p code,li code,td code{background:var(--violet-soft);color:var(--violet-hi);border-radius:5px;padding:1px 6px;font-size:.85em;white-space:normal}
 
-footer{margin:58px 0 38px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer{margin:44px 0 30px;padding-top:17px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
 footer a{color:var(--cyan);text-decoration:none}
 footer a:hover{text-decoration:underline}
 footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 .srcs{margin-top:10px;font-size:.82rem;line-height:1.9}
-.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:26px;text-decoration:none}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:20px;text-decoration:none}
 .backlink:hover{color:var(--ink)}
 
 @media (max-width:640px){
   body{font-size:16px}
   .topbar{gap:8px;padding:8px 14px}
   .navlinks{margin-left:0}
-  .hero{padding:38px 0 12px}
-  .card{padding:18px 17px}
-  ol.steps li{padding:14px 16px 14px 54px}
-  .arch{padding:14px 14px 10px}
+  .hero{padding:30px 0 10px}
+  .card{padding:14px 17px}
+  ol.steps li{padding:11px 16px 11px 54px}
+  .arch{padding:11px 14px 8px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 @media print{
