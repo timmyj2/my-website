@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Copilot — Operating Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF0F2; --panel:#FFFFFF; --ink:#131E27; --ink-soft:#41535F;
+  --pipe:#2C6C77; --pipe-deep:#1D4C55; --hazard:#F2B705; --rust:#9E4B2C;
+  --mist:#C6D0D6; --hair:#D8E0E4;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --measure:74ch;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:110px;}
+section[id]{scroll-margin-top:110px;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+.col{max-width:var(--measure);}
+
+/* rail + tabs */
+.rail{position:sticky;top:0;z-index:60;background:rgba(19,30,39,.98);border-bottom:2px solid var(--hazard);}
+.rail-in{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:6px;height:54px;}
+.rail-mark{font-family:var(--display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--hazard);font-size:15px;white-space:nowrap;margin-right:18px;}
+.tab-btn{
+  font-family:var(--display);font-size:17px;letter-spacing:.07em;text-transform:uppercase;
+  background:transparent;border:none;border-bottom:3px solid transparent;color:#9FB2BC;
+  padding:16px 12px 13px;cursor:pointer;white-space:nowrap;
+}
+.tab-btn:hover{color:#fff;}
+.tab-btn[aria-selected="true"]{color:#fff;border-bottom-color:var(--hazard);}
+.subnav{background:#1E2C36;border-bottom:1px solid #2C3D48;position:sticky;top:54px;z-index:55;}
+.subnav-in{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;gap:20px;height:42px;align-items:center;overflow-x:auto;scrollbar-width:none;}
+.subnav-in::-webkit-scrollbar{display:none;}
+.subnav a{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#8FA5B0;text-decoration:none;white-space:nowrap;padding:3px 0;border-bottom:1px solid transparent;}
+.subnav a:hover,.subnav a:focus-visible{color:#fff;border-bottom-color:var(--hazard);}
+
+/* title block */
+.titleblock{background:var(--ink);color:#EDF0F2;padding:56px 0 0;}
+.titleblock h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,7.6vw,86px);line-height:.92;letter-spacing:-.01em;text-transform:uppercase;margin:0 0 16px;}
+.titleblock h1 em{font-style:normal;color:var(--hazard);}
+.deck{max-width:58ch;color:#B9C7CF;font-size:19px;margin:0 0 36px;}
+.tb-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #2C3D48;}
+.tb-cell{padding:14px 16px 18px;border-right:1px solid #2C3D48;}
+.tb-cell:last-child{border-right:none;}
+.tb-key{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7A8F9B;display:block;margin-bottom:5px;}
+.tb-val{font-family:var(--display);font-size:19px;letter-spacing:.02em;text-transform:uppercase;color:#EDF0F2;}
+
+/* sections */
+/* ---------- single continuous document: NOTHING is ever hidden ---------- */
+.tab-radio{display:none;}
+.tab-panel{display:block;}
+.subnav{display:block;}
+a.tab-btn{display:inline-block;cursor:pointer;text-decoration:none;}
+a.tab-btn:hover{color:#fff;border-bottom-color:var(--hazard);}
+/* part divider banner */
+.part{background:var(--ink);color:#fff;margin:0;padding:40px 0 34px;border-top:6px solid var(--hazard);}
+.part-in{max-width:1080px;margin:0 auto;padding:0 24px;}
+.part-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--hazard);margin:0 0 8px;}
+.part h2{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:clamp(32px,5.4vw,54px);line-height:1;margin:0 0 10px;color:#fff;}
+.part p{color:#B9C7CF;max-width:62ch;margin:0;}
+section{padding:60px 0 8px;}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--pipe);margin:0 0 10px;display:flex;align-items:center;gap:10px;}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--hair);max-width:180px;}
+h2{font-family:var(--display);font-weight:600;text-transform:uppercase;font-size:clamp(30px,4.6vw,44px);line-height:1.02;margin:0 0 18px;}
+h3{font-family:var(--display);font-weight:600;text-transform:uppercase;font-size:24px;letter-spacing:.04em;margin:38px 0 10px;}
+h4{font-family:var(--body);font-weight:600;font-size:17px;margin:26px 0 6px;}
+p{margin:0 0 16px;max-width:var(--measure);}
+ul,ol{max-width:var(--measure);padding-left:20px;margin:0 0 18px;}
+li{margin-bottom:8px;}
+a{color:var(--pipe-deep);text-underline-offset:2px;}
+
+.hazard-tape{height:12px;margin:56px 0 0;background:repeating-linear-gradient(-45deg,var(--hazard) 0 14px,var(--ink) 14px 28px);}
+
+.panel{background:var(--panel);border:1px solid var(--hair);padding:24px 26px;margin:24px 0;}
+.panel-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;}
+.note{border-left:4px solid var(--hazard);background:#FBF4DC;padding:18px 22px;margin:26px 0;}
+.note .panel-label{color:#7A5B00;}
+.note p:last-child,.note ul:last-child{margin-bottom:0;}
+.stop{border-left:4px solid var(--rust);background:#F7E9E3;padding:18px 22px;margin:26px 0;}
+.stop .panel-label{color:var(--rust);}
+.stop p:last-child,.stop ul:last-child{margin-bottom:0;}
+
+/* gauge */
+.gauge{background:var(--ink);color:#E4EBEF;padding:26px 24px 18px;margin:28px 0;}
+.gauge-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+.gauge-title{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.06em;color:#fff;}
+.gauge-sub{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#8FA5B0;text-transform:uppercase;}
+.scale{position:relative;height:16px;margin:0 0 6px;border-bottom:1px solid #3A4C58;}
+.tick{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
+.tick span{font-family:var(--mono);font-size:10px;color:#8FA5B0;display:block;margin-bottom:3px;}
+.tick i{display:block;width:1px;height:6px;background:#3A4C58;margin:0 auto;}
+.row{display:grid;grid-template-columns:132px 1fr 62px;align-items:center;gap:12px;padding:5px 0;}
+.row-name{font-family:var(--mono);font-size:11.5px;color:#C6D5DD;}
+.row-track{position:relative;height:9px;background:#1E2C36;}
+.row-bar{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--pipe);transition:width .9s cubic-bezier(.2,.8,.2,1);}
+.row-bar.mid{background:#4E93A0;} .row-bar.high{background:var(--hazard);} .row-bar.top{background:var(--rust);}
+.row-val{font-family:var(--mono);font-size:11.5px;color:#E4EBEF;text-align:right;}
+.gauge-foot{font-family:var(--mono);font-size:10.5px;color:#8FA5B0;line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid #2C3D48;}
+
+/* tables */
+.table-scroll{overflow-x:auto;margin:22px 0;border:1px solid var(--hair);background:var(--panel);}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px;}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;text-align:left;padding:12px 14px;background:#E3E9EC;color:var(--ink-soft);border-bottom:1px solid var(--mist);white-space:nowrap;}
+td{padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:top;line-height:1.5;}
+tr:last-child td{border-bottom:none;}
+td.model{font-family:var(--mono);font-size:13px;font-weight:500;white-space:nowrap;}
+td.cost{font-family:var(--mono);font-size:13px;white-space:nowrap;text-align:right;}
+th.num{text-align:right;}
+td.you{font-family:var(--mono);font-size:13px;white-space:nowrap;text-align:right;color:var(--pipe-deep);font-weight:600;background:#F4F8F8;}
+.vendor-head td{background:var(--ink);color:var(--hazard);font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:15px;padding:8px 14px;}
+.dot{display:inline-block;width:8px;height:8px;margin-right:7px;vertical-align:1px;}
+.dot.low{background:var(--pipe);} .dot.mid{background:#4E93A0;} .dot.high{background:var(--hazard);} .dot.top{background:var(--rust);}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--mist);color:var(--ink-soft);white-space:nowrap;}
+
+/* estimator */
+.estimator{background:var(--ink);color:#E4EBEF;padding:24px;margin:24px 0;}
+.est-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.est-field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA5B0;margin-bottom:6px;}
+.est-field input,.est-field select{
+  width:100%;background:#0E1820;border:1px solid #3A4C58;color:#fff;
+  font-family:var(--mono);font-size:14px;padding:9px 10px;
+}
+.est-field input:focus,.est-field select:focus{outline:2px solid var(--hazard);outline-offset:1px;}
+.est-note{font-family:var(--mono);font-size:10.5px;color:#8FA5B0;margin-top:14px;line-height:1.6;}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.preset{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid #3A4C58;color:#9FB2BC;padding:5px 10px;cursor:pointer;}
+.preset:hover{color:#fff;border-color:var(--hazard);}
+.sortbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:18px 0 0;}
+.sortbar span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);}
+.sort{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--panel);border:1px solid var(--mist);color:var(--ink-soft);padding:6px 12px;cursor:pointer;}
+.sort[aria-pressed="true"]{background:var(--ink);color:var(--hazard);border-color:var(--ink);}
+
+/* code */
+.code{margin:20px 0;}
+.code-head{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#1E2C36;padding:8px 14px;}
+.code-path{font-family:var(--mono);font-size:11.5px;color:var(--hazard);}
+.copy{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;background:transparent;color:#9FB2BC;border:1px solid #3A4C58;padding:4px 10px;cursor:pointer;}
+.copy:hover{color:#fff;border-color:var(--hazard);}
+.copy.done{color:var(--hazard);border-color:var(--hazard);}
+pre{margin:0;background:var(--ink);color:#DCE6EB;padding:18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.65;}
+code{font-family:var(--mono);font-size:.92em;}
+p code,li code,td code{background:#DFE6EA;padding:1px 5px;border-radius:2px;font-size:.86em;}
+
+/* layers list */
+.layers{list-style:none;padding:0;counter-reset:ly;}
+.layers > li{counter-increment:ly;position:relative;padding-left:62px;margin-bottom:28px;}
+.layers > li::before{content:"L" counter(ly);position:absolute;left:0;top:2px;font-family:var(--mono);font-size:12px;color:var(--pipe);border:1px solid var(--mist);padding:5px 9px;background:var(--panel);}
+.layers h4{margin:0 0 4px;}
+.steps{list-style:none;padding:0;counter-reset:wk;}
+.steps > li{counter-increment:wk;position:relative;padding-left:64px;margin-bottom:26px;}
+.steps > li::before{content:"WK " counter(wk);position:absolute;left:0;top:2px;font-family:var(--mono);font-size:11px;color:var(--pipe);border:1px solid var(--mist);padding:5px 8px;background:var(--panel);}
+.steps h4{margin:0 0 4px;}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:26px 0;}
+.split .panel{margin:0;height:100%;}
+.split ul{margin:0;}
+.yes .panel-label{color:var(--pipe);} .no .panel-label{color:var(--rust);}
+
+dl{max-width:var(--measure);margin:20px 0;}
+dt{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--pipe-deep);margin-top:16px;}
+dd{margin:2px 0 0;}
+
+footer{background:var(--ink);color:#9FB2BC;margin-top:72px;padding:44px 0 56px;font-size:14.5px;}
+footer a{color:#BBD0D6;}
+footer .panel-label{color:#7A8F9B;}
+footer ul{max-width:none;}
+
+
+@media (max-width:860px){ .est-grid{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:760px){
+  body{font-size:16px;}
+  .tb-grid{grid-template-columns:repeat(2,1fr);}
+  .tb-cell{border-bottom:1px solid #2C3D48;}
+  .split{grid-template-columns:1fr;}
+  .row{grid-template-columns:96px 1fr 54px;gap:8px;}
+  .row-name{font-size:10.5px;}
+  section{padding:44px 0 4px;}
+  .rail-in{overflow-x:auto;}
+  .tab-btn{font-size:15px;padding:16px 8px 13px;}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .row-bar{transition:none;}
+}
+</style>
+</head>
+<body>
+
+
+<div id="app">
+
+<nav class="rail">
+  <div class="rail-in" role="tablist" aria-label="Sections">
+    <span class="rail-mark">Copilot / Ops</span>
+    <a class="tab-btn" id="tab-manual" href="#part-manual">Manual</a>
+    <a class="tab-btn" id="tab-models" href="#part-models">Model catalog</a>
+    <a class="tab-btn" id="tab-powerbi" href="#part-powerbi">Power BI design</a>
+    <a class="tab-btn" id="tab-memory" href="#part-memory">Memory bank</a>
+  </div>
+</nav>
+
+<div class="subnav" id="subnav-all">
+  <div class="subnav-in">
+    <a href="#part-manual">Manual</a><a href="#meter">The meter</a><a href="#models">Model picker</a><a href="#modes">Session modes</a>
+    <a href="#workspace">Workspace</a><a href="#agents">Agents</a><a href="#automations">Automations</a>
+    <a href="#bridge">M365 bridge</a><a href="#discipline">Cost discipline</a><a href="#ramp">30-day ramp</a><a href="#glossary">Glossary</a>
+    <a href="#part-models">Model catalog</a><a href="#estimator">Estimator</a><a href="#catalog">Full catalog</a><a href="#pairs">Pairings</a>
+    <a href="#part-powerbi">Power BI</a><a href="#layers">Five layers</a><a href="#park">Injae Park</a><a href="#kit">Copy-paste kit</a><a href="#pbir">PBIR</a><a href="#polish">Polish list</a><a href="#learn">Learn more</a>
+    <a href="#part-memory">Memory bank</a><a href="#memory-shape">Shape</a><a href="#memory-capture">Capture</a><a href="#memory-agents">Memory agents</a><a href="#memory-auto">Rhythm</a><a href="#memory-demo">Worked example</a>
+  </div>
+</div>
+
+<header class="titleblock">
+  <div class="wrap">
+    <h1>Run Copilot<br>like a <em>control room</em></h1>
+    <p class="deck">Which model to switch to and what it costs, how to stand up a small crew of agents that prep your meetings and compile your work, and how to stop your Power BI reports from looking like defaults.</p>
+  </div>
+  <div class="wrap">
+    <div class="tb-grid">
+      <div class="tb-cell"><span class="tb-key">Prepared for</span><span class="tb-val">Digital transformation advisor</span></div>
+      <div class="tb-cell"><span class="tb-key">Tool</span><span class="tb-val">GitHub Copilot app (desktop)</span></div>
+      <div class="tb-cell"><span class="tb-key">Constraint</span><span class="tb-val">No MCP connectors</span></div>
+      <div class="tb-cell"><span class="tb-key">Docs current as of</span><span class="tb-val">21 Aug 2026</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ TAB 1 : MANUAL ============================ -->
+<div class="part" id="part-manual">
+  <div class="part-in">
+    <p class="part-kicker">Part one</p>
+    <h2>The operating manual</h2>
+    <p>Billing, model switching, session modes, and the agent crew that preps your meetings.</p>
+  </div>
+</div>
+<div class="tab-panel" id="panel-manual">
+<main class="wrap">
+
+<section id="start">
+  <p class="eyebrow">Start here</p>
+  <h2>Four things to know before you touch a setting</h2>
+  <div class="col">
+    <p><strong>1. The app is a place to run agents, not a chat window.</strong> The Copilot desktop app is built for agent-driven work: you can run several agent sessions at once, each on its own branch, and pick the model and the level of autonomy per session.</p>
+    <p><strong>2. You are billed by tokens now, not by "requests."</strong> On 1 June 2026 every Copilot plan moved to usage-based billing with GitHub AI Credits. One credit is one cent. Every model has a published per-million-token rate for input, output, and cached tokens.</p>
+    <p><strong>3. Inline code completions are still free.</strong> Completions and next-edit suggestions are not billed in credits on paid plans. Only chat, agents, CLI, code review and similar features draw down credits.</p>
+    <p><strong>4. Model choice is the single biggest cost lever you control.</strong> Cheapest to priciest on the menu is roughly 40× on output tokens. Everything else in this manual is downstream of that one habit.</p>
+  </div>
+</section>
+
+<div class="hazard-tape"></div>
+
+<section id="meter">
+  <p class="eyebrow">Watch the meter</p>
+  <h2>How the money actually works</h2>
+  <div class="col">
+    <p>A token is roughly three quarters of a word. Everything the model reads is input tokens, everything it writes is output tokens, and repeated context can be cached at a lower rate. Output is always the expensive side — usually 5–6× the input rate.</p>
+    <p>Your plan comes with a monthly allowance of credits. When it runs out, additional usage bills at the same published rates if your organization allows it, or stops if a budget cap is set.</p>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Plan</th><th>Monthly cost</th><th>Included AI credits</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="model">Pro</td><td class="cost">$10</td><td class="cost">$15</td><td>Unlimited completions; light chat and agent use.</td></tr>
+        <tr><td class="model">Pro+</td><td class="cost">$39</td><td class="cost">$70</td><td>For heavy individual agent use.</td></tr>
+        <tr><td class="model">Max</td><td class="cost">$100</td><td class="cost">$200</td><td>Only worth it if agents run for hours daily.</td></tr>
+        <tr><td class="model">Business</td><td class="cost">$19 / user</td><td class="cost">$19 / user, pooled</td><td>Most corporate seats. Credits pool across the org.</td></tr>
+        <tr><td class="model">Enterprise</td><td class="cost">$39 / user</td><td class="cost">$39 / user, pooled</td><td>Adds SSO and admin controls.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <div class="panel-label">Find out what you're actually on</div>
+    <p>You are almost certainly on a company Business or Enterprise seat, so your credits come from a shared pool and your admin may have set a budget. Ask two questions before you build anything ambitious: <em>what is our monthly credit budget per user</em>, and <em>is additional paid usage enabled or hard-capped?</em> That answer sets the ceiling on how many scheduled agents you can responsibly run.</p>
+  </div>
+</section>
+
+<section id="models">
+  <p class="eyebrow">Pick a model</p>
+  <h2>The cost dial</h2>
+  <div class="col">
+    <p>A shortlist of what you'll actually reach for, positioned by price per million output tokens — the number that moves your bill. Every model and every rate is in the <strong>Model catalog</strong> tab.</p>
+  </div>
+
+  <div class="gauge" id="gauge-manual">
+    <div class="gauge-head">
+      <span class="gauge-title">Output rate, $ per 1M tokens</span>
+      <span class="gauge-sub">Log scale · GitHub published rates, Aug 2026</span>
+    </div>
+    <div class="scale">
+      <div class="tick" style="left:0%"><span>$1</span><i></i></div>
+      <div class="tick" style="left:39.3%"><span>$5</span><i></i></div>
+      <div class="tick" style="left:56.2%"><span>$10</span><i></i></div>
+      <div class="tick" style="left:78.6%"><span>$25</span><i></i></div>
+      <div class="tick" style="left:98%"><span>$50</span><i></i></div>
+    </div>
+    <div class="row"><span class="row-name">GPT-5.6 Luna</span><span class="row-track"><span class="row-bar" data-w="4.5" style="width:4.5%"></span></span><span class="row-val">$1.20</span></div>
+    <div class="row"><span class="row-name">GPT-5.4 nano</span><span class="row-track"><span class="row-bar" data-w="5.4" style="width:5.4%"></span></span><span class="row-val">$1.25</span></div>
+    <div class="row"><span class="row-name">GPT-5 mini</span><span class="row-track"><span class="row-bar" data-w="16.9" style="width:16.9%"></span></span><span class="row-val">$2.00</span></div>
+    <div class="row"><span class="row-name">Gemini 3.7 Flash</span><span class="row-track"><span class="row-bar" data-w="32.3" style="width:32.3%"></span></span><span class="row-val">$3.75</span></div>
+    <div class="row"><span class="row-name">GPT-5.4 mini</span><span class="row-track"><span class="row-bar mid" data-w="36.9" style="width:36.9%"></span></span><span class="row-val">$4.50</span></div>
+    <div class="row"><span class="row-name">Claude Haiku 4.5</span><span class="row-track"><span class="row-bar mid" data-w="39.3" style="width:39.3%"></span></span><span class="row-val">$5.00</span></div>
+    <div class="row"><span class="row-name">Grok 4.6</span><span class="row-track"><span class="row-bar mid" data-w="43.8" style="width:43.8%"></span></span><span class="row-val">$6.00</span></div>
+    <div class="row"><span class="row-name">Claude Sonnet 5</span><span class="row-track"><span class="row-bar mid" data-w="56.2" style="width:56.2%"></span></span><span class="row-val">$10.00</span></div>
+    <div class="row"><span class="row-name">GPT-5.6 Terra</span><span class="row-track"><span class="row-bar mid" data-w="60.7" style="width:60.7%"></span></span><span class="row-val">$12.00</span></div>
+    <div class="row"><span class="row-name">GPT-5.3-Codex</span><span class="row-track"><span class="row-bar mid" data-w="64.1" style="width:64.1%"></span></span><span class="row-val">$14.00</span></div>
+    <div class="row"><span class="row-name">GPT-5.4 / 5.6 Sol</span><span class="row-track"><span class="row-bar high" data-w="66.1" style="width:66.1%"></span></span><span class="row-val">$15.00</span></div>
+    <div class="row"><span class="row-name">Claude Opus 5</span><span class="row-track"><span class="row-bar high" data-w="78.6" style="width:78.6%"></span></span><span class="row-val">$25.00</span></div>
+    <div class="row"><span class="row-name">GPT-5.5</span><span class="row-track"><span class="row-bar top" data-w="83.1" style="width:83.1%"></span></span><span class="row-val">$30.00</span></div>
+    <div class="row"><span class="row-name">Claude Fable 5</span><span class="row-track"><span class="row-bar top" data-w="95.5" style="width:95.5%"></span></span><span class="row-val">$50.00</span></div>
+    <p class="gauge-foot">Input rates run roughly one fifth of output. Two promotions are live: GPT-5.6 Sol at half price through 3 Sep 2026, and Gemini 3.6 / 3.7 Flash at reduced rates through 31 Dec 2026.</p>
+  </div>
+
+  <h3>Which one for which job</h3>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Your task</th><th>Use</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Tidy notes, rename files, reformat a table, quick "what does this mean"</td><td class="model"><span class="dot low"></span>GPT-5.6 Luna<br>GPT-5.4 nano</td><td>Lightweight work at a fraction of a cent. Never spend a frontier model on formatting.</td></tr>
+        <tr><td>Draft a status update, summarize a meeting, write a first-pass email</td><td class="model"><span class="dot low"></span>GPT-5 mini<br><span class="dot mid"></span>Claude Haiku 4.5</td><td>Fast, competent prose. Good enough that you edit rather than rewrite.</td></tr>
+        <tr><td>Everyday agent runs: weekly digest, triage a list, follow a checklist</td><td class="model"><span class="dot mid"></span>Claude Sonnet 5<br>GPT-5.6 Terra<br>Grok 4.6</td><td>All three are classed as general-purpose coding and agent models. Your workhorse tier.</td></tr>
+        <tr><td>Reading a long document set and pulling out the through-line</td><td class="model"><span class="dot mid"></span>Gemini 3.1 Pro</td><td>Built for long context and technical analysis. Watch the long-context tier above 200K input tokens.</td></tr>
+        <tr><td>Writing or fixing Python, DAX, M, SQL</td><td class="model"><span class="dot mid"></span>GPT-5.3-Codex<br>Claude Sonnet 5</td><td>Codex is tuned for agentic engineering work and lands complex changes without long instructions.</td></tr>
+        <tr><td>Hard thinking: a vendor comparison, an architecture call, a business case you'll defend</td><td class="model"><span class="dot high"></span>Claude Opus 5<br>GPT-5.6 Sol</td><td>Deep reasoning tier. Reach for it deliberately, on a fresh session, once you know what you're asking.</td></tr>
+        <tr><td>Long autonomous runs where you won't be watching</td><td class="model"><span class="dot top"></span>Claude Fable 5</td><td>Built for first-attempt correctness over long horizons. Also the fastest way to burn a month of credits — set a session limit first.</td></tr>
+        <tr><td>Not sure</td><td class="model">Auto</td><td>Copilot routes to a suitable model and paid plans get a discount on model cost for using it. The correct default.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <div class="panel-label">The habit that matters</div>
+    <p><strong>Start on Auto or a cheap model. Escalate only when the answer disappoints you.</strong> Most people do the reverse — pin the most powerful model and leave it there for a month. Escalating costs you one re-run; defaulting high costs you every run.</p>
+  </div>
+</section>
+
+<section id="modes">
+  <p class="eyebrow">Steer the session</p>
+  <h2>Modes, effort, and knowing when to stop</h2>
+  <div class="col"><p>Each session has three dials: the model, the reasoning effort, and the autonomy mode. The modes matter as much as the model.</p></div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Mode</th><th>What happens</th><th>Use it when</th></tr></thead>
+      <tbody>
+        <tr><td class="model">Quick chat</td><td>A conversation with no branch or workspace attached.</td><td>Scoping and questions. Cheapest way to think out loud.</td></tr>
+        <tr><td class="model">Plan</td><td>The agent writes a plan and waits for approval before acting.</td><td>Anything unfamiliar or expensive. Catching a wrong plan costs one cheap turn.</td></tr>
+        <tr><td class="model">Interactive</td><td>You and the agent work together, step by step.</td><td>Work where your judgment is part of the loop.</td></tr>
+        <tr><td class="model">Autopilot</td><td>The agent runs to completion on its own.</td><td>Only for tasks you've already run manually and trust. Pair with a cheaper model and a credit limit.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Three moves that save real money</h3>
+  <ul>
+    <li><strong>Start a fresh session when you switch tasks.</strong> Context carries forward and you pay to re-read it every turn.</li>
+    <li><strong>Let agents run to completion.</strong> Inside a run, the tool calls the agent makes on its own are part of the run — it's your prompts that start the meter. Ten interruptions cost more than one good brief.</li>
+    <li><strong>Run <code>/chronicle cost tips</code> weekly.</strong> The app will tell you where your own usage is expensive.</li>
+  </ul>
+</section>
+
+<section id="workspace">
+  <p class="eyebrow">Set up the shop</p>
+  <h2>Give yourself a workspace the agents can see</h2>
+  <div class="col">
+    <p>The Copilot app works on <em>repositories</em> — folders of files tracked by Git. It has no idea what your job is until something is written down in a folder it can read. So the first build is not an agent. It's a private repository that acts as your work brain.</p>
+  </div>
+  <div class="code">
+    <div class="code-head"><span class="code-path">work-brain/ — folder layout</span><button class="copy">Copy</button></div>
+<pre><code>work-brain/
+├── AGENTS.md                  # who you are, how you want output written
+├── context/
+│   ├── portfolio.md           # your initiatives, one section each
+│   ├── stakeholders.md        # who cares about what, and how they like it
+│   └── glossary.md            # your company's acronyms and systems
+├── inbox/                     # raw paste-ins: notes, exports, transcripts
+├── log/                       # your running work record
+├── briefs/                    # agent output: meeting prep, digests
+└── .github/
+    └── agents/                # your agent definitions live here
+        ├── meeting-prep.agent.md
+        ├── weekly-digest.agent.md
+        └── intake.agent.md</code></pre>
+  </div>
+  <p>The <code>AGENTS.md</code> file at the root is read by every agent, every session. Highest-leverage file you will write.</p>
+  <div class="code">
+    <div class="code-head"><span class="code-path">AGENTS.md</span><button class="copy">Copy</button></div>
+<pre><code># Working context
+
+I am a digital transformation advisor at an oil and gas operator.
+My audience is a mix of operations leaders, engineers, and IT.
+I am not a software engineer — explain technical choices in plain language.
+
+## How to write for me
+- Lead with the decision or the answer. No throat-clearing.
+- Short paragraphs. Bullets only when the content is genuinely a list.
+- Flag assumptions explicitly. If a source is missing, say so — never invent
+  a number, a date, a name, or a system of record.
+- Use our terms from context/glossary.md. Spell out an acronym on first use.
+
+## Standing rules
+- Never write anything to files outside this repository.
+- Never include personal data, credentials, or anything marked confidential
+  in generated output.
+- When you summarize, cite the file in inbox/ or log/ you took it from.
+
+## Files worth reading before you start
+- context/portfolio.md — what I'm currently working on
+- context/stakeholders.md — who I write for
+- log/ — my running record, newest file is most relevant</code></pre>
+  </div>
+</section>
+
+<section id="agents">
+  <p class="eyebrow">Build the crew</p>
+  <h2>Three agents that earn their keep</h2>
+  <div class="col">
+    <p>A custom agent is a markdown file with a short header. It gives Copilot a role, a limited set of tools, and a fixed model. Commit it to your default branch and it appears in the picker.</p>
+    <p>Restricting <code>tools</code> isn't fussiness — an agent that can't edit files can't wreck anything, and it costs less because it does less. The <code>model</code> line is how you stop a routine job from silently running on your most expensive model.</p>
+  </div>
+
+  <h3>1. Intake — turns a mess into a usable note</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/intake.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: intake
+description: Cleans raw pasted notes, transcripts, and exports into a
+  structured note filed under log/, with decisions and actions pulled out.
+tools: ["read", "search", "edit"]
+model: GPT-5 mini
+---
+
+You normalize raw material into a consistent note. You never editorialize
+and you never add facts that are not in the source.
+
+When given a file in inbox/:
+
+1. Read it in full before writing anything.
+2. Produce a new file in log/ named YYYY-MM-DD-slug.md with this structure:
+
+   # &lt;Title&gt; — &lt;date&gt;
+   **Source:** &lt;inbox filename&gt;  **Attendees / origin:** &lt;if stated&gt;
+
+   ## What happened
+   Three to six sentences of plain summary.
+
+   ## Decisions
+   - Decision — who made it — date if known
+
+   ## Actions
+   - [ ] Action — owner — due date if known
+
+   ## Open questions
+   - Question — who can answer it
+
+   ## Unclear
+   - Anything ambiguous in the source. Do not resolve it yourself.
+
+3. Leave the original file in inbox/ untouched.
+
+If a section has no content, write "None recorded." Never guess an owner
+or a date.</code></pre>
+  </div>
+
+  <h3>2. Meeting prep — the one you'll use every day</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/meeting-prep.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: meeting-prep
+description: Builds a one-page prep brief for a specific upcoming meeting
+  from the work log, the portfolio, and stakeholder notes.
+tools: ["read", "search", "edit"]
+model: Claude Sonnet 5
+---
+
+You prepare me to walk into a meeting without re-reading everything.
+
+Ask for the meeting name and attendees if I have not given them. Then read
+context/stakeholders.md, context/portfolio.md, and the three most recent
+files in log/ that mention the same topic or people.
+
+Write briefs/YYYY-MM-DD-&lt;meeting-slug&gt;.md, one page maximum:
+
+## Where we left off
+Three sentences. What was agreed last time and what has moved since.
+
+## What each person walks in caring about
+One line per attendee, drawn from stakeholders.md. If someone is not in
+that file, say "no prior context on file" — do not speculate.
+
+## What I owe them
+Open commitments from log/ where I am the owner, with the date promised.
+
+## What they owe me
+Open commitments where someone else is the owner, and how overdue.
+
+## Three questions worth asking
+Specific to this meeting. Not generic.
+
+## Risks I should be ready for
+Only risks evidenced in the log. Name the file each one came from.
+
+Hard rules: no filler, no restating the agenda back to me, every claim
+traceable to a file. If the log is thin on this topic, say so in one line
+at the top instead of padding the brief.</code></pre>
+  </div>
+
+  <h3>3. Weekly digest — the "what have I been doing" machine</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/weekly-digest.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: weekly-digest
+description: Compiles the week's log files into a status update written for
+  leadership, plus a short private list of what slipped.
+tools: ["read", "search", "edit"]
+model: Claude Sonnet 5
+---
+
+You compile, you do not embellish.
+
+Read every file in log/ dated within the last seven days, plus
+context/portfolio.md for initiative names and framing.
+
+Write briefs/YYYY-Www-digest.md with two clearly separated parts.
+
+PART ONE — Send-ready update (aim for 250 words)
+Written for an operations leader who has fifteen seconds. Organized by
+initiative, not chronologically. Each item: what moved, what it unblocks,
+what happens next. Outcomes, not activity. No adjectives.
+
+PART TWO — For my eyes only
+- Commitments I made that I have not delivered, with days elapsed
+- Items that appeared two weeks running with no movement
+- Anything I flagged as a risk that no one has picked up
+
+Never invent progress. If an initiative had no activity this week, list it
+under a short "No movement" heading rather than dressing up old news.</code></pre>
+  </div>
+
+  <div class="note">
+    <div class="panel-label">Where these files go</div>
+    <p>Easiest path: in the app or on GitHub, open the agents view and choose <strong>Create an agent</strong> — it scaffolds a file in <code>.github/agents/</code>. Rename it, paste the content, commit to your default branch, and it shows up in the dropdown. Creating the files by hand works the same.</p>
+  </div>
+</section>
+
+<section id="automations">
+  <p class="eyebrow">Put it on a timer</p>
+  <h2>Automations: the agent runs without you</h2>
+  <div class="col">
+    <p>An automation is a saved prompt with a trigger — hourly, daily, weekly, or on a repository event. In the app: <strong>Automations</strong> tab, then <strong>New automation</strong>. You set the name, prompt, trigger, allowed tools, and model. Tokens bill to whoever created it, so a badly scoped daily automation is a standing order against your credit pool.</p>
+  </div>
+  <div class="panel">
+    <div class="panel-label">Before it will work</div>
+    <ul style="margin-bottom:0">
+      <li>The repository must be private or internal. Not available on public repos.</li>
+      <li>Copilot cloud agent must be enabled for that repository.</li>
+      <li>On a Business or Enterprise seat, an admin may need to enable it first.</li>
+    </ul>
+  </div>
+
+  <h3>Three worth setting up, in order</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">Automation 1 — Monday 07:00, weekly · model: Claude Sonnet 5</span><button class="copy">Copy</button></div>
+<pre><code>Using the weekly-digest agent, compile last week's log files into
+briefs/ following the agent's format exactly. Open a pull request titled
+"Weekly digest — week of &lt;date&gt;" so I can review it before it counts as
+final. If fewer than two log files exist for the period, stop and open the
+PR with a single line saying the log is empty for that week.</code></pre>
+  </div>
+  <div class="code">
+    <div class="code-head"><span class="code-path">Automation 2 — daily 06:30 · model: GPT-5 mini</span><button class="copy">Copy</button></div>
+<pre><code>Check inbox/ for files added in the last 24 hours that have no matching
+note in log/. For each one, run the intake agent to produce the structured
+note. Do not modify anything already in log/. If inbox/ has nothing new,
+do nothing and end the run.</code></pre>
+  </div>
+  <div class="code">
+    <div class="code-head"><span class="code-path">Automation 3 — Friday 15:00, weekly · model: GPT-5 mini</span><button class="copy">Copy</button></div>
+<pre><code>Scan log/ for every unchecked action item where I am the owner. Produce
+briefs/open-commitments.md as a single table: item, who I promised it to,
+date promised, days elapsed, and the source file. Sort by days elapsed,
+oldest first. Overwrite the previous version. Add no commentary.</code></pre>
+  </div>
+  <div class="note">
+    <div class="panel-label">Sequence, not enthusiasm</div>
+    <p>Run each by hand three or four times before scheduling it. You will rewrite the prompt every one of those times. A scheduled automation producing mediocre output isn't neutral — it costs credits weekly and trains you to ignore its output.</p>
+  </div>
+</section>
+
+<section id="bridge">
+  <p class="eyebrow">Work around the wall</p>
+  <h2>Feeding it your work without connectors</h2>
+  <div class="col">
+    <p>No MCP connectors means Copilot cannot reach into your mail, calendar, Teams, or SharePoint. The honest framing is a division of labor:</p>
+    <ul>
+      <li><strong>Microsoft 365 Copilot is your retrieval layer.</strong> It already has sanctioned access to your mail, meetings, and documents. Use it to gather and summarize.</li>
+      <li><strong>The GitHub Copilot app is your production layer.</strong> It holds your accumulated context, runs the agents, keeps history, does the scheduled work.</li>
+    </ul>
+    <p>The bridge is a copy-paste habit that takes about ten minutes a week.</p>
+  </div>
+  <h3>The Friday ritual</h3>
+  <ol>
+    <li>In M365 Copilot, ask for a summary of your meetings and mail for the week — decisions, commitments, open questions, with dates and owners.</li>
+    <li>Paste it into <code>inbox/</code> as a dated markdown file. Raw is fine; that's what intake is for.</li>
+    <li>Add what M365 can't see: hallway conversations, your judgment calls, what you think is actually going on.</li>
+    <li>Run intake, then the digest. Read Part Two before Part One.</li>
+  </ol>
+  <div class="code">
+    <div class="code-head"><span class="code-path">Prompt for M365 Copilot — weekly harvest</span><button class="copy">Copy</button></div>
+<pre><code>Summarize my meetings and email from the past 7 days as a plain markdown
+list, grouped by topic rather than by day. For each topic give me:
+
+- Decisions made, with who made them and the date
+- Commitments, with the owner and the date promised
+- Open questions and who can answer them
+- Anything that changed from a previous week
+
+Use only what's in my mail and meetings. Where something is ambiguous, say
+so rather than resolving it. No summary paragraph, no recommendations —
+just the structured list.</code></pre>
+  </div>
+  <div class="stop">
+    <div class="panel-label">Check this before you paste anything</div>
+    <p>You're moving company content from one sanctioned system into another system's storage. In oil and gas that question has real answers attached — production data, JV terms, safety incidents, personal data, anything export-controlled.</p>
+    <ul>
+      <li>Confirm with IT or security that storing work content in a private GitHub repo under your company's organization is approved. Get it in writing.</li>
+      <li>Use a repo owned by the <strong>company organization</strong>, not your personal account. Private or internal only.</li>
+      <li>Keep names, credentials, and identifiable personal data out of what you paste.</li>
+      <li>Ask whether content exclusion rules are configured for your org and whether they cover this repo.</li>
+    </ul>
+    <p>If the answer is no, the approach still works on your own non-confidential material: your notes, plans, drafts, judgment. That's most of the value anyway.</p>
+  </div>
+</section>
+
+<section id="discipline">
+  <p class="eyebrow">Keep the meter honest</p>
+  <h2>Cost discipline, condensed</h2>
+  <div class="split">
+    <div class="yes"><div class="panel">
+      <div class="panel-label">Do</div>
+      <ul>
+        <li>Default to <strong>Auto</strong>; it routes sensibly and paid plans get a discount for using it.</li>
+        <li>Scope in a <strong>quick chat</strong> before opening a full session.</li>
+        <li>Use <strong>Plan mode</strong> for anything you haven't done before.</li>
+        <li>Pin a cheap model in every scheduled automation.</li>
+        <li>Start a new session per task.</li>
+        <li>Write one clear brief instead of ten corrections.</li>
+        <li>Set a credit limit on long autonomous sessions.</li>
+        <li>Run <code>/chronicle cost tips</code> every Friday.</li>
+      </ul>
+    </div></div>
+    <div class="no"><div class="panel">
+      <div class="panel-label">Don't</div>
+      <ul>
+        <li>Leave the most powerful model pinned as your default.</li>
+        <li>Run a frontier model on formatting or renaming.</li>
+        <li>Keep one giant session open all week.</li>
+        <li>Schedule an automation you haven't run manually several times.</li>
+        <li>Point a long-context model at a huge pile of files "just in case" — long-context tiers cost double.</li>
+        <li>Turn on automatic code review across repos without knowing the per-run cost.</li>
+        <li>Assume anything on this page is still accurate in three months.</li>
+      </ul>
+    </div></div>
+  </div>
+  <h3>A rough sense of scale</h3>
+  <p>A meeting prep brief that reads ~15,000 tokens of context and writes ~1,200 tokens costs roughly 4 cents on Claude Sonnet 5 and roughly 9 cents on Claude Opus 5. Neither matters alone. Run it twice a day on the expensive model with a bloated session and you're at real money by month end — that's the actual failure mode. Use the estimator in the Model catalog tab to check your own numbers.</p>
+</section>
+
+<section id="ramp">
+  <p class="eyebrow">Four weeks</p>
+  <h2>A ramp that doesn't overwhelm you</h2>
+  <ol class="steps">
+    <li><h4>Learn the dials</h4><p>Install the app. Do your normal work in quick chats only. Run the same question on a cheap model and an expensive one and notice where the difference actually shows up — for a lot of your work, it won't. Ask your admin about the credit budget.</p></li>
+    <li><h4>Build the workspace</h4><p>Create the private repo, write <code>AGENTS.md</code> and <code>context/portfolio.md</code> by hand. Paste a week of raw notes into <code>inbox/</code>. No agents yet.</p></li>
+    <li><h4>Add two agents</h4><p>Commit <code>intake</code> and <code>meeting-prep</code>. Run them manually before every meeting for a week. Edit the agent files as you go — fixing the prompt is the actual work.</p></li>
+    <li><h4>Schedule the boring parts</h4><p>Add <code>weekly-digest</code>. Schedule the two automations you've already proven by hand. Run <code>/chronicle cost tips</code>, look at your month's usage, decide what to cut. Then stop building and just use it.</p></li>
+  </ol>
+</section>
+
+<section id="glossary">
+  <p class="eyebrow">Plain terms</p>
+  <h2>Glossary</h2>
+  <dl>
+    <dt>Token</dt><dd>A chunk of text, roughly ¾ of a word. Billing is measured in millions of them.</dd>
+    <dt>Context</dt><dd>Everything the model can see for one request: your prompt, the files it read, the conversation so far.</dd>
+    <dt>AI credit</dt><dd>GitHub's billing unit. One credit = one cent.</dd>
+    <dt>Repository (repo)</dt><dd>A tracked folder of files. Your workspace and your agents both live in one.</dd>
+    <dt>Branch</dt><dd>A parallel copy of the folder where work happens safely before it's accepted.</dd>
+    <dt>Pull request (PR)</dt><dd>A proposal to accept changes from a branch, with a review step. Your approval gate for agent output.</dd>
+    <dt>Agent</dt><dd>A model given a role, tools, and permission to act rather than just answer.</dd>
+    <dt>Custom agent</dt><dd>A markdown file in <code>.github/agents/</code> defining one of those roles.</dd>
+    <dt>Automation</dt><dd>A saved agent task with a trigger, so it runs on a schedule or an event.</dd>
+    <dt>MCP</dt><dd>Model Context Protocol — the standard way to plug an AI tool into an outside system. Blocked at your company, hence the manual bridge.</dd>
+    <dt>Reasoning effort</dt><dd>A per-session dial for how much internal deliberation the model does. More effort, better hard answers, more output tokens.</dd>
+  </dl>
+</section>
+</main>
+</div>
+
+<!-- ============================ TAB 2 : MODEL CATALOG ============================ -->
+<div class="part" id="part-models">
+  <div class="part-in">
+    <p class="part-kicker">Part two</p>
+    <h2>Model catalog</h2>
+    <p>All 31 models GitHub publishes a rate for, with a cost estimator for your own workload.</p>
+  </div>
+</div>
+<div class="tab-panel" id="panel-models">
+<main class="wrap">
+
+<section id="estimator">
+  <p class="eyebrow">Every model, every rate</p>
+  <h2>What a job costs, across the whole menu</h2>
+  <div class="col">
+    <p>Describe one typical task and the table below prices it on every model GitHub publishes a rate for. Adjust the numbers and the last two columns re-calculate live.</p>
+  </div>
+
+  <div class="estimator">
+    <div class="est-grid">
+      <div class="est-field">
+        <label for="in-tok">Input tokens per run</label>
+        <input type="number" id="in-tok" value="15000" min="0" step="1000">
+      </div>
+      <div class="est-field">
+        <label for="out-tok">Output tokens per run</label>
+        <input type="number" id="out-tok" value="1200" min="0" step="100">
+      </div>
+      <div class="est-field">
+        <label for="runs">Runs per month</label>
+        <input type="number" id="runs" value="40" min="0" step="5">
+      </div>
+      <div class="est-field">
+        <label for="cache">Share of input cached</label>
+        <select id="cache">
+          <option value="0" selected>0% — fresh context each time</option>
+          <option value="0.5">50% — repeated context</option>
+          <option value="0.8">80% — same files every run</option>
+        </select>
+      </div>
+    </div>
+    <div class="presets">
+      <button class="preset" data-in="2000" data-out="400" data-runs="200">Quick question ×200</button>
+      <button class="preset" data-in="15000" data-out="1200" data-runs="40">Meeting brief ×40</button>
+      <button class="preset" data-in="60000" data-out="3000" data-runs="4">Weekly digest ×4</button>
+      <button class="preset" data-in="200000" data-out="15000" data-runs="10">Long agent run ×10</button>
+    </div>
+    <p class="est-note">Rough token conversion: 1,000 tokens ≈ 750 words ≈ 1.5 pages of plain text. An agent run that reads a dozen files easily hits 50,000+ input tokens. Estimates ignore cache-write charges and any long-context tier, so treat them as a floor, not a quote.</p>
+  </div>
+
+  <div class="sortbar">
+    <span>Sort</span>
+    <button class="sort" data-sort="vendor" aria-pressed="true">By vendor</button>
+    <button class="sort" data-sort="cost" aria-pressed="false">Cheapest first</button>
+  </div>
+</section>
+
+<section id="catalog" style="padding-top:20px">
+  <div class="table-scroll">
+    <table id="catalog-table">
+      <thead>
+        <tr>
+          <th>Model</th><th>Class</th><th class="num">Input</th><th class="num">Cached in</th>
+          <th class="num">Cache write</th><th class="num">Output</th><th class="num">Your run</th><th class="num">Your month</th>
+        </tr>
+      </thead>
+      <tbody id="catalog-body">
+        <tr class="vendor-head"><td colspan="8">OpenAI</td></tr>
+        <tr><td class="model"><span class="dot low"></span>GPT-5 mini</td><td><span class="tag">Lightweight</span></td><td class="cost">$0.250</td><td class="cost">$0.025</td><td class="cost">—</td><td class="cost">$2.00</td><td class="you">$0.0061</td><td class="you">$0.246</td></tr>
+        <tr><td class="model"><span class="dot high"></span>GPT-5.3-Codex</td><td><span class="tag">Powerful</span></td><td class="cost">$1.75</td><td class="cost">$0.175</td><td class="cost">—</td><td class="cost">$14.00</td><td class="you">$0.043</td><td class="you">$1.72</td></tr>
+        <tr><td class="model"><span class="dot high"></span>GPT-5.4<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Long context &gt;272K: 5.00 / 22.50</span></td><td><span class="tag">Versatile</span></td><td class="cost">$2.50</td><td class="cost">$0.250</td><td class="cost">—</td><td class="cost">$15.00</td><td class="you">$0.055</td><td class="you">$2.22</td></tr>
+        <tr><td class="model"><span class="dot low"></span>GPT-5.4 mini</td><td><span class="tag">Lightweight</span></td><td class="cost">$0.750</td><td class="cost">$0.075</td><td class="cost">—</td><td class="cost">$4.50</td><td class="you">$0.017</td><td class="you">$0.666</td></tr>
+        <tr><td class="model"><span class="dot low"></span>GPT-5.4 nano</td><td><span class="tag">Lightweight</span></td><td class="cost">$0.200</td><td class="cost">$0.020</td><td class="cost">—</td><td class="cost">$1.25</td><td class="you">$0.0045</td><td class="you">$0.180</td></tr>
+        <tr><td class="model"><span class="dot top"></span>GPT-5.5<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Long context &gt;272K: 10.00 / 45.00</span></td><td><span class="tag">Powerful</span></td><td class="cost">$5.00</td><td class="cost">$0.500</td><td class="cost">—</td><td class="cost">$30.00</td><td class="you">$0.111</td><td class="you">$4.44</td></tr>
+        <tr><td class="model"><span class="dot low"></span>GPT-5.6 Luna<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Long context &gt;200K: 0.40 / 1.80</span></td><td><span class="tag">Lightweight</span></td><td class="cost">$0.200</td><td class="cost">$0.020</td><td class="cost">$0.250</td><td class="cost">$1.20</td><td class="you">$0.0044</td><td class="you">$0.178</td></tr>
+        <tr><td class="model"><span class="dot high"></span>GPT-5.6 Sol<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Promo −50% to 3 Sep 2026 · long &gt;272K: 5.00 / 22.50</span></td><td><span class="tag">Powerful</span></td><td class="cost">$2.50</td><td class="cost">$0.250</td><td class="cost">$3.12</td><td class="cost">$15.00</td><td class="you">$0.055</td><td class="you">$2.22</td></tr>
+        <tr><td class="model"><span class="dot high"></span>GPT-5.6 Terra<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Long context &gt;272K: 4.00 / 18.00</span></td><td><span class="tag">Versatile</span></td><td class="cost">$2.00</td><td class="cost">$0.200</td><td class="cost">$2.50</td><td class="cost">$12.00</td><td class="you">$0.044</td><td class="you">$1.78</td></tr>
+        <tr class="vendor-head"><td colspan="8">Anthropic</td></tr>
+        <tr><td class="model"><span class="dot mid"></span>Claude Haiku 4.5</td><td><span class="tag">Versatile</span></td><td class="cost">$1.00</td><td class="cost">$0.100</td><td class="cost">$1.25</td><td class="cost">$5.00</td><td class="you">$0.021</td><td class="you">$0.840</td></tr>
+        <tr><td class="model"><span class="dot high"></span>Claude Sonnet 4</td><td><span class="tag">Versatile</span></td><td class="cost">$3.00</td><td class="cost">$0.300</td><td class="cost">$3.75</td><td class="cost">$15.00</td><td class="you">$0.063</td><td class="you">$2.52</td></tr>
+        <tr><td class="model"><span class="dot high"></span>Claude Sonnet 4.5</td><td><span class="tag">Versatile</span></td><td class="cost">$3.00</td><td class="cost">$0.300</td><td class="cost">$3.75</td><td class="cost">$15.00</td><td class="you">$0.063</td><td class="you">$2.52</td></tr>
+        <tr><td class="model"><span class="dot high"></span>Claude Sonnet 4.6</td><td><span class="tag">Versatile</span></td><td class="cost">$3.00</td><td class="cost">$0.300</td><td class="cost">$3.75</td><td class="cost">$15.00</td><td class="you">$0.063</td><td class="you">$2.52</td></tr>
+        <tr><td class="model"><span class="dot mid"></span>Claude Sonnet 5</td><td><span class="tag">Versatile</span></td><td class="cost">$2.00</td><td class="cost">$0.200</td><td class="cost">$2.50</td><td class="cost">$10.00</td><td class="you">$0.042</td><td class="you">$1.68</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Opus 4.5</td><td><span class="tag">Powerful</span></td><td class="cost">$5.00</td><td class="cost">$0.500</td><td class="cost">$6.25</td><td class="cost">$25.00</td><td class="you">$0.105</td><td class="you">$4.20</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Opus 4.6</td><td><span class="tag">Powerful</span></td><td class="cost">$5.00</td><td class="cost">$0.500</td><td class="cost">$6.25</td><td class="cost">$25.00</td><td class="you">$0.105</td><td class="you">$4.20</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Opus 4.7</td><td><span class="tag">Powerful</span></td><td class="cost">$5.00</td><td class="cost">$0.500</td><td class="cost">$6.25</td><td class="cost">$25.00</td><td class="you">$0.105</td><td class="you">$4.20</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Opus 4.8</td><td><span class="tag">Powerful</span></td><td class="cost">$5.00</td><td class="cost">$0.500</td><td class="cost">$6.25</td><td class="cost">$25.00</td><td class="you">$0.105</td><td class="you">$4.20</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Opus 5</td><td><span class="tag">Powerful</span></td><td class="cost">$5.00</td><td class="cost">$0.500</td><td class="cost">$6.25</td><td class="cost">$25.00</td><td class="you">$0.105</td><td class="you">$4.20</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Opus 4.8 fast mode<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Preview</span></td><td><span class="tag">Powerful</span></td><td class="cost">$10.00</td><td class="cost">$1.00</td><td class="cost">$12.50</td><td class="cost">$50.00</td><td class="you">$0.210</td><td class="you">$8.40</td></tr>
+        <tr><td class="model"><span class="dot top"></span>Claude Fable 5</td><td><span class="tag">Powerful</span></td><td class="cost">$10.00</td><td class="cost">$1.00</td><td class="cost">$12.50</td><td class="cost">$50.00</td><td class="you">$0.210</td><td class="you">$8.40</td></tr>
+        <tr class="vendor-head"><td colspan="8">Google</td></tr>
+        <tr><td class="model"><span class="dot high"></span>Gemini 3.1 Pro<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Public preview · long &gt;200K: 4.00 / 18.00</span></td><td><span class="tag">Powerful</span></td><td class="cost">$2.00</td><td class="cost">$0.200</td><td class="cost">—</td><td class="cost">$12.00</td><td class="you">$0.044</td><td class="you">$1.78</td></tr>
+        <tr><td class="model"><span class="dot mid"></span>Gemini 3.5 Flash</td><td><span class="tag">Lightweight</span></td><td class="cost">$1.50</td><td class="cost">$0.150</td><td class="cost">—</td><td class="cost">$9.00</td><td class="you">$0.033</td><td class="you">$1.33</td></tr>
+        <tr><td class="model"><span class="dot low"></span>Gemini 3.6 Flash<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Promo rate to 31 Dec 2026</span></td><td><span class="tag">Versatile</span></td><td class="cost">$0.750</td><td class="cost">$0.075</td><td class="cost">—</td><td class="cost">$3.75</td><td class="you">$0.016</td><td class="you">$0.630</td></tr>
+        <tr><td class="model"><span class="dot low"></span>Gemini 3.7 Flash<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Promo rate to 31 Dec 2026</span></td><td><span class="tag">Versatile</span></td><td class="cost">$0.750</td><td class="cost">$0.075</td><td class="cost">—</td><td class="cost">$3.75</td><td class="you">$0.016</td><td class="you">$0.630</td></tr>
+        <tr class="vendor-head"><td colspan="8">xAI</td></tr>
+        <tr><td class="model"><span class="dot mid"></span>Grok 4.5<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Long context &gt;200K: 4.00 / 12.00</span></td><td><span class="tag">Versatile</span></td><td class="cost">$2.00</td><td class="cost">$0.500</td><td class="cost">—</td><td class="cost">$6.00</td><td class="you">$0.037</td><td class="you">$1.49</td></tr>
+        <tr><td class="model"><span class="dot mid"></span>Grok 4.6<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">Long context &gt;200K: 4.00 / 12.00</span></td><td><span class="tag">Versatile</span></td><td class="cost">$2.00</td><td class="cost">$0.500</td><td class="cost">—</td><td class="cost">$6.00</td><td class="you">$0.037</td><td class="you">$1.49</td></tr>
+        <tr class="vendor-head"><td colspan="8">Microsoft</td></tr>
+        <tr><td class="model"><span class="dot low"></span>MAI-Code-1-Flash</td><td><span class="tag">Lightweight</span></td><td class="cost">$0.750</td><td class="cost">$0.075</td><td class="cost">—</td><td class="cost">$4.50</td><td class="you">$0.017</td><td class="you">$0.666</td></tr>
+        <tr><td class="model"><span class="dot low"></span>MAI-Code-1.1-Flash</td><td><span class="tag">Lightweight</span></td><td class="cost">$0.200</td><td class="cost">$0.020</td><td class="cost">—</td><td class="cost">$1.20</td><td class="you">$0.0044</td><td class="you">$0.178</td></tr>
+        <tr class="vendor-head"><td colspan="8">GitHub</td></tr>
+        <tr><td class="model"><span class="dot low"></span>Raptor mini</td><td><span class="tag">Versatile</span></td><td class="cost">$0.250</td><td class="cost">$0.025</td><td class="cost">—</td><td class="cost">$2.00</td><td class="you">$0.0061</td><td class="you">$0.246</td></tr>
+        <tr class="vendor-head"><td colspan="8">Moonshot AI</td></tr>
+        <tr><td class="model"><span class="dot low"></span>Kimi K2.7 Code</td><td><span class="tag">Versatile</span></td><td class="cost">$0.950</td><td class="cost">$0.190</td><td class="cost">—</td><td class="cost">$4.00</td><td class="you">$0.019</td><td class="you">$0.762</td></tr>
+        <tr><td class="model"><span class="dot high"></span>Kimi K3<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">See GitHub's model-specific safety note</span></td><td><span class="tag">Powerful</span></td><td class="cost">$3.00</td><td class="cost">$0.300</td><td class="cost">—</td><td class="cost">$15.00</td><td class="you">$0.063</td><td class="you">$2.52</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-family:var(--mono);font-size:12px;color:var(--ink-soft)">All rates in USD per 1 million tokens, from GitHub's published pricing table, retrieved 21 Aug 2026. "—" means no separate charge is published for that column.</p>
+</section>
+
+<section id="reading">
+  <p class="eyebrow">How to read it</p>
+  <h2>Notes on the fine print</h2>
+  <div class="col">
+    <h4>Long-context tiers</h4>
+    <p>Several models charge a second, higher rate once a single request's input crosses a threshold — 272K tokens for GPT-5.4, GPT-5.5, GPT-5.6 Sol and Terra; 200K for GPT-5.6 Luna, Gemini 3.1 Pro, Grok 4.5 and 4.6. The long-context rate is typically double. This is the trap behind "just point it at the whole folder."</p>
+
+    <h4>Cache write</h4>
+    <p>Anthropic models and the GPT-5.6 family charge a one-time premium to write context into cache, then a steep discount to read it back. Long sessions that reuse the same files come out ahead; sessions that touch different files each turn just pay the premium.</p>
+
+    <h4>Promotions running now</h4>
+    <ul>
+      <li><strong>GPT-5.6 Sol</strong> — 50% off standard rates through 3 September 2026. The rates in the table are the promotional ones.</li>
+      <li><strong>Gemini 3.6 and 3.7 Flash</strong> — promotional rates through 31 December 2026.</li>
+    </ul>
+
+    <h4>What isn't priced here</h4>
+    <p>Inline code completions and next-edit suggestions don't consume credits at all. Copilot code review is billed differently — token consumption in credits <em>plus</em> GitHub Actions minutes, and the model it uses isn't disclosed, so its per-review cost varies. <strong>Qwen2.5</strong> appears in GitHub's model comparison but not on the published rate table; if it shows in your picker, check the rate before leaning on it.</p>
+
+    <h4>What your admin controls</h4>
+    <p>Which models appear in your picker is a policy setting. If GPT-5.4 and Codex are in your list but Fable 5 isn't, that's your enterprise policy, not an outage. Same goes for preview models like Gemini 3.1 Pro.</p>
+  </div>
+</section>
+
+<section id="pairs">
+  <p class="eyebrow">Sensible pairings</p>
+  <h2>Four default setups</h2>
+  <div class="col"><p>Rather than choosing fresh every time, pick a standing pair and only deviate deliberately.</p></div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Situation</th><th>Working model</th><th>Escalate to</th><th>Why this pair</th></tr></thead>
+      <tbody>
+        <tr><td>Writing and summarizing all day</td><td class="model">GPT-5 mini</td><td class="model">Claude Sonnet 5</td><td>Ten-to-one cost gap, and mini handles most prose. Escalate when structure or nuance breaks down.</td></tr>
+        <tr><td>Scripting: Python, DAX, M, SQL</td><td class="model">GPT-5.3-Codex</td><td class="model">Claude Opus 5</td><td>Codex is tuned for engineering work. Escalate when a bug survives two attempts.</td></tr>
+        <tr><td>Scheduled automations</td><td class="model">GPT-5 mini or GPT-5.6 Luna</td><td class="model">—</td><td>Never escalate an unattended job. If it needs a better model, it needs your attention instead.</td></tr>
+        <tr><td>Thinking work you'll be judged on</td><td class="model">Claude Opus 5 or GPT-5.6 Sol</td><td class="model">—</td><td>Already the top. Control cost by scoping in a quick chat first, then opening one clean session.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <div class="panel-label">One number worth memorizing</div>
+    <p>At 15,000 input and 1,200 output tokens, a single run costs about <strong>0.6 cents</strong> on GPT-5 mini and about <strong>10.5 cents</strong> on Claude Fable 5. Not a reason to avoid the expensive models — a reason to know which one you're on.</p>
+  </div>
+</section>
+</main>
+</div>
+
+<!-- ============================ TAB 3 : POWER BI ============================ -->
+<div class="part" id="part-powerbi">
+  <div class="part-in">
+    <p class="part-kicker">Part three</p>
+    <h2>Power BI design</h2>
+    <p>Why AI-built reports look plain, Injae Park's method, and the copy-paste kit to fix it.</p>
+  </div>
+</div>
+<div class="tab-panel" id="panel-powerbi">
+<main class="wrap">
+
+<section id="why">
+  <p class="eyebrow">The plainness problem</p>
+  <h2>Why AI-built reports come out looking like defaults</h2>
+  <div class="col">
+    <p>When you ask an agent to rebuild a Power BI report, it does the part it can see: get the data in, build the measures, drop in visuals that answer the question. What it skips is everything that makes a report feel like a product — because that lives in five separate layers the agent was never pointed at.</p>
+    <p>The designers whose work looks like an app aren't using secret visuals. They're doing the same five things every time, in the same order. Most of it is one-time setup you reuse forever.</p>
+  </div>
+  <div class="note">
+    <div class="panel-label">The reframe</div>
+    <p>Stop asking the agent to "make it look better." That's a taste instruction with nowhere to land. Instead, give it a <strong>theme file, a grid, and a component spec</strong>, and ask it to conform to them. Design becomes a constraint the agent can satisfy rather than an opinion it has to guess at.</p>
+  </div>
+</section>
+
+<section id="layers">
+  <p class="eyebrow">The anatomy</p>
+  <h2>The five layers of an app-like report</h2>
+
+  <ol class="layers">
+    <li>
+      <h4>Grid and canvas</h4>
+      <p>Set the page size deliberately (16:9 at 1280×720 is standard; go custom for a tall scrolling page). Then work on an 8-pixel grid with consistent outer padding — visuals aligned to a grid read as designed even when nothing else changes. Turn on <strong>Maintain layer order</strong> under General → Properties → Advanced so buttons stop jumping in front of charts when clicked, and turn <strong>off</strong> visual header icons across the board unless a specific visual needs them.</p>
+    </li>
+    <li>
+      <h4>Theme JSON — the highest-leverage hour you'll spend</h4>
+      <p>A theme file sets colors, fonts, corner radius, shadows, gridline behavior, and default formatting for every visual type, everywhere, forever. Most "plain" reports are plain because nobody wrote one. This is also the single easiest thing to hand to Copilot: it's a JSON file, and generating structured JSON from a spec is exactly what these models are good at. Starter file in the kit below.</p>
+    </li>
+    <li>
+      <h4>The frame — background instead of borders</h4>
+      <p>Pro dashboards mostly aren't drawing card borders in Power BI. They design the whole page frame — panels, section headers, sidebar, soft shadows — in Figma or PowerPoint, export it as one image, and set it as the canvas background at "Fit." Visuals sit on top with transparent backgrounds. That's the trick behind the app look. Keep live text out of the background image so it stays searchable and editable.</p>
+    </li>
+    <li>
+      <h4>Navigation and state</h4>
+      <p>This is what makes it feel like software rather than a slide. Page navigator and bookmark navigator for tabs; buttons with distinct default, hover, and pressed states; a slide-out filter panel built with two bookmarks; modal pop-ups for detail; drill-through for the deep dive. Microsoft's own training module for this is literally called "design reports that behave like apps."</p>
+    </li>
+    <li>
+      <h4>Signature visuals</h4>
+      <p>Where the personality comes from. Three tiers, in order of governance friendliness: <strong>SVG measures in native visuals</strong> (no custom visual required, works in table, matrix, new card, button slicer, image), <strong>Deneb</strong> for anything Vega-Lite can draw, and <strong>certified AppSource visuals</strong> last. Check your tenant's custom-visual policy before designing around anything from AppSource — many energy companies block uncertified visuals outright, and SVG measures sail past that entirely.</p>
+    </li>
+  </ol>
+</section>
+
+<section id="park">
+  <p class="eyebrow">The person you're thinking of</p>
+  <h2>Injae Park's actual method</h2>
+  <div class="col">
+    <p>The creator you're describing is <strong>Injae Park</strong> — @PowerBIPark on YouTube, Microsoft Data Platform MVP, Power BI World Championship finalist, and he posts sample files on GitHub. His conference sessions tell you exactly what the method is, and it's narrower than it looks from the outside:</p>
+    <ul>
+      <li><strong>SVGs inside native visuals.</strong> Custom chart shapes drawn as SVG and rendered inside ordinary tables, matrices, and cards — no custom visual, no AppSource approval.</li>
+      <li><strong>LLM-generated SVGs.</strong> He doesn't hand-write the vector math. He describes the graphic and lets a model produce the SVG, then wires it into DAX. This is the part that's directly transferable to your Copilot setup.</li>
+      <li><strong>Automation over repetition.</strong> C# scripts in Tabular Editor to generate SVG measures in bulk and set default properties, so a design system gets applied across a model rather than one measure at a time.</li>
+      <li><strong>AI for the grunt work.</strong> Bulk measure creation, DAX documentation, mock datasets for prototyping — plus a clear-eyed view of where AI stops being useful.</li>
+    </ul>
+    <p>Worth internalizing: the interactivity you're seeing is mostly bookmarks and buttons, and the polish is mostly theme plus background plus SVG. It reads as an app because those two things are done thoroughly, not because there's a hidden visual you don't have.</p>
+  </div>
+</section>
+
+<section id="kit">
+  <p class="eyebrow">Copy-paste kit</p>
+  <h2>Start with these four files</h2>
+
+  <h3>A. Theme starter</h3>
+  <p>Save as <code>theme.json</code>, then View → Themes → Browse for themes. Swap the palette for your company colors. If the import errors, it's almost always a JSON syntax slip — paste the error back into Copilot and it'll fix it.</p>
+  <div class="code">
+    <div class="code-head"><span class="code-path">theme.json</span><button class="copy">Copy</button></div>
+<pre><code>{
+  "name": "Ops Standard",
+  "dataColors": ["#2C6C77","#F2B705","#9E4B2C","#4E93A0","#6B7F8C","#C6D0D6"],
+  "background": "#F4F6F7",
+  "foreground": "#131E27",
+  "tableAccent": "#2C6C77",
+  "textClasses": {
+    "title":     { "fontFace": "Segoe UI Semibold", "fontSize": 14, "color": "#131E27" },
+    "label":     { "fontFace": "Segoe UI", "fontSize": 10, "color": "#41535F" },
+    "callout":   { "fontFace": "Segoe UI Light", "fontSize": 32, "color": "#131E27" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background":   [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
+        "border":       [{ "show": true, "color": { "solid": { "color": "#E3E9EC" } }, "radius": 10 }],
+        "dropShadow":   [{ "show": true, "preset": "BottomRight" }],
+        "visualHeader": [{ "show": false }],
+        "title":        [{ "show": true, "fontSize": 13, "fontColor": { "solid": { "color": "#131E27" } },
+                           "alignment": "left" }],
+        "padding":      [{ "top": 8, "bottom": 8, "left": 10, "right": 10 }]
+      }
+    },
+    "card": {
+      "*": { "labels": [{ "fontSize": 30 }], "categoryLabels": [{ "fontSize": 10 }] }
+    },
+    "columnChart": {
+      "*": { "valueAxis": [{ "gridlineShow": false }], "categoryAxis": [{ "showAxisTitle": false }] }
+    },
+    "lineChart": {
+      "*": { "valueAxis": [{ "gridlineShow": true, "gridlineColor": { "solid": { "color": "#EDF0F2" } } }] }
+    }
+  }
+}</code></pre>
+  </div>
+
+  <h3>B. SVG progress bar — in any table or matrix row</h3>
+  <p>Create the measure, then select it and set <strong>Measure tools → Data category → Image URL</strong>. Without that step it renders as text. Drop it into a table column.</p>
+  <div class="code">
+    <div class="code-head"><span class="code-path">DAX — Progress Bar SVG</span><button class="copy">Copy</button></div>
+<pre><code>Progress Bar SVG =
+VAR _Pct     = DIVIDE( [Actual], [Target] )
+VAR _Clamped = MIN( MAX( _Pct, 0 ), 1 )
+VAR _Width   = 220 * _Clamped
+VAR _Color   = SWITCH( TRUE(),
+                   _Pct &gt;= 1,    "%232C6C77",   -- teal   (%23 is an encoded #)
+                   _Pct &gt;= 0.8,  "%23F2B705",   -- amber
+                                 "%239E4B2C" )  -- rust
+VAR _Label   = FORMAT( _Pct, "0%" )
+RETURN
+"data:image/svg+xml;utf8," &
+"&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 28'&gt;" &
+    "&lt;rect x='0' y='6' width='220' height='16' rx='8' fill='%23E3E9EC'/&gt;" &
+    "&lt;rect x='0' y='6' width='" & _Width & "' height='16' rx='8' fill='" & _Color & "'/&gt;" &
+    "&lt;text x='230' y='19' font-family='Segoe UI' font-size='13' fill='%2341535F'&gt;" &
+        _Label &
+    "&lt;/text&gt;" &
+"&lt;/svg&gt;"</code></pre>
+  </div>
+
+  <h3>C. SVG delta indicator — arrow plus variance in one cell</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">DAX — Delta Arrow SVG</span><button class="copy">Copy</button></div>
+<pre><code>Delta Arrow SVG =
+VAR _Delta = DIVIDE( [This Period] - [Last Period], [Last Period] )
+VAR _Up    = _Delta &gt;= 0
+VAR _Color = IF( _Up, "%232C6C77", "%239E4B2C" )
+VAR _Path  = IF( _Up, "M8 3 L14 12 L2 12 Z", "M8 13 L14 4 L2 4 Z" )
+VAR _Label = FORMAT( ABS( _Delta ), "0.0%" )
+RETURN
+"data:image/svg+xml;utf8," &
+"&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 16'&gt;" &
+    "&lt;path d='" & _Path & "' fill='" & _Color & "'/&gt;" &
+    "&lt;text x='20' y='13' font-family='Segoe UI' font-size='12' fill='" & _Color & "'&gt;" &
+        _Label &
+    "&lt;/text&gt;" &
+"&lt;/svg&gt;"</code></pre>
+  </div>
+  <p style="font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);max-width:var(--measure)">Escaping note: inside DAX you're already in double quotes, so use single quotes for SVG attributes, and encode <code>#</code> in hex colors as <code>%23</code> — unencoded hashes are the most common reason an SVG measure silently fails to render.</p>
+
+  <h3>D. Prompts that produce usable output</h3>
+  <p>These work in Copilot chat, the Copilot app, or M365 Copilot. The pattern in all of them: give the model the constraint, the exact output format, and the acceptance test.</p>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">Prompt — generate a theme from a brand</span><button class="copy">Copy</button></div>
+<pre><code>Write a Power BI theme JSON file for an operations dashboard.
+
+Constraints:
+- Primary #2C6C77, accent #F2B705, alert #9E4B2C, neutral greys for everything else
+- Segoe UI throughout; titles 13pt left-aligned, labels 10pt
+- White visual containers, 10px corner radius, subtle bottom-right shadow
+- Visual headers hidden by default
+- No gridlines on column charts; faint gridlines on line charts
+- Data colors ordered so the first three are distinguishable in greyscale
+
+Output only the JSON, no explanation. It must import into Power BI Desktop
+without error — validate the structure before you answer, and use only
+properties that current Power BI theme files support.</code></pre>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">Prompt — generate an SVG measure</span><button class="copy">Copy</button></div>
+<pre><code>Write a Power BI DAX measure that returns an SVG data URI for use in a
+table column with Data Category set to Image URL.
+
+The graphic: a horizontal bullet chart, 240x24 viewBox. Grey track, a
+filled bar for [Actual] scaled against [Target], a thin vertical black
+tick at the target position, and the variance percentage as text on the
+right in 12px Segoe UI.
+
+Rules:
+- Prefix with "data:image/svg+xml;utf8,"
+- Single quotes for all SVG attributes
+- Encode every # in a hex colour as %23
+- Handle blank and negative values without erroring
+- Use VAR statements and comment each one
+
+Return the DAX only.</code></pre>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">Prompt — critique an existing report page</span><button class="copy">Copy</button></div>
+<pre><code>I'm attaching a screenshot of a Power BI page. Review it as a dashboard
+designer, not as a data analyst.
+
+Assess: visual hierarchy, alignment to a grid, use of colour, typography
+consistency, chart-type fit, cognitive load, and whether the eye lands on
+the right thing first.
+
+Give me a numbered list of concrete changes, each one specific enough to
+implement in Power BI in under five minutes. Order them by impact per
+minute of effort. No compliments, no general design theory.</code></pre>
+  </div>
+</section>
+
+<section id="pbir">
+  <p class="eyebrow">The unlock</p>
+  <h2>PBIR: your reports are now editable code</h2>
+  <div class="col">
+    <p>This is the part that connects both halves of this manual, and most people haven't caught up to it yet.</p>
+    <p>Power BI reports used to be an opaque binary. Now, in the <strong>PBIR</strong> format inside a Power BI Project (<code>.pbip</code>), every visual, page, and bookmark is its own JSON file in a folder — each one validated against a published schema — with the semantic model alongside it as TMDL text files. It became the default for new reports in the Power BI Service in January 2026 and in Desktop from the March 2026 release, with full general availability expected later in 2026.</p>
+    <p>Which means: <strong>a Power BI report is now a repository your Copilot agents can read and edit.</strong> Restyling forty visuals to a new standard stops being forty manual edits and becomes one agent task with a diff you review in a pull request. People are already building AI skills that understand the PBIR schema and generate report pages from prompts.</p>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/pbir-stylist.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: pbir-stylist
+description: Applies our report design standard across the JSON files of a
+  Power BI project in PBIR format. Never touches data, measures, or queries.
+tools: ["read", "search", "edit"]
+model: Claude Sonnet 5
+---
+
+You enforce a design standard across a Power BI project saved in PBIR
+format. You are editing JSON, not designing from scratch.
+
+Scope — you may edit only files under the .Report folder. You must never
+modify anything under .SemanticModel, and never change a visual's fields,
+filters, measures, or queries. Layout and formatting only.
+
+The standard, from design/standard.md:
+- 8px grid: every visual x, y, width, height is a multiple of 8
+- Outer page padding 24px, gutter between visuals 16px
+- Visual headers off; titles 13pt, left aligned, sentence case
+- No visual-level colour overrides — colours come from the theme file
+- Card visuals aligned in a single row across the top of the page
+
+Method:
+1. Read design/standard.md and the page JSON before changing anything.
+2. List every deviation you found, grouped by page, before you edit.
+3. Make the edits, one page at a time, preserving the schema declaration
+   at the top of each file.
+4. Open a pull request with a summary table: page, visual, what changed.
+
+If a change would alter what the visual displays rather than how it looks,
+skip it and note it in the PR instead.</code></pre>
+  </div>
+
+  <div class="stop">
+    <div class="panel-label">Ground rules before you point an agent at a report</div>
+    <ul>
+      <li>Work on a copy. Converting to PBIR is one-way — keep a backup of the original file.</li>
+      <li>The report must be in a Git repository so every agent edit is a reviewable diff you can revert.</li>
+      <li>Open the result in Power BI Desktop and click through every page before publishing. Schema-valid JSON is not the same as a working report.</li>
+      <li>Confirm your tenant hasn't opted out of PBIR, and check with your BI team before introducing a code-first workflow into a shared workspace.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="polish">
+  <p class="eyebrow">Before you ship</p>
+  <h2>Twelve-point polish pass</h2>
+  <div class="col">
+    <p>Run this on any report before it goes to a leader. Most items take under a minute and together they account for most of the gap between "an analyst made this" and "someone designed this."</p>
+  </div>
+  <div class="split">
+    <div class="yes"><div class="panel">
+      <div class="panel-label">Layout and type</div>
+      <ul>
+        <li>Every visual snapped to the grid; equal gutters</li>
+        <li>One type family, three sizes maximum</li>
+        <li>Titles in sentence case, left aligned, consistent height</li>
+        <li>Numbers formatted and abbreviated consistently (1.2M, not 1,234,567 in one card and 1.2M in another)</li>
+        <li>Nothing overlapping or clipped at 100% zoom</li>
+        <li>The most important number is the largest thing on the page</li>
+      </ul>
+    </div></div>
+    <div class="no"><div class="panel">
+      <div class="panel-label">Colour and behaviour</div>
+      <ul>
+        <li>Colour used for meaning only — no rainbow categories</li>
+        <li>One accent colour, and it points at the thing that matters</li>
+        <li>Gridlines and axis lines dialled down or removed</li>
+        <li>Every chart legible in greyscale</li>
+        <li>Buttons have hover states; navigation works on every page</li>
+        <li>Tooltips customized on at least the primary visuals</li>
+      </ul>
+    </div></div>
+  </div>
+  <div class="note">
+    <div class="panel-label">Fastest single upgrade</div>
+    <p>If you only do one thing: write the theme file and remove chart junk (gridlines, axis titles, redundant legends, default headers). That alone moves a report most of the distance, and it costs you an hour once rather than an hour per report.</p>
+  </div>
+</section>
+
+<section id="learn">
+  <p class="eyebrow">Where to go next</p>
+  <h2>Sources worth your time</h2>
+  <div class="col">
+    <ul>
+      <li><a href="https://www.youtube.com/@PowerBIPark" target="_blank" rel="noopener noreferrer">Injae Park — PowerBIPark on YouTube</a>, with sample files at <a href="https://github.com/PowerBIPark" target="_blank" rel="noopener noreferrer">github.com/PowerBIPark</a>. Start with anything on SVGs.</li>
+      <li><a href="https://www.sqlbi.com/articles/creating-custom-visuals-in-power-bi-with-dax/" target="_blank" rel="noopener noreferrer">SQLBI — creating custom visuals with DAX</a>. The clearest explanation of how SVG measures actually work and when they're worth it.</li>
+      <li><a href="https://kerrykolosko.com/" target="_blank" rel="noopener noreferrer">Kerry Kolosko</a>. Data storytelling and design-forward Power BI, with breakdowns of how each report was built.</li>
+      <li><a href="https://learn.microsoft.com/en-us/training/modules/data-driven-story-power-bi" target="_blank" rel="noopener noreferrer">Microsoft Learn — enhance report designs for the user experience</a>. Free module covering bookmarks, navigation, and reports that behave like apps.</li>
+      <li><a href="https://deneb-viz.github.io/" target="_blank" rel="noopener noreferrer">Deneb</a>. Vega-Lite specs inside a certified Power BI visual, for charts native visuals can't draw.</li>
+      <li><a href="https://learn.microsoft.com/en-us/power-bi/developer/embedded/projects-enhanced-report-format" target="_blank" rel="noopener noreferrer">Microsoft Learn — PBIR enhanced report format</a>. The schema your agents will be editing.</li>
+      <li><a href="https://community.fabric.microsoft.com/t5/Desktop/Let-s-Talk-Design-Design-Tips-amp-Toolkit/m-p/4717732" target="_blank" rel="noopener noreferrer">Fabric Community — "Let's talk design" thread</a>. Practical settings-level tips, including Maintain layer order and header icons.</li>
+      <li><a href="https://www.figma.com/community/file/1411107682737489647/power-bi-dashboard-design-toolkit" target="_blank" rel="noopener noreferrer">Power BI Dashboard Design Toolkit for Figma</a>. Free community file if you want to design the frame properly.</li>
+    </ul>
+  </div>
+</section>
+</main>
+</div>
+
+<!-- ============================ PART 4 : MEMORY BANK ============================ -->
+<div class="part" id="part-memory">
+  <div class="part-in">
+    <p class="part-kicker">Part four</p>
+    <h2>The memory bank</h2>
+    <p>How to make the brain repo remember your work well enough that a project from four months ago can be demoed tomorrow.</p>
+  </div>
+</div>
+<div class="tab-panel" id="panel-memory">
+<main class="wrap">
+
+<section id="memory-why">
+  <p class="eyebrow">The core idea</p>
+  <h2>Two layers, and never confuse them</h2>
+  <div class="col">
+    <p>The instinct is to save everything into one pile. That fails twice over: it gets expensive to read (you pay tokens for every irrelevant file an agent opens) and it gets useless to search, because raw material buries the conclusions.</p>
+    <p>A memory bank that actually works has two layers with different rules.</p>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Layer</th><th>What it is</th><th>Rule</th><th>Who writes it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="model">The log</td>
+          <td><code>log/</code> — dated notes, one per event. What happened, when, who said what.</td>
+          <td><strong>Append-only.</strong> Never edited, never reorganized. It's evidence.</td>
+          <td>Intake agent, from raw material</td>
+        </tr>
+        <tr>
+          <td class="model">The dossiers</td>
+          <td><code>memory/projects/</code> — one living file per project. What it is, why you built it that way, how to demo it.</td>
+          <td><strong>Rewritten continuously.</strong> Always reflects current truth, not history.</td>
+          <td>Scribe agent, from the log, reviewed by you</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col">
+    <p>The log answers "what happened on 8 May." The dossier answers "what is this thing and how do I explain it." You need both, and the dossier is the one that saves you in four months.</p>
+    <p>On top of those sits a third thing that isn't really a layer — <code>memory/INDEX.md</code>, a single table of every project with a one-line description. It exists so an agent can read <em>one small file</em> to decide which dossiers are worth opening. That's the whole token-economics trick from Part two applied to your own memory: cheap map first, expensive territory second.</p>
+  </div>
+
+  <div class="note">
+    <div class="panel-label">The test for whether a memory is worth keeping</div>
+    <p>Would you want to read this line in six months, in a conversation about something else? Decisions, constraints, results, and "why we rejected the other option" pass. Status updates, meeting logistics, and the fact that you had a call on Tuesday do not — those live in the log and expire there.</p>
+  </div>
+</section>
+
+<section id="memory-shape">
+  <p class="eyebrow">The shape</p>
+  <h2>What gets added to the brain repo</h2>
+  <div class="col">
+    <p>This extends the <code>work-brain</code> layout from Part one. Everything new is under <code>memory/</code>.</p>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">work-brain/ — with the memory bank added</span><button class="copy">Copy</button></div>
+<pre><code>work-brain/
+├── AGENTS.md
+├── context/
+│   ├── portfolio.md
+│   ├── stakeholders.md
+│   └── glossary.md
+├── inbox/                     # raw paste-ins, cleared after processing
+├── log/                       # append-only dated notes  (LAYER 1)
+│   └── 2026-08-21-ops-sync.md
+├── memory/                    # curated, living memory   (LAYER 2)
+│   ├── INDEX.md               # the map — every project, one line each
+│   ├── projects/
+│   │   ├── anomaly-detection.md
+│   │   ├── work-order-automation.md
+│   │   └── historian-migration.md
+│   ├── decisions/             # why you chose what you chose
+│   │   └── 2026-05-02-adr-anomaly-baseline-method.md
+│   ├── people/                # working context on recurring collaborators
+│   └── archive/               # retired projects, compressed to one page
+├── briefs/                    # agent output: prep, digests, deck outlines
+└── .github/
+    └── agents/
+        ├── intake.agent.md
+        ├── meeting-prep.agent.md
+        ├── weekly-digest.agent.md
+        ├── scribe.agent.md        # keeps dossiers current
+        ├── recall.agent.md        # answers "what did I do about X"
+        ├── archivist.agent.md     # monthly consolidation + pruning
+        └── deck-builder.agent.md  # dossier to slide outline</code></pre>
+  </div>
+
+  <h3>The dossier template</h3>
+  <p>Fixed structure matters more than good writing here. A consistent schema is what lets an agent reliably find the demo script four months from now. The front matter is machine-readable; the body is for you.</p>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">memory/projects/anomaly-detection.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+id: anomaly-detection
+title: ESP pump anomaly detection prototype
+status: shipped              # exploring | building | shipped | paused | retired
+started: 2026-04-08
+last_touched: 2026-08-14
+tags: [python, time-series, reliability, pilot]
+systems: [historian, power-bi]
+stakeholders: [maintenance-superintendent, reliability-lead]
+repos: [ops-anomaly-detector]
+one_liner: Flags abnormal vibration patterns on ESP pumps roughly two weeks
+  before failure, using historian tag data and a seasonal-decomposition baseline.
+---
+
+## Problem it solves
+Two or three sentences. What was broken before this existed, and who felt it.
+
+## What I built
+Five bullets maximum, plain language. The version you would say out loud.
+
+## How it works
+The walkthrough, one step per stage: where data comes in, what transforms it,
+where the output lands, who consumes it. Name the actual systems and tables.
+
+## Key decisions
+Link to the ADR files. One line each on what was chosen and what was rejected.
+
+## Results
+Numbers if you have them, with the date and the source. "Caught 3 of 4 failures
+in the June pilot" is worth more in six months than any description.
+
+## Demo script — 5 minutes
+1. Open with the problem, in the audience's language
+2. Show &lt;the thing to show&gt;, click &lt;the thing to click&gt;
+3. The one slide or screen that lands the value
+4. Known limits, stated before anyone asks
+5. What it would take to scale it
+
+## What broke / gotchas
+The things you'd forget and get burned by. Data quality issues, edge cases,
+the tag that's mislabelled in the historian.
+
+## Open threads
+What's unfinished and what would come next.
+
+## Where things live
+Repo, folder, dashboard URL, the notebook, who else has access.</code></pre>
+  </div>
+
+  <div class="note">
+    <div class="panel-label">The field that does the heavy lifting</div>
+    <p><strong>Demo script.</strong> Write it while the project is fresh, even in rough form. It's the single hardest thing to reconstruct later and the exact thing you get asked for. Everything else in the dossier can be rebuilt from the log; this one is pure judgment that only exists in your head.</p>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">memory/INDEX.md</span><button class="copy">Copy</button></div>
+<pre><code># Project index
+
+Read this first. Open a dossier only if the one-liner matches the question.
+
+| id | title | status | last touched | one-liner |
+|---|---|---|---|---|
+| anomaly-detection | ESP pump anomaly detection | shipped | 2026-08-14 | Flags abnormal vibration ~2 weeks before pump failure |
+| work-order-automation | Work order intake automation | building | 2026-08-19 | Auto-routes SAP work orders by asset class and priority |
+| historian-migration | Historian tag migration | paused | 2026-06-30 | Consolidating legacy tag naming into the new standard |
+
+## Conventions
+- id matches the filename in memory/projects/
+- status: exploring | building | shipped | paused | retired
+- retired projects move to memory/archive/ and drop off this table</code></pre>
+  </div>
+</section>
+
+<section id="memory-capture">
+  <p class="eyebrow">Getting work in</p>
+  <h2>Three intake streams</h2>
+  <div class="col">
+    <p>Memory only works if capture is nearly free. Three streams feed the log, and only one of them requires you to think.</p>
+  </div>
+
+  <h3>Stream 1 — What your repos already know</h3>
+  <p>Your commit history is an accurate, timestamped record of what you actually built, and you're already writing it. This PowerShell script pulls last week's commits from every repo on your machine into a single file in <code>inbox/</code>. Schedule it with Task Scheduler for Friday afternoon, or just run it.</p>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">tools/harvest-git.ps1</span><button class="copy">Copy</button></div>
+<pre><code># Collects the past week's commits from every git repo under $Root
+# into one dated file in work-brain/inbox/.
+
+$Root      = "C:\repos"                        # where your repos live
+$BrainRepo = "C:\repos\work-brain"
+$Since     = (Get-Date).AddDays(-7).ToString("yyyy-MM-dd")
+$Stamp     = Get-Date -Format "yyyy-MM-dd"
+$OutFile   = Join-Path $BrainRepo "inbox\$Stamp-git-harvest.md"
+
+"# Git activity since $Since" | Out-File $OutFile -Encoding utf8
+
+Get-ChildItem -Path $Root -Directory | ForEach-Object {
+    $repo = $_.FullName
+    if (-not (Test-Path (Join-Path $repo ".git"))) { return }
+
+    $log = git -C $repo log --since=$Since --pretty=format:"- %ad %s" --date=short
+    if ([string]::IsNullOrWhiteSpace($log)) { return }
+
+    $files = git -C $repo log --since=$Since --name-only --pretty=format:"" |
+             Where-Object { $_ -ne "" } | Sort-Object -Unique | Select-Object -First 25
+
+    Add-Content $OutFile ""
+    Add-Content $OutFile "## $($_.Name)"
+    Add-Content $OutFile $log
+    Add-Content $OutFile ""
+    Add-Content $OutFile "Files touched:"
+    Add-Content $OutFile ($files | ForEach-Object { "  - $_" })
+}
+
+Write-Host "Wrote $OutFile"</code></pre>
+  </div>
+
+  <h3>Stream 2 — What Microsoft 365 knows</h3>
+  <p>Same bridge as Part one, but pointed at memory rather than status. This prompt asks M365 Copilot for the things a dossier needs and a digest doesn't: decisions, reasoning, and commitments with their justification.</p>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">Prompt for M365 Copilot — weekly memory harvest</span><button class="copy">Copy</button></div>
+<pre><code>Review my meetings, chats, and email from the past 7 days. I'm building a
+long-term record of my work, so I need substance rather than a status update.
+
+For each distinct project or workstream, give me:
+
+- The project name as people actually refer to it
+- Decisions made this week, with WHO decided and WHY — include the reasoning
+  given at the time, and any alternative that was rejected
+- New constraints, requirements, or blockers that emerged
+- Numbers, dates, or results that were quoted, with the source
+- Commitments made, by me or to me, with dates
+- Anything a newcomer would need explained to understand the discussion
+
+Plain markdown, grouped by project. Quote directly where the exact wording of
+a decision matters. If something is ambiguous, mark it "unclear" rather than
+resolving it. Do not summarize into generalities — specifics are the point.</code></pre>
+  </div>
+
+  <h3>Stream 3 — What only you know</h3>
+  <p>Ten minutes on Friday, in a plain file in <code>inbox/</code>. The reasoning you never wrote down anywhere, the thing you decided in the truck on the way back from the field, the hunch about why the pilot worked. This is the highest-value input and the only one that can't be automated. Answer four questions:</p>
+  <ul>
+    <li>What did I figure out this week that I didn't know last week?</li>
+    <li>What did I decide, and what did I decide against?</li>
+    <li>What would I need to remember to demo or defend this later?</li>
+    <li>What's likely to bite me?</li>
+  </ul>
+</section>
+
+<section id="memory-agents">
+  <p class="eyebrow">The crew, extended</p>
+  <h2>Four more agents</h2>
+  <div class="col">
+    <p>These follow the same rules as Part one: restricted tools, a pinned model, and a fixed output shape. Note the model choices — the scribe and archivist are cheap, the recall agent is mid-tier because retrieval quality matters, and only the deck builder gets a strong model.</p>
+  </div>
+
+  <h3>Scribe — keeps dossiers current</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/scribe.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: scribe
+description: Updates project dossiers in memory/projects/ from new entries in
+  log/, preserving the template structure and never inventing detail.
+tools: ["read", "search", "edit"]
+model: Claude Sonnet 5
+---
+
+You maintain the project dossiers. You are a records clerk, not an author.
+
+Process:
+1. Read memory/INDEX.md to learn which projects exist.
+2. Read log/ entries newer than each dossier's last_touched date.
+3. For each project with new material, update its dossier in place:
+   - Keep the exact section structure of the template. Never add or rename
+     sections. Never reorder them.
+   - Update last_touched and status in the front matter.
+   - Add new facts to the right section. Do not restate what's already there
+     in different words.
+   - Where a new fact contradicts an old one, replace it and note the change
+     in one line: "(was X, changed &lt;date&gt;)". History matters.
+4. If material implies a significant choice was made, do not bury it in the
+   dossier — create memory/decisions/YYYY-MM-DD-adr-&lt;slug&gt;.md instead, using
+   the ADR format, and link it from the Key decisions section.
+5. Update the row in memory/INDEX.md.
+6. If a project appears in log/ that has no dossier, create one from the
+   template with everything you can fill and "TBD" everywhere else.
+
+Hard rules:
+- Every fact traceable to a log file. Cite the filename inline.
+- Never write the Demo script section yourself. If it's empty, add the line
+  "TBD — needs 10 minutes from me" and list it in your PR description.
+- Never touch log/. It is append-only.
+- Open a pull request. Never commit to the default branch directly.</code></pre>
+  </div>
+
+  <h3>Recall — answers "what did I do about X"</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/recall.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: recall
+description: Answers questions about past work by reading the index first,
+  then only the dossiers and log entries that are actually relevant.
+tools: ["read", "search"]
+model: Claude Sonnet 5
+---
+
+You answer questions about work I have already done. You have no edit access
+and you never guess.
+
+Retrieval order — follow it exactly, it controls cost:
+1. Read memory/INDEX.md. Nothing else yet.
+2. Pick at most three candidate projects based on the one-liners.
+3. Read those dossiers. Stop if they answer the question.
+4. Only if the dossier is thin, search log/ for the project id and read the
+   three most relevant dated entries.
+5. Only if still unresolved, widen the search.
+
+Answering:
+- Lead with the direct answer in two sentences.
+- Then the supporting detail, in the order I would need it.
+- Cite the file each claim came from, inline.
+- State clearly what you could NOT find. "The dossier has no results section"
+  is a useful answer. Inventing a plausible number is not.
+- If the question is about something that predates the memory bank, say so
+  rather than reconstructing it from thin evidence.</code></pre>
+  </div>
+
+  <h3>Deck builder — dossier to slide outline</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/deck-builder.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: deck-builder
+description: Turns a project dossier into a slide-by-slide deck outline
+  pitched at a named audience.
+tools: ["read", "search", "edit"]
+model: Claude Opus 5
+---
+
+You turn a dossier into a deck outline. Ask who the audience is and how long
+the slot is before you start. Those two answers change everything.
+
+Read the project dossier and any ADRs it links. Do not read the whole log.
+
+Write briefs/&lt;project-id&gt;-deck-&lt;audience&gt;.md. One block per slide:
+
+  ### Slide N — &lt;title as it appears on the slide&gt;
+  **On the slide:** the three to five words or the single visual. Not prose.
+  **What I say:** two or three sentences, in my voice, plain language.
+  **Source:** which dossier section this came from.
+
+Rules for the deck itself:
+- Open with the problem in the audience's language, never with architecture.
+- One idea per slide. If a slide needs two claims, it's two slides.
+- Technical depth scaled to the audience: operations leaders get outcomes and
+  one diagram; engineers get the method and the failure modes.
+- Include a limits slide before the ask. Stating your own constraints first
+  is what makes the rest credible.
+- Last slide is the ask, and it must be specific.
+- Flag anything the dossier can't support with: "NEEDS INPUT — &lt;what&gt;".
+  Never fill a results slide with invented numbers.
+
+At the end, list the screenshots or exports I need to grab, with the exact
+path or dashboard where each one lives.</code></pre>
+  </div>
+
+  <h3>Archivist — the cleanup crew</h3>
+  <div class="code">
+    <div class="code-head"><span class="code-path">.github/agents/archivist.agent.md</span><button class="copy">Copy</button></div>
+<pre><code>---
+name: archivist
+description: Monthly consolidation. Compresses stale log entries, flags
+  contradictions, and proposes retirements. Proposes only — never deletes.
+tools: ["read", "search", "edit"]
+model: GPT-5 mini
+---
+
+You keep the memory bank from rotting. You are conservative by default.
+
+Monthly pass:
+1. Log compression — for log/ files older than 90 days whose content is fully
+   captured in a dossier, replace the body with a three-line summary and a
+   pointer to the dossier. Keep the filename and the date. Never compress a
+   file containing a decision that has no ADR.
+2. Contradictions — list any place where two dossiers or a dossier and a log
+   entry disagree on a fact, date, or number. Do not resolve them yourself.
+3. Staleness — list dossiers with status building or exploring that have not
+   been touched in 60 days, and ask whether they are actually paused.
+4. Gaps — list shipped projects whose Demo script or Results section is empty.
+5. Retirement candidates — projects untouched for 6 months. For each, propose
+   a one-page compression into memory/archive/.
+
+Output a single PR with the compressions applied and a description containing
+the lists from steps 2 through 5 as checklists for me.
+
+Absolute rules:
+- Never delete a file. Compress, move, or flag only.
+- Never delete an ADR or a Results section, at any age.
+- Never resolve a contradiction. Surface it and let me decide.</code></pre>
+  </div>
+</section>
+
+<section id="memory-auto">
+  <p class="eyebrow">On a timer</p>
+  <h2>The rhythm</h2>
+  <div class="col">
+    <p>Four scheduled jobs, at four different cadences. Note that everything writes a pull request rather than committing — memory you never reviewed isn't memory, it's noise you'll distrust later.</p>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>When</th><th>What runs</th><th>Model</th><th>Your job</th></tr></thead>
+      <tbody>
+        <tr><td class="model">Daily 06:30</td><td>intake — clears <code>inbox/</code> into <code>log/</code></td><td class="cost">GPT-5 mini</td><td>Nothing</td></tr>
+        <tr><td class="model">Friday 15:00</td><td>Git harvest script, then your 10-minute brain dump</td><td class="cost">—</td><td>10 minutes</td></tr>
+        <tr><td class="model">Monday 07:00</td><td>weekly-digest, then scribe updates dossiers</td><td class="cost">Claude Sonnet 5</td><td>Review the PR</td></tr>
+        <tr><td class="model">1st of month</td><td>archivist — compress, flag, propose</td><td class="cost">GPT-5 mini</td><td>Work the checklist</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">Automation — Monday 07:15, weekly · model: Claude Sonnet 5</span><button class="copy">Copy</button></div>
+<pre><code>Run the scribe agent. Update every project dossier in memory/projects/ that
+has new material in log/ since its last_touched date, then update
+memory/INDEX.md to match.
+
+Open a single pull request titled "Memory update — week of &lt;date&gt;". In the PR
+description, list: which dossiers changed and why, any new ADRs created, any
+project that appeared in the log without a dossier, and every section still
+marked TBD that needs input from me.
+
+If no dossier needs updating, do not open a PR.</code></pre>
+  </div>
+
+  <div class="code">
+    <div class="code-head"><span class="code-path">Automation — 1st of month, monthly · model: GPT-5 mini</span><button class="copy">Copy</button></div>
+<pre><code>Run the archivist agent for the monthly pass. Apply log compression where the
+rules allow it, and open one pull request titled "Memory maintenance — &lt;month&gt;".
+
+The PR description must contain four checklists: contradictions found, stale
+dossiers, shipped projects missing a demo script or results, and retirement
+candidates. Apply no retirements yourself — I approve those individually.</code></pre>
+  </div>
+
+  <h3>Retention policy</h3>
+  <p>Worth writing into <code>memory/RETENTION.md</code> so the archivist has a rule to follow rather than a judgment to make.</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Content</th><th>Keep</th><th>Then</th></tr></thead>
+      <tbody>
+        <tr><td>Decisions and their reasoning (ADRs)</td><td class="cost">Forever</td><td>Never compressed, never deleted</td></tr>
+        <tr><td>Results, numbers, outcomes</td><td class="cost">Forever</td><td>Never compressed</td></tr>
+        <tr><td>Project dossiers</td><td class="cost">Forever</td><td>Retired ones compress to one page in <code>archive/</code></td></tr>
+        <tr><td>Demo scripts and gotchas</td><td class="cost">Forever</td><td>These are the whole point</td></tr>
+        <tr><td>Log entries</td><td class="cost">90 days full</td><td>Compress to 3 lines + pointer once captured in a dossier</td></tr>
+        <tr><td>Raw inbox files</td><td class="cost">Until processed</td><td>Delete once the log entry exists</td></tr>
+        <tr><td>Weekly digests</td><td class="cost">6 months</td><td>Delete — the underlying log and dossiers survive</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="memory-demo">
+  <p class="eyebrow">Worked example</p>
+  <h2>"Can you demo that anomaly tool you built?"</h2>
+  <div class="col">
+    <p>Four months on, no memory of the details, three days' notice. Here's the sequence end to end.</p>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <h4>Ask recall what you built</h4>
+      <p>Quick chat, recall agent: <em>"What was the anomaly detection tool? What does it do, how does it work, and what were the results?"</em> It reads INDEX.md, opens one dossier, and hands you back the answer with citations. Cost: under a cent. This is the moment the whole system pays for itself.</p>
+    </li>
+    <li>
+      <h4>Check what's rotted</h4>
+      <p><em>"What's stale or unverified in the anomaly-detection dossier? What would I get caught out on?"</em> Four months is long enough for the data source to have moved or the pilot numbers to be superseded. Better to find that now than on the call.</p>
+    </li>
+    <li>
+      <h4>Build the outline</h4>
+      <p>Deck-builder agent: <em>"Audience is the reliability team plus the ops superintendent. Twenty minutes with questions, so about eight slides. Goal is getting approval to extend the pilot to a second pad."</em> It returns slide-by-slide with speaker notes, sourced to the dossier, plus a list of the screenshots you need and honest NEEDS INPUT flags where the record is thin.</p>
+    </li>
+    <li>
+      <h4>Fill the gaps and generate</h4>
+      <p>Grab the flagged screenshots, answer the NEEDS INPUT items. Then hand the outline to Copilot to generate the actual file — a <code>python-pptx</code> script in the app is the reliable route, or M365 Copilot in PowerPoint if your template lives there. Either way you're generating from a reviewed outline, not from a vague prompt, which is the difference between a usable deck and a generic one.</p>
+    </li>
+    <li>
+      <h4>Feed the demo back in</h4>
+      <p>Afterward, drop the questions you got asked into <code>inbox/</code>. Audience questions are the best possible input for the gotchas section — they're the gaps in your explanation, found for free. Next time the dossier is better.</p>
+    </li>
+  </ol>
+
+  <div class="note">
+    <div class="panel-label">Why this works and a folder of old files doesn't</div>
+    <p>Not because the AI is clever. Because four months ago you wrote down <em>why</em> you chose the seasonal-decomposition baseline and <em>what</em> the pilot caught, in a fixed place with a fixed shape. The agent is just retrieval. The memory bank is the part that has to exist.</p>
+  </div>
+</section>
+
+<section id="memory-rules">
+  <p class="eyebrow">Making it stick</p>
+  <h2>Rules that keep it honest</h2>
+
+  <div class="split">
+    <div class="yes"><div class="panel">
+      <div class="panel-label">Do</div>
+      <ul>
+        <li>Review every memory PR, even briefly. Unreviewed memory decays into confident nonsense.</li>
+        <li>Keep the log append-only. It's your evidence when a dossier and your recollection disagree.</li>
+        <li>Cite sources inside dossiers so any claim can be traced back.</li>
+        <li>Write the demo script while it's fresh, however rough.</li>
+        <li>Record what you rejected, not just what you chose.</li>
+        <li>Start with three projects, not your whole history.</li>
+      </ul>
+    </div></div>
+    <div class="no"><div class="panel">
+      <div class="panel-label">Don't</div>
+      <ul>
+        <li>Let an agent delete anything. Compress, archive, or flag.</li>
+        <li>Let the scribe write your demo script or invent results.</li>
+        <li>Backfill five years of history before the system has proven itself.</li>
+        <li>Store credentials, personal data, or anything confidential — same governance box as Part one, and it applies harder here because this is designed to persist.</li>
+        <li>Point a recall query at the whole repo. Index first, always.</li>
+        <li>Let dossiers and INDEX.md drift apart — that's what breaks retrieval.</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <h3>Bootstrapping without the backlog</h3>
+  <p>Don't try to reconstruct everything. Write dossiers for the two or three projects you're most likely to be asked about, from memory, in about twenty minutes each — TBD everywhere you can't recall. Then let the weekly rhythm fill in going forward. In three months you'll have a real bank; in a year you'll have something you'd genuinely miss.</p>
+
+  <div class="stop">
+    <div class="panel-label">One caution specific to memory</div>
+    <p>A memory bank is designed to outlive the context it was written in, which makes AI-generated inaccuracies far more dangerous here than in a throwaway summary. A wrong number in a status update is noticed that week. A wrong number in a dossier gets quoted confidently to a superintendent four months later. That's why every fact carries a citation, why the scribe can't write results, and why you review the PRs.</p>
+  </div>
+</section>
+</main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="panel-label">Copilot sources — GitHub Docs, retrieved 21 August 2026</div>
+    <ul>
+      <li><a href="https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing" target="_blank" rel="noopener noreferrer">Models and pricing for GitHub Copilot</a> — the live rate table behind the catalog tab. Check this before trusting any number here.</li>
+      <li><a href="https://docs.github.com/en/copilot/reference/ai-models/model-comparison" target="_blank" rel="noopener noreferrer">AI model comparison</a> · <a href="https://docs.github.com/en/copilot/concepts/agents/github-copilot-app" target="_blank" rel="noopener noreferrer">About the GitHub Copilot app</a> · <a href="https://docs.github.com/en/copilot/tutorials/optimize-ai-usage" target="_blank" rel="noopener noreferrer">Optimizing your AI usage</a></li>
+      <li><a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-automations" target="_blank" rel="noopener noreferrer">About Copilot automations</a> · <a href="https://docs.github.com/en/copilot/reference/custom-agents-configuration" target="_blank" rel="noopener noreferrer">Custom agents configuration</a></li>
+    </ul>
+    <p style="max-width:70ch">Model names, prices, and promotional rates change frequently, and the Power BI project formats are still moving toward general availability. Treat every number and every format claim here as a snapshot dated 21 August 2026.</p>
+  </div>
+</footer>
+
+</div><!-- /#app -->
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- in-page anchor scroll fallback ----------
+     Some preview/webview renderers swallow the browser's native fragment
+     jump for <a href="#id">. This gives every such link a second, JS-driven
+     path to the same result, without removing the native href so it still
+     works anywhere the default behaviour is fine. */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var id = a.getAttribute('href').slice(1);
+      var target = id ? document.getElementById(id) : null;
+      if (!target) return;
+      e.preventDefault();
+      var top = target.getBoundingClientRect().top + window.pageYOffset - 110;
+      window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+
+
+  /* ---------- catalog data: USD per 1M tokens ---------- */
+  var MODELS = [
+    {v:"OpenAI", n:"GPT-5 mini",            c:"Lightweight", i:0.25,  cin:0.025, cw:null,  o:2.00},
+    {v:"OpenAI", n:"GPT-5.3-Codex",         c:"Powerful",    i:1.75,  cin:0.175, cw:null,  o:14.00},
+    {v:"OpenAI", n:"GPT-5.4",               c:"Versatile",   i:2.50,  cin:0.25,  cw:null,  o:15.00, note:"Long context >272K: 5.00 / 22.50"},
+    {v:"OpenAI", n:"GPT-5.4 mini",          c:"Lightweight", i:0.75,  cin:0.075, cw:null,  o:4.50},
+    {v:"OpenAI", n:"GPT-5.4 nano",          c:"Lightweight", i:0.20,  cin:0.02,  cw:null,  o:1.25},
+    {v:"OpenAI", n:"GPT-5.5",               c:"Powerful",    i:5.00,  cin:0.50,  cw:null,  o:30.00, note:"Long context >272K: 10.00 / 45.00"},
+    {v:"OpenAI", n:"GPT-5.6 Luna",          c:"Lightweight", i:0.20,  cin:0.02,  cw:0.25,  o:1.20,  note:"Long context >200K: 0.40 / 1.80"},
+    {v:"OpenAI", n:"GPT-5.6 Sol",           c:"Powerful",    i:2.50,  cin:0.25,  cw:3.125, o:15.00, note:"Promo −50% to 3 Sep 2026 · long >272K: 5.00 / 22.50"},
+    {v:"OpenAI", n:"GPT-5.6 Terra",         c:"Versatile",   i:2.00,  cin:0.20,  cw:2.50,  o:12.00, note:"Long context >272K: 4.00 / 18.00"},
+
+    {v:"Anthropic", n:"Claude Haiku 4.5",   c:"Versatile",   i:1.00,  cin:0.10,  cw:1.25,  o:5.00},
+    {v:"Anthropic", n:"Claude Sonnet 4",    c:"Versatile",   i:3.00,  cin:0.30,  cw:3.75,  o:15.00},
+    {v:"Anthropic", n:"Claude Sonnet 4.5",  c:"Versatile",   i:3.00,  cin:0.30,  cw:3.75,  o:15.00},
+    {v:"Anthropic", n:"Claude Sonnet 4.6",  c:"Versatile",   i:3.00,  cin:0.30,  cw:3.75,  o:15.00},
+    {v:"Anthropic", n:"Claude Sonnet 5",    c:"Versatile",   i:2.00,  cin:0.20,  cw:2.50,  o:10.00},
+    {v:"Anthropic", n:"Claude Opus 4.5",    c:"Powerful",    i:5.00,  cin:0.50,  cw:6.25,  o:25.00},
+    {v:"Anthropic", n:"Claude Opus 4.6",    c:"Powerful",    i:5.00,  cin:0.50,  cw:6.25,  o:25.00},
+    {v:"Anthropic", n:"Claude Opus 4.7",    c:"Powerful",    i:5.00,  cin:0.50,  cw:6.25,  o:25.00},
+    {v:"Anthropic", n:"Claude Opus 4.8",    c:"Powerful",    i:5.00,  cin:0.50,  cw:6.25,  o:25.00},
+    {v:"Anthropic", n:"Claude Opus 5",      c:"Powerful",    i:5.00,  cin:0.50,  cw:6.25,  o:25.00},
+    {v:"Anthropic", n:"Claude Opus 4.8 fast mode", c:"Powerful", i:10.00, cin:1.00, cw:12.50, o:50.00, note:"Preview"},
+    {v:"Anthropic", n:"Claude Fable 5",     c:"Powerful",    i:10.00, cin:1.00,  cw:12.50, o:50.00},
+
+    {v:"Google", n:"Gemini 3.1 Pro",        c:"Powerful",    i:2.00,  cin:0.20,  cw:null,  o:12.00, note:"Public preview · long >200K: 4.00 / 18.00"},
+    {v:"Google", n:"Gemini 3.5 Flash",      c:"Lightweight", i:1.50,  cin:0.15,  cw:null,  o:9.00},
+    {v:"Google", n:"Gemini 3.6 Flash",      c:"Versatile",   i:0.75,  cin:0.075, cw:null,  o:3.75,  note:"Promo rate to 31 Dec 2026"},
+    {v:"Google", n:"Gemini 3.7 Flash",      c:"Versatile",   i:0.75,  cin:0.075, cw:null,  o:3.75,  note:"Promo rate to 31 Dec 2026"},
+
+    {v:"xAI", n:"Grok 4.5",                 c:"Versatile",   i:2.00,  cin:0.50,  cw:null,  o:6.00,  note:"Long context >200K: 4.00 / 12.00"},
+    {v:"xAI", n:"Grok 4.6",                 c:"Versatile",   i:2.00,  cin:0.50,  cw:null,  o:6.00,  note:"Long context >200K: 4.00 / 12.00"},
+
+    {v:"Microsoft", n:"MAI-Code-1-Flash",   c:"Lightweight", i:0.75,  cin:0.075, cw:null,  o:4.50},
+    {v:"Microsoft", n:"MAI-Code-1.1-Flash", c:"Lightweight", i:0.20,  cin:0.02,  cw:null,  o:1.20},
+
+    {v:"GitHub", n:"Raptor mini",           c:"Versatile",   i:0.25,  cin:0.025, cw:null,  o:2.00},
+
+    {v:"Moonshot AI", n:"Kimi K2.7 Code",   c:"Versatile",   i:0.95,  cin:0.19,  cw:null,  o:4.00},
+    {v:"Moonshot AI", n:"Kimi K3",          c:"Powerful",    i:3.00,  cin:0.30,  cw:null,  o:15.00, note:"See GitHub's model-specific safety note"}
+  ];
+
+  var VENDOR_ORDER = ["OpenAI","Anthropic","Google","xAI","Microsoft","GitHub","Moonshot AI"];
+  var sortMode = "vendor";
+
+  function money(x){
+    if (x >= 1) return "$" + x.toFixed(2);
+    if (x >= 0.01) return "$" + x.toFixed(3);
+    return "$" + x.toFixed(4);
+  }
+  function rate(x){ return x === null ? "—" : "$" + x.toFixed(x < 1 ? 3 : 2); }
+
+  function runCost(m, inTok, outTok, cacheShare){
+    var fresh = inTok * (1 - cacheShare);
+    var cached = inTok * cacheShare;
+    var cinRate = (m.cin === null ? m.i : m.cin);
+    return (fresh / 1e6) * m.i + (cached / 1e6) * cinRate + (outTok / 1e6) * m.o;
+  }
+
+  function render(){
+    var inTok  = Math.max(0, +document.getElementById('in-tok').value || 0);
+    var outTok = Math.max(0, +document.getElementById('out-tok').value || 0);
+    var runs   = Math.max(0, +document.getElementById('runs').value || 0);
+    var share  = +document.getElementById('cache').value || 0;
+    var body = document.getElementById('catalog-body');
+    if (!body) return;
+    body.innerHTML = "";
+
+    var rows = MODELS.map(function(m){
+      var per = runCost(m, inTok, outTok, share);
+      return { m:m, per:per, month:per * runs };
+    });
+
+    if (sortMode === "cost") {
+      rows.sort(function(a,b){ return a.per - b.per; });
+      rows.forEach(function(r){ body.appendChild(rowEl(r)); });
+    } else {
+      VENDOR_ORDER.forEach(function(v){
+        var group = rows.filter(function(r){ return r.m.v === v; });
+        if (!group.length) return;
+        var head = document.createElement('tr');
+        head.className = 'vendor-head';
+        var td = document.createElement('td');
+        td.colSpan = 8; td.textContent = v;
+        head.appendChild(td); body.appendChild(head);
+        group.forEach(function(r){ body.appendChild(rowEl(r)); });
+      });
+    }
+  }
+
+  function rowEl(r){
+    var m = r.m;
+    var tr = document.createElement('tr');
+    var cls = m.o >= 25 ? 'top' : (m.o >= 12 ? 'high' : (m.o >= 5 ? 'mid' : 'low'));
+    var nameCell = '<td class="model"><span class="dot ' + cls + '"></span>' + m.n +
+        (m.note ? '<br><span style="font-family:var(--body);font-size:11.5px;color:var(--ink-soft);white-space:normal;display:inline-block;max-width:34ch">' + m.note + '</span>' : '') + '</td>';
+    tr.innerHTML =
+      nameCell +
+      '<td><span class="tag">' + m.c + '</span></td>' +
+      '<td class="cost">' + rate(m.i) + '</td>' +
+      '<td class="cost">' + rate(m.cin) + '</td>' +
+      '<td class="cost">' + rate(m.cw) + '</td>' +
+      '<td class="cost">' + rate(m.o) + '</td>' +
+      '<td class="you">' + money(r.per) + '</td>' +
+      '<td class="you">' + money(r.month) + '</td>';
+    return tr;
+  }
+
+  ['in-tok','out-tok','runs','cache'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', render);
+  });
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.getElementById('in-tok').value  = b.dataset.in;
+      document.getElementById('out-tok').value = b.dataset.out;
+      document.getElementById('runs').value    = b.dataset.runs;
+      render();
+    });
+  });
+  document.querySelectorAll('.sort').forEach(function(b){
+    b.addEventListener('click', function(){
+      sortMode = b.dataset.sort;
+      document.querySelectorAll('.sort').forEach(function(x){
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      render();
+    });
+  });
+  render();
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var block = btn.closest('.code');
+      var text = block ? block.querySelector('pre').innerText : '';
+      var done = function(){
+        btn.textContent = 'Copied'; btn.classList.add('done');
+        setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+      } else { fallback(text, done); }
+    });
+  });
+  function fallback(text, done){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- gauge bars ----------
+     Widths are already set inline in the HTML so they render with zero JS.
+     This is only a safety re-assert; there is no fade-in system anymore,
+     so no element on this page is ever set to opacity:0. */
+  document.querySelectorAll('.row-bar').forEach(function(b){
+    if (b.dataset.w) b.style.width = b.dataset.w + '%';
+  });
+
+})();
+</script>
+</body>
+</html>
