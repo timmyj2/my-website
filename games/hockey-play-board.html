@@ -192,7 +192,7 @@ window.addEventListener('error', function(e){
      3. rink drawing
      4. ops model + undo/redo
      5. ink rendering (replay ops onto a context)
-     6. pointer input state machine
+     6. touch/mouse input state machine
      7. toolbar wiring
      8. export / print
      9. boot
@@ -474,15 +474,23 @@ function redrawInk(){
   ictx.globalCompositeOperation = 'source-over';
 }
 
-/* ------------------------------------------------------- 6. pointer input */
+/* --------------------------------------------------------- 6. touch/mouse input */
+
+/* Raw touchstart/touchmove/touchend with {passive:false} + preventDefault(),
+   matching every other game on this site — Pointer Events were tried first
+   but iOS Safari does not reliably honor preventDefault() on pointer events
+   to block page scroll/bounce, even with touch-action:none. This pattern is
+   the proven one. */
 
 let dragState = null;
+let activeTouchId = null;
+let mouseDown = false;
 
-function toLogical(e){
+function toLogical(clientX, clientY){
   const rect = inkCv.getBoundingClientRect();
   return {
-    x: (e.clientX - rect.left) / rect.width  * RINK_W,
-    y: (e.clientY - rect.top)  / rect.height * RINK_H
+    x: (clientX - rect.left) / rect.width  * RINK_W,
+    y: (clientY - rect.top)  / rect.height * RINK_H
   };
 }
 function renderLive(){
@@ -491,11 +499,8 @@ function renderLive(){
     renderOp(ictx, dragState);
   }
 }
-function onPointerDown(e){
-  e.preventDefault();
-  try{ inkCv.setPointerCapture(e.pointerId); }catch(_){}
-  const p = toLogical(e);
-
+function beginDrag(clientX, clientY){
+  const p = toLogical(clientX, clientY);
   if(tool === 'pen' || tool === 'eraser'){
     snapshotForUndo();
     dragState = {kind:'stroke', type:tool, color: tool==='eraser' ? '#000' : color, width:WIDTHS[widthIdx], points:[[p.x,p.y]]};
@@ -510,10 +515,9 @@ function onPointerDown(e){
   }
   renderLive();
 }
-function onPointerMove(e){
+function moveDrag(clientX, clientY){
   if(!dragState) return;
-  e.preventDefault();
-  const p = toLogical(e);
+  const p = toLogical(clientX, clientY);
   if(dragState.kind === 'stroke'){
     const last = dragState.points[dragState.points.length-1];
     if(Math.hypot(p.x-last[0], p.y-last[1]) > 2) dragState.points.push([p.x, p.y]);
@@ -524,9 +528,8 @@ function onPointerMove(e){
   }
   renderLive();
 }
-function onPointerUp(e){
+function endDrag(){
   if(!dragState) return;
-  e.preventDefault();
   if(dragState.kind === 'stroke'){
     let pts = dragState.points;
     if(pts.length === 1) pts = [pts[0], pts[0]];
@@ -539,12 +542,51 @@ function onPointerUp(e){
   redrawInk();
   writeSave();
   updateUndoRedoButtons();
-  try{ inkCv.releasePointerCapture(e.pointerId); }catch(_){}
 }
-inkCv.addEventListener('pointerdown', onPointerDown);
-inkCv.addEventListener('pointermove', onPointerMove);
-inkCv.addEventListener('pointerup', onPointerUp);
-inkCv.addEventListener('pointercancel', onPointerUp);
+function findTouch(list, id){
+  for(let i=0;i<list.length;i++) if(list[i].identifier === id) return list[i];
+  return null;
+}
+
+inkCv.addEventListener('touchstart', function(e){
+  e.preventDefault();
+  if(activeTouchId !== null) return;
+  const t = e.changedTouches[0];
+  activeTouchId = t.identifier;
+  beginDrag(t.clientX, t.clientY);
+}, {passive:false});
+inkCv.addEventListener('touchmove', function(e){
+  e.preventDefault();
+  if(activeTouchId === null) return;
+  const t = findTouch(e.changedTouches, activeTouchId) || findTouch(e.touches, activeTouchId);
+  if(!t) return;
+  moveDrag(t.clientX, t.clientY);
+}, {passive:false});
+function onTouchEnd(e){
+  e.preventDefault();
+  if(activeTouchId === null) return;
+  const t = findTouch(e.changedTouches, activeTouchId);
+  if(!t) return;
+  activeTouchId = null;
+  endDrag();
+}
+inkCv.addEventListener('touchend', onTouchEnd, {passive:false});
+inkCv.addEventListener('touchcancel', onTouchEnd, {passive:false});
+
+inkCv.addEventListener('mousedown', function(e){
+  e.preventDefault();
+  mouseDown = true;
+  beginDrag(e.clientX, e.clientY);
+});
+window.addEventListener('mousemove', function(e){
+  if(!mouseDown) return;
+  moveDrag(e.clientX, e.clientY);
+});
+window.addEventListener('mouseup', function(){
+  if(!mouseDown) return;
+  mouseDown = false;
+  endDrag();
+});
 
 /* -------------------------------------------------------- 7. toolbar UI */
 
