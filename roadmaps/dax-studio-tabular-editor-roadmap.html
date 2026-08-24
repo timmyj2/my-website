@@ -588,23 +588,41 @@ SUMMARIZECOLUMNS (
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">Twenty measures × five time-intelligence variants = a hundred-measure model nobody wants to maintain. A calculation group replaces the whole grid with one set of calculation items. Tabular Editor was the original home of calc groups, and it's still the most comfortable place to build them.</p>
+      <p class="blurb">20 measures × 5 time-intelligence variants = 100 measures nobody wants to maintain. A calc group replaces the whole grid with one set of calculation items.</p>
+      <div class="diagram" aria-hidden="true">
+        <svg viewBox="0 0 300 70">
+          <g fill="none" stroke="var(--dim)" stroke-width="1.3" opacity=".55">
+            <rect x="10" y="8" width="10" height="10"/><rect x="24" y="8" width="10" height="10"/><rect x="38" y="8" width="10" height="10"/><rect x="52" y="8" width="10" height="10"/><rect x="66" y="8" width="10" height="10"/>
+            <rect x="10" y="22" width="10" height="10"/><rect x="24" y="22" width="10" height="10"/><rect x="38" y="22" width="10" height="10"/><rect x="52" y="22" width="10" height="10"/><rect x="66" y="22" width="10" height="10"/>
+            <rect x="10" y="36" width="10" height="10"/><rect x="24" y="36" width="10" height="10"/><rect x="38" y="36" width="10" height="10"/><rect x="52" y="36" width="10" height="10"/><rect x="66" y="36" width="10" height="10"/>
+            <rect x="10" y="50" width="10" height="10"/><rect x="24" y="50" width="10" height="10"/><rect x="38" y="50" width="10" height="10"/><rect x="52" y="50" width="10" height="10"/><rect x="66" y="50" width="10" height="10"/>
+          </g>
+          <path d="M100,32 H150" stroke="var(--dim)" stroke-width="1.6" fill="none"/>
+          <path d="M140,26 L150,32 L140,38" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <g fill="var(--azure)" opacity=".55" stroke="var(--azure)" stroke-width="1.3">
+            <rect x="170" y="8" width="14" height="12" rx="2"/>
+            <rect x="170" y="24" width="14" height="12" rx="2"/>
+            <rect x="170" y="40" width="14" height="12" rx="2"/>
+            <rect x="192" y="16" width="14" height="12" rx="2"/>
+            <rect x="192" y="32" width="14" height="12" rx="2"/>
+          </g>
+        </svg>
+        <div class="diagram-cap"><span>20 measures &times; 5 variants</span><span>1 calc group, 5 items</span></div>
+      </div>
       <p class="gh">Learn this</p>
       <ul class="checks">
-        <li><label><input type="checkbox" data-k="b9-1"><span>Build a time-intelligence calculation group (YTD, PY, YoY %) using <code>SELECTEDMEASURE()</code> and apply it to a real report</span></label></li>
-        <li><label><input type="checkbox" data-k="b9-2"><span>Add format string expressions so YoY % formats as a percent while base measures stay currency</span></label></li>
-        <li><label><input type="checkbox" data-k="b9-3"><span>Understand precedence when multiple calc groups exist, and the sharp edges: non-additive measures and measure filters</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-1"><span>Build a time-intelligence calc group (YTD, PY, YoY %) with <code>SELECTEDMEASURE()</code>, apply it to a real report</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-2"><span>Add format string expressions so YoY % shows as a percent while base measures stay currency</span></label></li>
+        <li><label><input type="checkbox" data-k="b9-3"><span>Know precedence across multiple calc groups, and the sharp edges: non-additive measures, measure filters</span></label></li>
         <li><label><input type="checkbox" data-k="b9-4"><span>Use perspectives to give different audiences a trimmed view of one model</span></label></li>
         <li><label><input type="checkbox" data-k="b9-5"><span>Explore metadata translations and object-level security — both live naturally in the TE tree</span></label></li>
       </ul>
       <p class="gh">Go deeper</p>
       <ul class="links">
-        <li><a href="https://www.sqlbi.com/calculation-groups/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SQLBI calculation groups hub — the definitive article series, start to finish</span><span class="dom">sqlbi.com</span></a></li>
-        <li><a href="https://dax.guide/st/selectedmeasure/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SELECTEDMEASURE and friends — the calc-item function family on DAX Guide</span><span class="dom">dax.guide</span></a></li>
-        <li><a href="https://www.daxpatterns.com/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">DAX Patterns: time intelligence — the measure logic your calc items will wrap</span><span class="dom">daxpatterns.com</span></a></li>
-        <li><a href="https://www.sqlbi.com/p/dax-tools-video-course/" target="_blank" rel="noopener"><span class="tag course">Course</span><span class="lt">DAX Tools course — includes building a calc group in Tabular Editor on camera</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/calculation-groups/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SQLBI calculation groups hub — definitive series</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://dax.guide/st/selectedmeasure/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SELECTEDMEASURE and friends on DAX Guide</span><span class="dom">dax.guide</span></a></li>
       </ul>
-      <div class="tip"><b>Field note</b>Prototype calc groups on a copy of the model first — they change how every measure in the report behaves under that group's filter, and it's much easier to reason about the blast radius in a sandbox.</div>
+      <div class="tip"><b>Field note</b>Prototype on a copy first — a calc group changes how every measure behaves under its filter.</div>
     </div>
   </div>
 
@@ -618,27 +636,37 @@ SUMMARIZECOLUMNS (
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">The endgame: models in source control, best-practice checks running in a pipeline, and deployments nobody does by hand. And since TE3 lands on your desk at the end of the year — this section doubles as your upgrade prep. Everything you've built (scripts, macros, BPA rules) carries straight over.</p>
+      <p class="blurb">The endgame: models in source control, BPA in a pipeline, deployments nobody does by hand. TE3 lands end of year — scripts, macros, and BPA rules carry straight over.</p>
+      <div class="diagram" aria-hidden="true">
+        <svg viewBox="0 0 300 60">
+          <rect x="6" y="18" width="76" height="26" rx="5" fill="none" stroke="var(--acc)" stroke-width="1.8"/>
+          <path d="M86,31 H112" stroke="var(--dim)" stroke-width="1.6" fill="none"/>
+          <path d="M104,25 L112,31 L104,37" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="114" y="14" width="80" height="34" rx="5" fill="none" stroke="var(--amber)" stroke-width="1.8" stroke-dasharray="3 3"/>
+          <path d="M198,31 H224" stroke="var(--dim)" stroke-width="1.6" fill="none"/>
+          <path d="M216,25 L224,31 L216,37" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="226" y="18" width="70" height="26" rx="5" fill="none" stroke="var(--ok)" stroke-width="1.8"/>
+        </svg>
+        <div class="diagram-cap"><span>Model (TMDL, git)</span><span>BPA gate</span><span>Deploy</span></div>
+      </div>
       <p class="gh">Learn this</p>
       <ul class="checks">
-        <li><label><input type="checkbox" data-k="b10-1"><span>Run the TE2 command line once by hand: load a model, execute a script, run BPA with <code>-A</code>, and read the violation output</span></label></li>
-        <li><label><input type="checkbox" data-k="b10-2"><span>Understand TMDL — the readable, folder-per-object model format that makes git diffs and PR reviews actually work</span></label></li>
-        <li><label><input type="checkbox" data-k="b10-3"><span>Save a model as a Power BI Project (.pbip) with TMDL and put it in a repo; make one change and read the diff</span></label></li>
-        <li><label><input type="checkbox" data-k="b10-4"><span>Sketch a CI gate: pipeline fails if BPA reports errors — even a local batch file counts as a first version</span></label></li>
-        <li><label><input type="checkbox" data-k="b10-5"><span>Preview TE3: the DAX debugger, DAX query editor with traces, diagram view, built-in VertiPaq analysis, and workspace mode</span></label></li>
-        <li><label><input type="checkbox" data-k="b10-6"><span>Plan your upgrade week: import your macros and BPA rules, remap muscle memory, and note the TE3-only panes you want to master first</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-1"><span>Run the TE2 command line once by hand: load a model, execute a script, run BPA with <code>-A</code>, read the violation output</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-2"><span>Understand TMDL — the readable, folder-per-object format that makes git diffs and PR reviews work</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-3"><span>Save a model as a Power BI Project (.pbip) with TMDL, put it in a repo; make one change and read the diff</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-4"><span>Sketch a CI gate: pipeline fails if BPA reports errors — even a local batch file counts as v1</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-5"><span>Preview TE3: DAX debugger, DAX query editor with traces, diagram view, built-in VertiPaq, workspace mode</span></label></li>
+        <li><label><input type="checkbox" data-k="b10-6"><span>Plan your upgrade week: import macros and BPA rules, note the TE3-only panes to master first</span></label></li>
       </ul>
       <pre><code><span class="cm">:: BPA as a quality gate (TE2 CLI, runs free — no TE3 license needed in pipelines)</span>
 start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class="st">"Rules\BPARules.json"</span> -V</code></pre>
       <p class="gh">Go deeper</p>
       <ul class="links">
-        <li><a href="https://docs.tabulareditor.com/en/features/Command-line-Options.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Command-line options — TE2 CLI flags, pipeline examples, and the new cross-platform CLI</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TMDL overview — the model-as-code format explained</span><span class="dom">learn.microsoft.com</span></a></li>
-        <li><a href="https://docs.tabulareditor.com/en/index.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE2 vs TE3 — the official side-by-side feature table</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://docs.tabulareditor.com/en/getting-started/index.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE3 onboarding guide — the official new-user path for when your license arrives</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://tabulareditor.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">tabulareditor.com — TE3 editions, blog, and release announcements</span><span class="dom">tabulareditor.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/en/features/Command-line-Options.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Command-line options — CLI flags, pipeline examples</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TMDL overview — the model-as-code format</span><span class="dom">learn.microsoft.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/en/getting-started/index.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE3 onboarding guide — for when your license arrives</span><span class="dom">docs.tabulareditor.com</span></a></li>
       </ul>
-      <div class="tip"><b>Field note</b>Best possible position for the TE3 handover: arrive fluent in TE2 scripting and BPA. TE3 doesn't replace those skills — it wraps them in a real IDE (IntelliSense, debugger, integrated traces) so the ceiling gets higher, not different.</div>
+      <div class="tip"><b>Field note</b>Arrive at TE3 fluent in TE2 scripting and BPA — TE3 wraps those skills in a real IDE, raising the ceiling, not replacing it.</div>
     </div>
   </div>
 </section>
@@ -650,7 +678,7 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
   <div class="pbanner">
     <p class="pk">Part C &middot; The ecosystem</p>
     <h2>Ship it &mdash; the wider toolbelt and a capstone tune-up</h2>
-    <p class="pdesc">DAX Studio and Tabular Editor sit inside a small, excellent ecosystem of free tools and a community that publishes its best tricks. This part rounds out the toolbelt, then puts everything together on a real model.</p>
+    <p class="pdesc">A small ecosystem of free tools rounds out the big two, backed by a community that publishes its best tricks. This part covers both, then puts it all together on a real model.</p>
     <div class="motif" aria-hidden="true">
       <svg viewBox="0 0 220 34">
         <defs><linearGradient id="mixGrad" x1="0" y1="0" x2="220" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2a33c"/><stop offset="1" stop-color="#41a4e8"/></linearGradient></defs>
@@ -670,7 +698,14 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">Each of these does one job extremely well and pairs with the big two: ALM Toolkit compares and promotes models, Bravo handles date tables and quick size analysis, Measure Killer finds what's actually unused, and the community keeps publishing the playbook for free.</p>
+      <p class="blurb">Each tool does one job well and pairs with the big two — the row below is the whole division of labor.</p>
+      <div class="iconrow" aria-hidden="true">
+        <div class="icell"><svg viewBox="0 0 28 28"><circle cx="12" cy="12" r="7" fill="none" stroke="var(--amber)" stroke-width="2"/><line x1="17" y1="17" x2="24" y2="24" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/></svg><span>Diagnose</span></div>
+        <div class="icell"><svg viewBox="0 0 28 28"><path d="M6,22 L8,17 L18,7 L21,10 L11,20 Z" fill="none" stroke="var(--azure)" stroke-width="2" stroke-linejoin="round"/><line x1="16" y1="9" x2="19" y2="12" stroke="var(--azure)" stroke-width="2"/></svg><span>Change</span></div>
+        <div class="icell"><svg viewBox="0 0 28 28"><path d="M6,10 H18 M18,10 L14,6 M18,10 L14,14" fill="none" stroke="var(--acc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22,18 H10 M10,18 L14,14 M10,18 L14,22" fill="none" stroke="var(--acc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Promote</span></div>
+        <div class="icell"><svg viewBox="0 0 28 28"><rect x="5" y="7" width="18" height="16" rx="2" fill="none" stroke="var(--acc)" stroke-width="2"/><line x1="5" y1="12" x2="23" y2="12" stroke="var(--acc)" stroke-width="2"/><line x1="9" y1="4" x2="9" y2="9" stroke="var(--acc)" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="4" x2="19" y2="9" stroke="var(--acc)" stroke-width="2" stroke-linecap="round"/></svg><span>Chores</span></div>
+        <div class="icell"><svg viewBox="0 0 28 28"><path d="M6,9 H22 M11,9 V6 H17 V9 M8,9 L9.5,23 H18.5 L20,9" fill="none" stroke="var(--dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="13" x2="12.5" y2="20" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/><line x1="16" y1="13" x2="15.5" y2="20" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round"/></svg><span>Cleanup</span></div>
+      </div>
       <p class="gh">Learn this</p>
       <ul class="checks">
         <li><label><input type="checkbox" data-k="c11-1"><span>Install ALM Toolkit and diff two versions of the same model — then push one changed measure between them</span></label></li>
@@ -681,23 +716,17 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
       </ul>
       <p class="gh">The tools</p>
       <ul class="links">
-        <li><a href="http://alm-toolkit.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">ALM Toolkit — schema compare and selective deploy between models</span><span class="dom">alm-toolkit.com</span></a></li>
-        <li><a href="https://bravo.bi/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">Bravo for Power BI — analyze size, format DAX, build date tables, export data</span><span class="dom">bravo.bi</span></a></li>
-        <li><a href="https://www.brunner.bi/measurekiller" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">Measure Killer — find and remove unused measures and columns safely</span><span class="dom">brunner.bi</span></a></li>
-        <li><a href="https://www.daxformatter.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">DAX Formatter — paste ugly DAX, get readable DAX</span><span class="dom">daxformatter.com</span></a></li>
-        <li><a href="https://www.sqlbi.com/tools/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">SQLBI tools index — incl. Contoso Data Generator for practice models of any size</span><span class="dom">sqlbi.com</span></a></li>
-        <li><a href="https://github.com/microsoft/semantic-link-labs" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Semantic Link Labs — the same automation ideas in Fabric notebooks, for when your work heads that way</span><span class="dom">github.com</span></a></li>
+        <li><a href="http://alm-toolkit.com/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">ALM Toolkit — schema compare, selective deploy</span><span class="dom">alm-toolkit.com</span></a></li>
+        <li><a href="https://bravo.bi/" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">Bravo — size analysis, DAX format, date tables</span><span class="dom">bravo.bi</span></a></li>
+        <li><a href="https://www.brunner.bi/measurekiller" target="_blank" rel="noopener"><span class="tag tool">Tool</span><span class="lt">Measure Killer — find unused measures &amp; columns</span><span class="dom">brunner.bi</span></a></li>
       </ul>
       <p class="gh">The community</p>
       <ul class="links">
-        <li><a href="https://www.sqlbi.com/articles/tools-in-power-bi/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Tools in Power BI — SQLBI's map of every tool across the model lifecycle</span><span class="dom">sqlbi.com</span></a></li>
-        <li><a href="https://www.youtube.com/@GuyInACube" target="_blank" rel="noopener"><span class="tag video">Video</span><span class="lt">Guy in a Cube — weekly, practical, and current</span><span class="dom">youtube.com</span></a></li>
-        <li><a href="https://data-goblins.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins — Kurt Buhler's illustrated deep work on models and tooling</span><span class="dom">data-goblins.com</span></a></li>
-        <li><a href="https://powerbi.tips/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">PowerBI.tips — tools, layouts, and the Explicit Measures podcast</span><span class="dom">powerbi.tips</span></a></li>
-        <li><a href="https://community.fabric.microsoft.com/" target="_blank" rel="noopener"><span class="tag blog">Forum</span><span class="lt">Fabric Community — where the product team and MVPs answer</span><span class="dom">community.fabric.microsoft.com</span></a></li>
-        <li><a href="https://www.reddit.com/r/PowerBI/" target="_blank" rel="noopener"><span class="tag blog">Forum</span><span class="lt">r/PowerBI — honest war stories and quick sanity checks</span><span class="dom">reddit.com</span></a></li>
+        <li><a href="https://www.sqlbi.com/articles/tools-in-power-bi/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Tools in Power BI — SQLBI's map of the lifecycle</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://www.youtube.com/@GuyInACube" target="_blank" rel="noopener"><span class="tag video">Video</span><span class="lt">Guy in a Cube — weekly, practical, current</span><span class="dom">youtube.com</span></a></li>
+        <li><a href="https://data-goblins.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins — illustrated model deep dives</span><span class="dom">data-goblins.com</span></a></li>
       </ul>
-      <div class="tip"><b>Field note</b>Rough division of labor: DAX Studio diagnoses, Tabular Editor changes, ALM Toolkit promotes, Bravo does the chores, Measure Killer takes out the trash. One job each — that's why they're all still on the ribbon.</div>
+      <div class="tip"><b>Field note</b>One job each — that's why they're all still on the ribbon.</div>
     </div>
   </div>
 
@@ -707,21 +736,36 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
       <span class="snum">C12</span>
       <span class="stitle"><h3>Capstone — the full model tune-up</h3><span class="ssub">One real model, both tools, before-and-after receipts</span></span>
       <span class="lvl proj">Project</span>
-      <span class="cnt">0/8</span>
+      <span class="cnt">0/11</span>
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">Pick a real model you own — ideally one that's a little slow and a little messy (every shop has one). Run the full loop: measure in DAX Studio, refactor in Tabular Editor, verify in DAX Studio, and finish with a one-page before/after write-up. This is the exercise that makes both tools permanent.</p>
+      <p class="blurb">Pick a real model — a little slow, a little messy. Run the loop: measure, fix, verify, write up before/after. This is what makes both tools permanent.</p>
+      <div class="diagram" aria-hidden="true">
+        <svg viewBox="0 0 320 50">
+          <rect x="4" y="14" width="66" height="22" rx="5" fill="none" stroke="var(--amber)" stroke-width="1.8"/>
+          <path d="M74,25 H94" stroke="var(--dim)" stroke-width="1.6"/>
+          <path d="M87,20 L94,25 L87,30" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="96" y="14" width="66" height="22" rx="5" fill="none" stroke="var(--azure)" stroke-width="1.8"/>
+          <path d="M166,25 H186" stroke="var(--dim)" stroke-width="1.6"/>
+          <path d="M179,20 L186,25 L179,30" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="188" y="14" width="66" height="22" rx="5" fill="none" stroke="var(--amber)" stroke-width="1.8"/>
+          <path d="M258,25 H278" stroke="var(--dim)" stroke-width="1.6"/>
+          <path d="M271,20 L278,25 L271,30" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="280" y="14" width="36" height="22" rx="5" fill="none" stroke="var(--ok)" stroke-width="1.8"/>
+        </svg>
+        <div class="diagram-cap"><span>Measure</span><span>Fix</span><span>Verify</span><span>Ship</span></div>
+      </div>
       <p class="gh">The mission</p>
       <ul class="steps">
-        <li><label><input type="checkbox" data-k="c12-1"><span><b>Baseline it.</b> Export a .vpax in DAX Studio. Record total model size, top 5 columns by size, and their cardinality.</span></label></li>
-        <li><label><input type="checkbox" data-k="c12-2"><span><b>Find the pain.</b> Run Performance Analyzer on the report, copy the two slowest visual queries into DAX Studio, and capture Server Timings for each (cold cache).</span></label></li>
-        <li><label><input type="checkbox" data-k="c12-3"><span><b>Diagnose.</b> For each slow query, decide: storage engine problem or formula engine problem? Write the reason down in one sentence.</span></label></li>
-        <li><label><input type="checkbox" data-k="c12-4"><span><b>Fix the model.</b> In Tabular Editor: remove or fix the worst columns (Measure Killer can confirm what's unused), kill auto date/time leftovers, repair anything BPA flags as a performance issue.</span></label></li>
-        <li><label><input type="checkbox" data-k="c12-5"><span><b>Fix the DAX.</b> Rewrite the worst measure — prototype with DEFINE MEASURE in DAX Studio first, prove it with Benchmark, then save the winner via Tabular Editor.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-1"><span><b>Baseline it.</b> Export a .vpax. Record total size, top 5 columns by size, and their cardinality.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-2"><span><b>Find the pain.</b> Performance Analyzer &rarr; copy the two slowest visual queries into DAX Studio &rarr; capture cold-cache Server Timings.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-3"><span><b>Diagnose.</b> For each slow query: storage engine problem or formula engine problem? One sentence each.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-4"><span><b>Fix the model.</b> In TE: fix or remove the worst columns (Measure Killer confirms unused), kill auto date/time, resolve BPA's performance flags.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-5"><span><b>Fix the DAX.</b> Rewrite the worst measure — prototype with DEFINE MEASURE, prove it with Benchmark, save the winner via TE.</span></label></li>
         <li><label><input type="checkbox" data-k="c12-6"><span><b>Standardize.</b> Replace one family of repeated time-intelligence measures with a calculation group.</span></label></li>
-        <li><label><input type="checkbox" data-k="c12-7"><span><b>Automate the hygiene.</b> Run three macros from B8: hide keys, format all DAX, fill in measure descriptions. Run BPA until it's clean or every ignore is justified.</span></label></li>
-        <li><label><input type="checkbox" data-k="c12-8"><span><b>Publish the receipts.</b> Export a fresh .vpax and write the one-pager: size before/after, slowest visual before/after, what changed and why.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-7"><span><b>Automate the hygiene.</b> Run three B8 macros: hide keys, format DAX, fill descriptions. Get BPA clean or every ignore justified.</span></label></li>
+        <li><label><input type="checkbox" data-k="c12-8"><span><b>Publish the receipts.</b> Fresh .vpax + one-pager: size before/after, slowest visual before/after, what changed and why.</span></label></li>
       </ul>
       <p class="gh">Success looks like</p>
       <ul class="checks">
@@ -729,13 +773,13 @@ start /wait TabularEditor.exe <span class="st">"Model.bim"</span> -A <span class
         <li><label><input type="checkbox" data-k="c12-10"><span>Slowest visual measurably faster, with before/after Server Timings screenshots</span></label></li>
         <li><label><input type="checkbox" data-k="c12-11"><span>BPA clean, one calc group live, three macros saved for reuse — and the write-up shared with your team</span></label></li>
       </ul>
-      <div class="tip"><b>Field note</b>No suitable model at hand? Generate one with SQLBI's Contoso Data Generator at whatever size you like, sabotage it (add a datetime key, some ugly iterators), and tune it back to health. Surgeons practice too.</div>
+      <div class="tip"><b>Field note</b>No model handy? Generate one with Contoso Data Generator, sabotage it, tune it back to health. Surgeons practice too.</div>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>Companion page to the Data Engineering and Snowflake roadmaps. Same rules apply: check things off, come back whenever, and when you outgrow it, bring it to Claude and ask for the next layer (deeper xmSQL, DirectQuery tuning, full CI/CD, TE3 mastery&hellip;).</p>
+  <p>Companion to the Data Engineering and Snowflake roadmaps. Check things off, come back whenever, and ask Claude for the next layer when you outgrow this one.</p>
   <p class="fp">v1 &middot; July 2026 &middot; progress stored locally in this browser &middot; <span style="color:#a6620b">&#9632;</span> DAX Studio amber &middot; <span style="color:#1677b9">&#9632;</span> Tabular Editor azure</p>
 </footer>
 
