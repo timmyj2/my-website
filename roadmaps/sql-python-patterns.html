@@ -522,12 +522,12 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 <span class="k">FROM</span> spine s
 <span class="k">LEFT JOIN</span> monthly_actuals a <span class="k">ON</span> a.period = s.d
 <span class="k">OPTION</span> (MAXRECURSION <span class="n">0</span>);</code></pre>
-    <div class="note"><b>Do it once, properly</b>Better still: keep a permanent date dimension table with month, quarter, fiscal year and period-end flags. Every model you build will use it, and your fiscal calendar lives in exactly one place instead of being reinvented in each report.</div>
+    <div class="note"><b>Do it once, properly</b>Better: keep a permanent date dimension table with month, quarter, fiscal year and period-end flags. Every model uses it; your fiscal calendar lives in exactly one place.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">08</span><h3>Banding &mdash; turn numbers into categories</h3></div>
-    <p class="want"><b>You want this when:</b> "group these into small / medium / large", ageing buckets, materiality tiers. Any time a continuous number needs to become something you can group by.</p>
+    <p class="want"><b>You want this when:</b> "group these into small / medium / large", ageing buckets, materiality tiers &mdash; any continuous number that needs to become groupable.</p>
     <pre><code><span class="k">SELECT</span> invoice_id, days_overdue,
   <span class="k">CASE</span>
     <span class="k">WHEN</span> days_overdue &lt;= <span class="n">0</span>  <span class="k">THEN</span> <span class="s">'Current'</span>
@@ -536,14 +536,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     <span class="k">ELSE</span> <span class="s">'60+'</span>
   <span class="k">END</span> <span class="k">AS</span> ageing_bucket
 <span class="k">FROM</span> receivables;</code></pre>
-    <div class="note warn"><b>Better as a table</b>Hard-coded CASE logic gets copied into six reports and then diverges. Put the bands in a small lookup table and join to it &mdash; then changing "60+" to "90+" is one row, not a search across your estate.</div>
+    <div class="note warn"><b>Better as a table</b>Hard-coded CASE logic gets copied into six reports and diverges. Put the bands in a lookup table and join to it &mdash; changing "60+" to "90+" becomes one row, not an estate-wide search.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">09</span><h3>Slowly changing dimensions &mdash; keeping history</h3></div>
-    <p class="want"><b>You want this when:</b> a customer moves region, a cost centre is renamed, an account is remapped &mdash; and last year's report must still show what was true <em>then</em>. This is the pattern that makes you sound senior, because most people never learn it.</p>
+    <p class="want"><b>You want this when:</b> a customer moves region, a cost centre is renamed &mdash; and last year's report must still show what was true <em>then</em>. Most people never learn this one.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Instead of overwriting the row, close the old one off with an end date and insert a new one. Each row becomes "this was true between these dates", and you join on the date to get the version that applied at the time.</p>
+    <p class="want">Instead of overwriting the row, close the old one off with an end date and insert a new one. Join on the date to get the version that applied at the time.</p>
     <pre><code><span class="c">-- one row per version, not per entity</span>
 customer_key | customer_id | region | valid_from | valid_to   | is_current
 <span class="n">1</span>            | C100        | North  | 2024-01-01 | 2025-06-30 | 0
@@ -555,7 +555,7 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
 <span class="k">JOIN</span> dim_customer c
   <span class="k">ON</span> c.customer_id = t.customer_id
  <span class="k">AND</span> t.txn_date <span class="k">BETWEEN</span> c.valid_from <span class="k">AND</span> c.valid_to;</code></pre>
-    <div class="note"><b>Decide deliberately</b>Overwriting (type 1) is fine for typos. Versioning (type 2) is required when history must be restatement-proof. Getting asked "why did last year's number change?" is what happens when you picked type 1 and should have picked type 2.</div>
+    <div class="note"><b>Decide deliberately</b>Overwriting (type 1) is fine for typos. Versioning (type 2) is required when history must be restatement-proof. "Why did last year's number change?" is what happens when you picked wrong.</div>
   </div>
 </section>
 
