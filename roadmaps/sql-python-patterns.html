@@ -138,6 +138,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 
 /* ---- inline figures (hand-drawn schematics, not screenshots) ---- */
 .fig{margin:13px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 20px 11px}
+.fig.inset{background:var(--panel2)}
 .fig svg{display:block;width:100%;height:auto}
 .fig svg text{font-family:var(--mono)}
 .fig svg .ff-disp{font-family:var(--disp)}
@@ -280,26 +281,78 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     <span class="k">ROWS BETWEEN</span> <span class="n">2</span> <span class="k">PRECEDING AND CURRENT ROW</span>            <span class="c">-- 3-month rolling</span>
   ) <span class="k">AS</span> rolling_3m
 <span class="k">FROM</span> monthly_actuals;</code></pre>
-    <div class="note"><b>In Power BI, don't</b>If the destination is a semantic model, do this in DAX with time-intelligence measures instead &mdash; it stays responsive to whatever the user filters. Precompute it in SQL only when the grain is fixed and the cost of recalculating is real.</div>
+    <div class="note"><b>In Power BI, don't</b>Feeding a semantic model? Use DAX time-intelligence measures instead &mdash; they stay responsive to filters. Precompute in SQL only when the grain is fixed.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">04</span><h3>Rank within a group &mdash; top N per category</h3></div>
-    <p class="want"><b>You want this when:</b> "top 5 customers per region", "biggest three variances per department". Note this is pattern 01 with a different filter &mdash; same machinery.</p>
+    <p class="want"><b>You want this when:</b> "top 5 per region", "biggest three variances per department" &mdash; pattern 01's machinery, different filter.</p>
     <pre><code><span class="k">WITH</span> r <span class="k">AS</span> (
   <span class="k">SELECT</span> region, customer, revenue,
     <span class="f">DENSE_RANK</span>() <span class="k">OVER</span> (<span class="k">PARTITION BY</span> region <span class="k">ORDER BY</span> revenue <span class="k">DESC</span>) <span class="k">AS</span> rk
   <span class="k">FROM</span> sales
 )
 <span class="k">SELECT</span> * <span class="k">FROM</span> r <span class="k">WHERE</span> rk &lt;= <span class="n">5</span>;</code></pre>
-    <div class="note"><b>Which ranking function</b><code>ROW_NUMBER</code> never ties (1,2,3,4). <code>RANK</code> ties then skips (1,1,3). <code>DENSE_RANK</code> ties without skipping (1,1,2). For "top 5" you almost always want DENSE_RANK, otherwise a tie silently costs you a row.</div>
+    <div class="note"><b>Which ranking function</b><code>ROW_NUMBER</code> never ties (1,2,3,4). <code>RANK</code> ties then skips (1,1,3). <code>DENSE_RANK</code> ties without skipping (1,1,2). Want DENSE_RANK for "top 5" &mdash; otherwise a tie silently costs you a row.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">05</span><h3>Gaps and islands &mdash; find consecutive runs</h3></div>
-    <p class="want"><b>You want this when:</b> "how many days in a row was this breached", "find the missing invoice numbers", "how long was each outage". Sounds exotic, comes up constantly once you can name it.</p>
+    <p class="want"><b>You want this when:</b> "how many days in a row was this breached", "find the missing invoice numbers", "how long was each outage". Sounds exotic, comes up constantly.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">The trick that makes it click: if you number the rows sequentially and subtract that from the date, <b>every row in a consecutive run gets the same answer</b>. Group by that answer and you've found your runs. It's a genuinely clever trick and it's worth sitting with for a minute.</p>
+    <p class="want">Number the rows sequentially and subtract that from the date: <b>every row in a consecutive run lands on the same value</b>. Group by that value and you've found your runs.</p>
+
+    <figure class="fig inset">
+      <svg viewBox="0 0 760 236" preserveAspectRatio="xMidYMid meet" role="img">
+        <title>A five-row breach table where subtracting an ascending row number from each date produces a grp column that stays constant across a run of consecutive days, then jumps to a new value once a day is skipped. Grouping by grp collapses the two runs into two summary rows with a start date, end date, and day count.</title>
+
+        <text x="8" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">daily_breaches &mdash; one row per day</text>
+        <text x="466" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">one row per run</text>
+
+        <!-- left: per-day table -->
+        <rect x="8" y="20" width="330" height="180" fill="none" stroke="var(--line)"/>
+        <rect x="8" y="50" width="330" height="90" fill="var(--green-soft)"/>
+        <rect x="8" y="140" width="330" height="60" fill="var(--cyan-soft)"/>
+        <path d="M138,20 V200 M208,20 V200" stroke="var(--line)"/>
+        <path d="M8,50 H338 M8,80 H338 M8,110 H338 M8,140 H338 M8,170 H338" stroke="var(--line)"/>
+        <g font-size="10.5" font-weight="600" fill="var(--mut)">
+          <text x="73" y="38" text-anchor="middle">breach_date</text>
+          <text x="173" y="38" text-anchor="middle">rn</text>
+          <text x="273" y="38" text-anchor="middle">grp</text>
+        </g>
+        <g font-size="10.5" fill="var(--ink)">
+          <text x="73" y="68" text-anchor="middle">Jan 1</text><text x="173" y="68" text-anchor="middle">1</text><text x="273" y="68" text-anchor="middle" font-weight="600">Dec 31</text>
+          <text x="73" y="98" text-anchor="middle">Jan 2</text><text x="173" y="98" text-anchor="middle">2</text><text x="273" y="98" text-anchor="middle" font-weight="600">Dec 31</text>
+          <text x="73" y="128" text-anchor="middle">Jan 3</text><text x="173" y="128" text-anchor="middle">3</text><text x="273" y="128" text-anchor="middle" font-weight="600">Dec 31</text>
+          <text x="73" y="158" text-anchor="middle">Jan 6</text><text x="173" y="158" text-anchor="middle">4</text><text x="273" y="158" text-anchor="middle" font-weight="600">Jan 2</text>
+          <text x="73" y="188" text-anchor="middle">Jan 7</text><text x="173" y="188" text-anchor="middle">5</text><text x="273" y="188" text-anchor="middle" font-weight="600">Jan 2</text>
+        </g>
+        <text x="173" y="216" text-anchor="middle" font-size="9" fill="var(--dim)">Jan 4&ndash;5 breached nothing, so rn jumps and grp jumps with it</text>
+
+        <!-- arrow -->
+        <path d="M352,95 H430" stroke="var(--dim)" stroke-width="1.4" fill="none"/>
+        <path d="M424,89 L434,95 L424,101 Z" fill="var(--dim)"/>
+        <text x="391" y="83" text-anchor="middle" font-size="9" font-weight="600" letter-spacing="0.05em" fill="var(--mut)">GROUP BY grp</text>
+
+        <!-- right: run summary -->
+        <rect x="440" y="20" width="312" height="120" fill="none" stroke="var(--line)"/>
+        <rect x="440" y="50" width="312" height="35" fill="var(--green-soft)"/>
+        <rect x="440" y="105" width="312" height="35" fill="var(--cyan-soft)"/>
+        <path d="M596,20 V140 M674,20 V140" stroke="var(--line)"/>
+        <path d="M440,50 H752 M440,85 H752 M440,105 H752" stroke="var(--line)"/>
+        <g font-size="10" font-weight="600" fill="var(--mut)">
+          <text x="518" y="38" text-anchor="middle">run_start</text>
+          <text x="635" y="38" text-anchor="middle">run_end</text>
+          <text x="713" y="38" text-anchor="middle">days</text>
+        </g>
+        <g font-size="10.5" fill="var(--ink)">
+          <text x="518" y="72" text-anchor="middle">Jan 1</text><text x="635" y="72" text-anchor="middle">Jan 3</text><text x="713" y="72" text-anchor="middle" font-weight="700">3</text>
+          <text x="518" y="127" text-anchor="middle">Jan 6</text><text x="635" y="127" text-anchor="middle">Jan 7</text><text x="713" y="127" text-anchor="middle" font-weight="700">2</text>
+        </g>
+      </svg>
+      <figcaption><b>Subtracting a running count cancels the day-to-day increment.</b> While the dates advance by one each row, so does <code>rn</code> &mdash; so <code>date &minus; rn</code> stays flat. The moment a day is skipped, only the date jumps, so <code>grp</code> jumps too, marking a new run.</figcaption>
+    </figure>
+
     <pre><code><span class="k">WITH</span> g <span class="k">AS</span> (
   <span class="k">SELECT</span> breach_date,
     <span class="f">DATEADD</span>(day,
@@ -379,14 +432,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
         <text x="490" y="216" text-anchor="middle">Payroll</text><text x="575" y="216" text-anchor="middle">Mar</text><text x="655" y="216" text-anchor="middle">18,900</text>
       </g>
     </svg>
-    <figcaption><b>Same three numbers, colour-matched across both tables.</b> The Rent row's three cells become three rows on the right; Payroll's become three more. Long is three times as many rows and one third as many columns &mdash; which is exactly why every analytical tool downstream prefers it.</figcaption>
+    <figcaption><b>Same numbers, colour-matched across both tables.</b> Rent's three cells become three rows; Payroll's become three more. Long is three times the rows, a third of the columns &mdash; why every tool downstream prefers it.</figcaption>
   </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">06</span><h3>Unpivot &mdash; columns that should be rows</h3></div>
-    <p class="want"><b>You want this when:</b> a finance extract has a column per month (<code>Jan</code>, <code>Feb</code>, <code>Mar</code>&hellip;). Humans love this layout; every analytical tool hates it. Almost every spreadsheet-sourced dataset needs this first.</p>
+    <p class="want"><b>You want this when:</b> a finance extract has a column per month (<code>Jan</code>, <code>Feb</code>&hellip;). Humans love this layout; every analytical tool hates it.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Turn twelve columns into two: one saying <em>which month</em>, one saying <em>the value</em>. Long and boring beats wide and clever &mdash; every time, for anything downstream.</p>
+    <p class="want">Turn twelve columns into two: <em>which month</em>, and <em>the value</em>. Long and boring beats wide and clever, every time, downstream.</p>
     <pre><code><span class="c">-- portable version: works everywhere</span>
 <span class="k">SELECT</span> account, <span class="s">'Jan'</span> <span class="k">AS</span> period, jan <span class="k">AS</span> amount <span class="k">FROM</span> budget
 <span class="k">UNION ALL SELECT</span> account, <span class="s">'Feb'</span>, feb <span class="k">FROM</span> budget
@@ -396,14 +449,70 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 <span class="k">SELECT</span> account, period, amount
 <span class="k">FROM</span> budget
 <span class="k">UNPIVOT</span> (amount <span class="k">FOR</span> period <span class="k">IN</span> (jan, feb, mar)) <span class="k">AS</span> u;</code></pre>
-    <div class="note py"><b>Python is better here</b>If there are 36 columns, don't write 36 UNION ALLs. One line of pandas: <code>df.melt(id_vars=['account'], var_name='period', value_name='amount')</code>. This is exactly the kind of job where a notebook beats SQL.</div>
+    <div class="note py"><b>Python is better here</b>36 columns? Don't write 36 UNION ALLs. One line of pandas: <code>df.melt(id_vars=['account'], var_name='period', value_name='amount')</code>.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">07</span><h3>Date spine &mdash; make the missing rows exist</h3></div>
-    <p class="want"><b>You want this when:</b> a month with no activity vanishes from your report instead of showing zero, so charts have gaps and prior-period comparisons quietly lie (see pattern 02).</p>
+    <p class="want"><b>You want this when:</b> a month with no activity vanishes from your report instead of showing zero, so charts have gaps and prior-period comparisons quietly lie (pattern 02).</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Build a table of every date you care about, then <code>LEFT JOIN</code> your data onto it. Now absence is visible as a zero rather than invisible as a missing row &mdash; which is nearly always what people actually meant.</p>
+    <p class="want">Build a table of every date you care about, then <code>LEFT JOIN</code> your data onto it. Absence becomes a visible zero instead of an invisible missing row.</p>
+
+    <figure class="fig inset">
+      <svg viewBox="0 0 760 236" preserveAspectRatio="xMidYMid meet" role="img">
+        <title>A row of six months where March and May have no source row at all, dashed and unfilled, next to the same six months after a LEFT JOIN to a full date spine, where March and May now exist as real rows holding zero instead of being absent.</title>
+
+        <text x="8" y="14" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">monthly_actuals &mdash; as extracted</text>
+        <g font-size="10.5" font-weight="600">
+          <text x="90" y="34" text-anchor="middle" fill="var(--mut)">Jan</text>
+          <text x="212" y="34" text-anchor="middle" fill="var(--mut)">Feb</text>
+          <text x="334" y="34" text-anchor="middle" fill="var(--rose)">Mar</text>
+          <text x="456" y="34" text-anchor="middle" fill="var(--mut)">Apr</text>
+          <text x="578" y="34" text-anchor="middle" fill="var(--rose)">May</text>
+          <text x="700" y="34" text-anchor="middle" fill="var(--mut)">Jun</text>
+        </g>
+        <g>
+          <rect x="50" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="90" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,200</text>
+          <rect x="172" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="212" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,550</text>
+          <rect x="294" y="42" width="80" height="46" rx="6" fill="none" stroke="var(--rose)" stroke-width="1.3" stroke-dasharray="4 3"/>
+          <text x="334" y="70" text-anchor="middle" font-size="9.5" fill="var(--rose)">no row</text>
+          <rect x="416" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="456" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,800</text>
+          <rect x="538" y="42" width="80" height="46" rx="6" fill="none" stroke="var(--rose)" stroke-width="1.3" stroke-dasharray="4 3"/>
+          <text x="578" y="70" text-anchor="middle" font-size="9.5" fill="var(--rose)">no row</text>
+          <rect x="660" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="700" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">5,100</text>
+        </g>
+
+        <path d="M380,100 V128" stroke="var(--dim)" stroke-width="1.4" fill="none"/>
+        <path d="M376,124 L380,134 L384,124 Z" fill="var(--dim)"/>
+        <text x="395" y="118" font-size="9.5" font-weight="600" letter-spacing="0.04em" fill="var(--mut)">LEFT JOIN spine, COALESCE(amount,0)</text>
+
+        <text x="8" y="152" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">after the join &mdash; every month exists</text>
+        <g font-size="10.5" font-weight="600" fill="var(--mut)">
+          <text x="90" y="172" text-anchor="middle">Jan</text><text x="212" y="172" text-anchor="middle">Feb</text><text x="334" y="172" text-anchor="middle">Mar</text>
+          <text x="456" y="172" text-anchor="middle">Apr</text><text x="578" y="172" text-anchor="middle">May</text><text x="700" y="172" text-anchor="middle">Jun</text>
+        </g>
+        <g>
+          <rect x="50" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="90" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,200</text>
+          <rect x="172" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="212" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,550</text>
+          <rect x="294" y="180" width="80" height="46" rx="6" fill="var(--amber-soft)" stroke="var(--amber)"/>
+          <text x="334" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="var(--amber)">0</text>
+          <rect x="416" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="456" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,800</text>
+          <rect x="538" y="180" width="80" height="46" rx="6" fill="var(--amber-soft)" stroke="var(--amber)"/>
+          <text x="578" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="var(--amber)">0</text>
+          <rect x="660" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="700" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">5,100</text>
+        </g>
+      </svg>
+      <figcaption><b>The spine supplies the row; the data supplies the value.</b> March and May had no source record at all &mdash; not a zero, an absence. After the LEFT JOIN they're real rows holding zero, so charts don't gap and LAG (pattern 02) doesn't skip a month by accident.</figcaption>
+    </figure>
+
     <pre><code><span class="k">WITH</span> spine <span class="k">AS</span> (
   <span class="k">SELECT</span> <span class="f">CAST</span>(<span class="s">'2024-01-01'</span> <span class="k">AS</span> date) <span class="k">AS</span> d
   <span class="k">UNION ALL</span>

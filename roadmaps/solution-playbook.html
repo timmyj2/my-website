@@ -88,8 +88,9 @@ ol.qs h4{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:3p
 ol.qs p{color:var(--mut);font-size:.93rem}
 
 /* group headers */
-.grouphead{display:flex;align-items:center;gap:12px;margin:30px 0 3px}
+.grouphead{display:flex;align-items:center;gap:10px;margin:30px 0 3px}
 .grouphead .gdot{width:11px;height:11px;border-radius:3px;background:var(--acc);flex-shrink:0}
+.grouphead .gicon{width:21px;height:21px;flex-shrink:0;color:var(--acc)}
 .grouphead h3{font-family:var(--disp);font-weight:700;font-size:1.12rem;color:var(--ink)}
 .grouphead .gsub{color:var(--dim);font-size:.87rem;font-family:var(--mono)}
 
@@ -195,19 +196,18 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 <header class="hero">
   <p class="eyebrow">Tool-belt series &middot; Problem shaping &middot; For people who build</p>
   <h1>Someone describes a problem.<br>You need to hear a <span class="a">shape</span>.</h1>
-  <p class="sub">The hard part of building things at work was never the code &mdash; you can vibe your way through code. The hard part is that people describe problems in the language of their frustration, not in the language of what to build. This is a catalogue of the shapes underneath: what people actually say, what it really is, what to build, and how to do a scrappy version this afternoon instead of a proper version next quarter.</p>
+  <p class="sub">The hard part was never the code &mdash; it's that people describe problems in the language of their frustration, not what to build. This catalogues the shapes underneath: what they say, what it really is, and the scrappy version you can ship today.</p>
 
   <div class="premise">
     <h2>The premise</h2>
-    <p>There are maybe sixteen problems in a business. You'll meet them over and over in different costumes &mdash; different department, different system, different vocabulary, same underlying shape. <b>Once you can name the shape, you already know roughly what to build</b>, and the building is the part you're good at.</p>
-    <p>Use it two ways: read it once to load the patterns into your head, then come back to it when someone corners you at a desk and you want to sound like you've seen this before. You have. It just had a different name last time.</p>
+    <p>Maybe sixteen problems exist in a business. Same shape, different costume every time &mdash; department, system, vocabulary change; the pattern doesn't. <b>Name the shape and you already know roughly what to build.</b> Skim it once to load the patterns in, then come back when someone corners you at a desk.</p>
   </div>
 </header>
 
 <!-- ============ FIRST CONVERSATION ============ -->
 <section id="first">
   <div class="shead"><span class="snum">01</span><h2>The first conversation &mdash; six questions before you build anything</h2></div>
-  <p class="slede">The most expensive mistake is building the thing someone asked for instead of the thing they need. These six questions take four minutes and save weeks. Ask them in this order &mdash; the order matters, because Q1 changes the answer to everything else.</p>
+  <p class="slede">The costliest mistake: building what they asked for, not what they need. These six questions take four minutes and save weeks &mdash; ask them in order, since Q1 reshapes every answer after it.</p>
 
   <figure class="fig">
     <svg viewBox="0 0 820 240" preserveAspectRatio="xMidYMid meet" role="img">
@@ -254,115 +254,115 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
   <ol class="qs">
     <li>
       <h4>&ldquo;Walk me through the last time this happened.&rdquo;</h4>
-      <p>Not "what do you need" &mdash; that gets you their proposed solution. A specific recent story gets you the actual problem, the workaround they've built, and who else touches it. Always start here.</p>
+      <p>Not "what do you need" &mdash; that just gets their proposed solution. A recent story gets you the real problem, their workaround, and who else touches it.</p>
     </li>
     <li>
       <h4>&ldquo;What do you do with it once you have it?&rdquo;</h4>
-      <p>The answer is often "I copy three numbers into a slide." Then you're not building a report &mdash; you're building three numbers. Enormous amounts of work get avoided by this question.</p>
+      <p>Often it's "I copy three numbers into a slide." Then you're building three numbers, not a report &mdash; this question alone kills most over-scoped work.</p>
     </li>
     <li>
       <h4>&ldquo;How often, and what happens if it's a day late?&rdquo;</h4>
-      <p>This is the latency question, and people always overstate it. "Real time" usually means "before my 9am meeting." Daily is dramatically cheaper to build than streaming, and honesty here is worth days of your life.</p>
+      <p>The latency question &mdash; always overstated. "Real time" usually means "before my 9am." Daily is far cheaper to build than streaming.</p>
     </li>
     <li>
       <h4>&ldquo;Who else does this?&rdquo;</h4>
-      <p>If three teams do the same manual thing, you're not solving one person's problem, you're solving a company problem &mdash; which changes the priority, the design, and how much support you'll get for doing it properly.</p>
+      <p>Three teams doing the same manual thing is a company problem, not a person's &mdash; it changes the priority and how much support you'll get.</p>
     </li>
     <li>
       <h4>&ldquo;What does it look like when it goes wrong today?&rdquo;</h4>
-      <p>Surfaces the real risk and the real value. "We restated a board number" is a different project from "I was mildly annoyed." It also tells you what your solution has to protect against.</p>
+      <p>"We restated a board number" is a different project from "I was mildly annoyed." Surfaces real risk and what to protect against.</p>
     </li>
     <li>
       <h4>&ldquo;If I could only fix one part of this, which part?&rdquo;</h4>
-      <p>Your scoping question. Their answer is your first release. Everything else is the backlog &mdash; and now it's <em>their</em> prioritisation, not your guess.</p>
+      <p>Your scoping question. Their answer is release one; everything else is backlog &mdash; and it's <em>their</em> prioritisation, not your guess.</p>
     </li>
   </ol>
 
-  <div class="tip"><b>The move that buys you credibility</b>Write their answers back to them in five bullets and ask "have I got this right?" Almost nobody does this, it takes two minutes, and it makes people feel heard before you've built anything. It also catches the misunderstanding while it's still free to fix.</div>
+  <div class="tip"><b>The move that buys you credibility</b>Write their answers back as five bullets: "have I got this right?" Two minutes, and it catches the misunderstanding while it's still free to fix.</div>
 </section>
 
 <!-- ============ PATTERNS ============ -->
 <section id="patterns">
   <div class="shead"><span class="snum">02</span><h2>The pattern catalogue</h2></div>
-  <p class="slede">Sixteen shapes, grouped by what they're fundamentally about. Each one gives you the sentence people actually say, what's really going on, what to build, and the scrappy version you could have working before you go home.</p>
+  <p class="slede">Sixteen shapes, grouped by what they're about &mdash; the sentence people say, what's really going on, and the scrappy version you can ship today.</p>
 
   <!-- ===== MOVE IT ===== -->
   <div class="g-move">
-    <div class="grouphead"><span class="gdot"></span><h3>Getting data to people</h3><span class="gsub">the plumbing problems</span></div>
+    <div class="grouphead"><span class="gdot"></span><svg class="gicon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v11M8 10l4 4 4-4M4 14v4a2 2 0 002 2h12a2 2 0 002-2v-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Getting data to people</h3><span class="gsub">the plumbing problems</span></div>
 
     <div class="pat">
       <p class="said">I export this every month and email it round.</p>
-      <div class="row"><span class="lab">What it really is</span><p>A <b>manual distribution problem</b>, and usually also an undocumented transformation problem &mdash; because between the export and the email, they do things. Filtering, renaming, a lookup they keep in another tab. That hidden work is the actual scope.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>manual distribution problem</b> &mdash; and usually a hidden transformation problem too. The filtering, renaming, and lookups they do between export and email are the real scope.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>Recreate their final output as one table in a lakehouse or a view, and get it to them once. If it matches, you've validated the logic before automating anything.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>Model it into gold, build a small report or a subscribed export, schedule it, and alert on failure. Retire the manual export deliberately &mdash; with them watching.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Recreate their final output as one table or view and send it once. A match validates the logic before you automate anything.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Model into gold, build a scheduled report or export, alert on failure. Retire the manual version deliberately, with them watching.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Automating the email and not the spreadsheet. If they still do the hidden steps by hand, you've saved them thirty seconds and kept all the risk.</div>
+      <div class="trap"><b>Trap</b>Automating the email, not the spreadsheet. The hidden manual steps stay &mdash; you saved thirty seconds and kept all the risk.</div>
     </div>
 
     <div class="pat">
       <p class="said">It's too much data for Excel now.</p>
-      <div class="row"><span class="lab">What it really is</span><p>The classic on-ramp &mdash; and the easiest win you'll ever get, because the pain is already acute and they've already given up. They don't need a platform strategy, they need the file to open.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>The classic on-ramp, and the easiest win going &mdash; the pain's acute and they've given up. They need the file to open, not a platform strategy.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>Land the data as a Delta table and point them at the SQL endpoint from Excel. Same tool they know, no row limit. Takes an hour and looks like magic.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>Proper gold-layer model plus a semantic model so the aggregations are done for them, and they stop pulling millions of rows to sum one column.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Land it as a Delta table, point them at the SQL endpoint from Excel. Same tool, no row limit, an hour of work.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A gold-layer model plus a semantic model, so aggregations are done for them instead of summed row by row.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Assuming they want a dashboard. Many people genuinely want a grid they can pivot. Give them what they'll use, not what demos well.</div>
+      <div class="trap"><b>Trap</b>Assuming they want a dashboard. Many just want a grid to pivot. Ship what they'll use.</div>
     </div>
 
     <div class="pat">
       <p class="said">Can you just add a column?</p>
-      <div class="row"><span class="lab">What it really is</span><p>Sometimes it's just a column. Often it's a <b>question they can't answer</b> and a column is their guess at the fix. Ask what they'd do with it &mdash; the answer frequently reveals a measure, a different grain, or an entirely different report.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>Sometimes it's just a column. Often it's a <b>question they can't answer</b>, and the column is their guess at the fix. Ask what they'd do with it.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>If it's genuinely a column and it's already in the source, add it. Small requests answered fast are how you earn the right to say "let's talk" on big ones.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>If it's a new grain or a new source, treat it as its own small project with its own conversation. Don't smuggle it in as a tweak.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>If it's genuinely a column already in the source, add it. Fast wins on small asks buy you "let's talk" on the big ones.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A new grain or source is its own small project with its own conversation &mdash; not a tweak.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Saying yes to twenty "just a columns" until the model is a swamp nobody can reason about. Each one was reasonable; the sum is not.</div>
+      <div class="trap"><b>Trap</b>Saying yes to twenty "just a columns" until the model's a swamp. Each was reasonable; the sum isn't.</div>
     </div>
   </div>
 
   <!-- ===== TRUST IT ===== -->
   <div class="g-trust">
-    <div class="grouphead"><span class="gdot"></span><h3>Making numbers believable</h3><span class="gsub">the trust problems &mdash; usually the highest-value work</span></div>
+    <div class="grouphead"><span class="gdot"></span><svg class="gicon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v16M5 7h14M5 7l-3 6a3 3 0 006 0l-3-6zm14 0l-3 6a3 3 0 006 0l-3-6zM8 21h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Making numbers believable</h3><span class="gsub">the trust problems &mdash; usually the highest-value work</span></div>
 
     <div class="pat">
       <p class="said">These two systems don't agree and nobody knows which is right.</p>
-      <div class="row"><span class="lab">What it really is</span><p>A <b>reconciliation</b> problem, and it's the most valuable pattern in this entire page because it's the one people actively fear. The deliverable is not "which one is right" &mdash; it's <b>a repeatable, explainable difference</b>. Once the gap is itemised and each line has a reason, the argument stops.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>reconciliation</b> problem &mdash; the most valuable pattern here, because people actively fear it. The deliverable isn't "which is right," it's <b>a repeatable, explainable difference</b>. Itemise the gap and the argument stops.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>Pull both sides into one place, join on the key, and produce a difference table with the ten biggest gaps. Show it to them. The reasons will start pouring out of them unprompted.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>A scheduled reconciliation with categorised difference reasons (timing, mapping, missing, genuine), a tolerance threshold, and an alert when the unexplained portion exceeds it.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Join both sides on the key, produce a difference table of the ten biggest gaps, and show it to them. Reasons pour out unprompted.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A scheduled reconciliation with categorised reasons (timing, mapping, missing, genuine), a tolerance threshold, and an alert past it.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Trying to make the difference zero. It won't be, and chasing it makes you look like you failed. Aim for <em>every difference has a name</em> &mdash; that's the win, and it's achievable.</div>
+      <div class="trap"><b>Trap</b>Chasing zero. It won't happen, and trying makes you look like you failed. Aim for <em>every difference has a name</em> instead.</div>
     </div>
 
     <div class="pat">
       <p class="said">Nobody trusts the numbers.</p>
-      <div class="row"><span class="lab">What it really is</span><p>Usually not accuracy &mdash; usually <b>ambiguity</b>. Four reports say "revenue" and mean four things, so people quietly stop believing all of them. The fix is definition and provenance, not more validation.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>Usually not accuracy &mdash; <b>ambiguity</b>. Four reports say "revenue," mean four things, and people quietly stop trusting all of them. Fix definitions, not validation.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>Take the three most argued-about measures and write one sentence each: what's included, what's excluded, as-of when. Circulate it. Watch the arguments change shape immediately.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>One certified semantic model as the definition of record, endorsement so people can see which one to trust, lineage so they can see where it came from, and retirement of the duplicates.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>Take the three most argued-about measures, write one sentence each: included, excluded, as-of when. Circulate it.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>One certified semantic model as the definition of record, with endorsement, lineage, and retirement of the duplicates.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Building a fifth version of the truth to fix the problem of four versions of the truth. If you're not deleting something, you're probably making it worse.</div>
+      <div class="trap"><b>Trap</b>Building a fifth version of the truth to fix four. If you're not deleting something, you're making it worse.</div>
     </div>
 
     <div class="pat">
       <p class="said">This number looks wrong but I can't prove it.</p>
-      <div class="row"><span class="lab">What it really is</span><p>A <b>lineage and drill-through</b> problem. They can see the total but not the rows behind it, so they can't self-serve the answer and have to ask you &mdash; which is why you keep getting asked.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>lineage and drill-through</b> problem. They see the total, not the rows behind it &mdash; so they can't self-serve, and keep asking you.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>Give them one drill-through page or a saved query that returns the underlying rows for any given total. Their next three questions answer themselves.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>Keep a bronze layer so you can always show the raw as-arrived record, plus the load timestamp and source. The ability to say "here's exactly what we received" ends most disputes.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>One drill-through page or saved query that returns the rows behind any total. Their next three questions answer themselves.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>A bronze layer holding the raw as-arrived record, load timestamp, and source. "Here's exactly what we received" ends most disputes.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Answering the specific question and not giving them the means to answer the next one. You're training people to depend on you, which feels good and scales terribly.</div>
+      <div class="trap"><b>Trap</b>Answering the question but not giving them the means to answer the next one themselves.</div>
     </div>
 
     <div class="pat">
       <p class="said">The data's a mess.</p>
-      <div class="row"><span class="lab">What it really is</span><p>A <b>data quality</b> problem that nobody has ever quantified. "A mess" is a feeling. Your job is to turn it into a count &mdash; because a count can be tracked, targeted and fixed, and a feeling can't.</p></div>
+      <div class="row"><span class="lab">What it really is</span><p>A <b>data quality</b> problem nobody's quantified. "A mess" is a feeling &mdash; turn it into a count, because counts can be tracked and fixed.</p></div>
       <div class="build">
-        <div class="bx fast"><span class="lab">This afternoon</span><p>Write one query that counts the issues: nulls in key fields, duplicate keys, orphan references, values outside a sane range. Report it as a table. That table is now the project.</p></div>
-        <div class="bx"><span class="lab">Done properly</span><p>Quality checks as a scheduled step between bronze and silver, with a trend over time and an alert when a threshold breaks. Bad data stops silently, loudly.</p></div>
+        <div class="bx fast"><span class="lab">This afternoon</span><p>One query counting the issues &mdash; nulls, duplicate keys, orphan references, out-of-range values. That table is now the project.</p></div>
+        <div class="bx"><span class="lab">Done properly</span><p>Quality checks as a scheduled step between bronze and silver, trended over time, alerting on a broken threshold.</p></div>
       </div>
-      <div class="trap"><b>Trap</b>Cleaning it in your pipeline forever instead of pushing the fix upstream. Some cleaning belongs to you; some is a source-system problem you're quietly subsidising.</div>
+      <div class="trap"><b>Trap</b>Cleaning it in your pipeline forever instead of pushing the fix upstream where it belongs.</div>
     </div>
   </div>
 
