@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Hockey Play Board</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#252c37; --text:#e8ebf1; --mut:#9aa4b3; --dim:#6b7686;
+    --accent:#38bdf8; --danger:#f87171;
+    --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:var(--sans);
+    display:flex;flex-direction:column;
+    height:100vh;height:100dvh;
+    touch-action:none;user-select:none;-webkit-user-select:none;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+  /* ── topbar ─────────────────────────────── */
+  .topbar{width:100%;flex:0 0 auto;display:flex;align-items:center;gap:8px;
+    padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));
+    font-family:var(--mono);border-bottom:1px solid var(--line)}
+  .topbar a.back{font-size:.74rem;color:var(--mut);flex:0 0 auto}
+  .topbar a.back:hover{color:var(--text)}
+  .topbar .ttl{flex:1 1 auto;min-width:0;text-align:center;font-size:.78rem;letter-spacing:.03em;
+    color:var(--dim);text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .icobtn{width:34px;height:34px;flex:0 0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    color:var(--mut)}
+  .icobtn:active{background:#1e2530;color:var(--text)}
+  .icobtn:disabled{opacity:.3;pointer-events:none}
+  .menuwrap{position:relative;flex:0 0 auto}
+  .menu{position:absolute;top:calc(100% + 6px);right:0;z-index:30;min-width:196px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;
+    box-shadow:0 12px 28px rgba(0,0,0,.45);display:none;flex-direction:column;gap:2px}
+  .menu.open{display:flex}
+  .menu-item{text-align:left;padding:10px 12px;border-radius:8px;font-size:.82rem;color:var(--text)}
+  .menu-item:active{background:#1e2530}
+  .menu-item.danger{color:var(--danger)}
+  .menu-sep{height:1px;background:var(--line);margin:4px 2px}
+
+  /* ── stage / rink ───────────────────────── */
+  .stage{flex:1 1 auto;width:100%;position:relative;min-height:0;touch-action:none;
+    display:flex;align-items:center;justify-content:center}
+  .boardWrap{position:relative}
+  .boardWrap canvas{position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:10px}
+  #rink{box-shadow:0 10px 34px rgba(0,0,0,.5);outline:1px solid #1d242e;outline-offset:0}
+  #ink{cursor:crosshair;touch-action:none}
+
+  /* ── bottom tool row ────────────────────── */
+  .pad{width:100%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:9px 10px;flex-wrap:nowrap}
+  .tool-btn{width:44px;height:44px;flex:0 0 auto;border-radius:12px;background:#1a212b;border:1px solid #2c3542;
+    color:var(--mut);display:flex;align-items:center;justify-content:center}
+  .tool-btn.on{background:#26303d;color:var(--text);border-color:#3a4658}
+
+  /* ── secondary row: colors + widths ─────── */
+  .subpad{width:100%;flex:0 0 auto;display:none;align-items:center;gap:12px;
+    padding:0 12px 9px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .subpad.show{display:flex}
+  .colorRow,.widthRow{flex:0 0 auto;display:flex;align-items:center;gap:7px}
+  .color-btn{width:32px;height:32px;flex:0 0 auto;border-radius:50%;border:2px solid transparent;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+  .color-btn.on{border-color:#fff}
+  .width-btn{width:38px;height:38px;flex:0 0 auto;border-radius:10px;background:#1a212b;border:1px solid #2c3542;
+    display:flex;align-items:center;justify-content:center}
+  .width-btn.on{background:#26303d;border-color:#3a4658}
+  .wdot{border-radius:50%;background:var(--text);display:block}
+  .rowsep{width:1px;align-self:stretch;background:var(--line);flex:0 0 auto}
+
+  .hint{width:100%;flex:0 0 auto;text-align:center;font-size:.66rem;color:var(--dim);
+    padding:0 16px calc(9px + env(safe-area-inset-bottom));line-height:1.55}
+  .rotatehint{display:none}
+  @media (max-width:1024px) and (orientation:portrait){ .rotatehint{display:block;margin-top:2px} }
+  @media (max-height:600px){ .hint{display:none} }
+
+  @media (max-width:400px){
+    .tool-btn{width:40px;height:40px}
+    .pad{gap:5px}
+  }
+
+  #printImg{display:none}
+  @media print{
+    body > *:not(#printImg){display:none!important}
+    #printImg{display:block!important;width:100%;height:auto}
+    @page{margin:.4in}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <span class="ttl">Hockey Play Board</span>
+    <button class="icobtn" id="btnUndo" aria-label="Undo" disabled>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M7 7L3.5 10.5L7 14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 10.5H14a6 6 0 1 1 0 12h-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="icobtn" id="btnRedo" aria-label="Redo" disabled style="transform:scaleX(-1)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M7 7L3.5 10.5L7 14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 10.5H14a6 6 0 1 1 0 12h-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="menuwrap">
+      <button class="icobtn" id="btnMenu" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+      </button>
+      <div class="menu" id="menu">
+        <button class="menu-item" id="miShare">Save image</button>
+        <button class="menu-item" id="miPrint">Print / Save as PDF</button>
+        <div class="menu-sep"></div>
+        <button class="menu-item danger" id="miClear">New play (clear board)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="boardWrap" id="boardWrap">
+      <canvas id="rink"></canvas>
+      <canvas id="ink"></canvas>
+    </div>
+  </div>
+
+  <div class="subpad" id="subpad">
+    <div class="colorRow" id="colorRow">
+      <button class="color-btn on" data-color="0"></button>
+      <button class="color-btn" data-color="1"></button>
+      <button class="color-btn" data-color="2"></button>
+      <button class="color-btn" data-color="3"></button>
+      <button class="color-btn" data-color="4"></button>
+      <button class="color-btn" data-color="5"></button>
+    </div>
+    <div class="rowsep"></div>
+    <div class="widthRow" id="widthRow">
+      <button class="width-btn" data-w="0"><span class="wdot" style="width:5px;height:5px"></span></button>
+      <button class="width-btn on" data-w="1"><span class="wdot" style="width:9px;height:9px"></span></button>
+      <button class="width-btn" data-w="2"><span class="wdot" style="width:14px;height:14px"></span></button>
+    </div>
+  </div>
+
+  <div class="pad" id="pad">
+    <button class="tool-btn on" data-tool="pen" aria-label="Marker">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M4 20l1-4.2L14.8 6l3.2 3.2L8.2 19 4 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 7.2l3.2 3.2" stroke="currentColor" stroke-width="1.6"/></svg>
+    </button>
+    <button class="tool-btn" data-tool="line" aria-label="Line / arrow">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M5 19L19 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="tool-btn" data-tool="player" aria-label="Player">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="7.5" fill="#2563eb" stroke="#0b3d91" stroke-width="1.6"/><text x="12" y="15.5" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">1</text></svg>
+    </button>
+    <button class="tool-btn" data-tool="opponent" aria-label="Opponent">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#dc2626" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+    <button class="tool-btn" data-tool="puck" aria-label="Puck">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><ellipse cx="12" cy="12" rx="7.5" ry="5.5" fill="#15181d" stroke="#5b6472" stroke-width="1.2"/></svg>
+    </button>
+    <button class="tool-btn" data-tool="eraser" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><rect x="4" y="10" width="16" height="8" rx="1.6" transform="rotate(-22 12 12)" stroke="currentColor" stroke-width="1.6"/></svg>
+    </button>
+  </div>
+
+  <div class="hint">
+    <span>Draw with your finger or mouse &middot; pick a tool, a color and a width &middot; tap the &#8942; menu to save.</span>
+    <span class="rotatehint">Turn your phone sideways for a bigger rink.</span>
+  </div>
+
+  <img id="printImg" alt="Hockey play">
+
+<script>
+window.addEventListener('error', function(e){
+  try{ document.documentElement.setAttribute('data-fatal', e.message+' @'+(e.lineno||'?')+':'+(e.colno||'?')); }catch(_){}
+});
+</script>
+<script>
+"use strict";
+(function(){
+/* ============================================================================
+   HOCKEY PLAY BOARD — a dry-erase rink whiteboard for drawing hockey plays.
+   Two stacked canvases: a static rink (redrawn on resize only) and a
+   transparent ink layer (redrawn whenever the drawing changes). Everything
+   drawn on the ink layer is stored as an ordered list of vector "ops" —
+   that gives free undo/redo, clean localStorage persistence, and lets
+   export/print re-render the whole play at full resolution.
+
+   Layout of this file:
+     1. constants + save
+     2. dual-canvas layout (DPR aware)
+     3. rink drawing
+     4. ops model + undo/redo
+     5. ink rendering (replay ops onto a context)
+     6. touch/mouse input state machine
+     7. toolbar wiring
+     8. export / print
+     9. boot
+============================================================================ */
+
+/* ---------------------------------------------------------------- 1. setup */
+
+const SAVE_KEY = "hockeyplayboard_save_v1";
+const FONT_STACK = "system-ui,-apple-system,'Segoe UI',sans-serif";
+
+const COLORS = ['#1f2937','#dc2626','#2563eb','#16a34a','#f97316','#7c3aed'];
+const WIDTHS = [5, 9, 14];
+
+const PLAYER_COLOR = '#2563eb';
+const PLAYER_STROKE = '#0b3d91';
+const OPPONENT_COLOR = '#dc2626';
+const PUCK_COLOR = '#15181d';
+const PUCK_STROKE = '#5b6472';
+
+const RINK_W = 1000, RINK_H = 440, PAD = 24;
+const GRAB_R = 34;
+
+let tool = 'pen';
+let color = COLORS[0];
+let widthIdx = 1;
+
+let ops = [];
+let nextPlayerNum = 1;
+let undoStack = [];
+let redoStack = [];
+const UNDO_CAP = 30;
+
+function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+function clampX(x){ return clamp(x, 6, RINK_W-6); }
+function clampY(y){ return clamp(y, 6, RINK_H-6); }
+function cloneOps(){ return JSON.parse(JSON.stringify(ops)); }
+
+function loadSave(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    const o = JSON.parse(raw);
+    if(o && typeof o === 'object'){
+      if(Array.isArray(o.ops)) ops = o.ops;
+      if(typeof o.nextPlayerNum === 'number') nextPlayerNum = o.nextPlayerNum;
+    }
+  }catch(_){}
+}
+function writeSave(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify({ops:ops, nextPlayerNum:nextPlayerNum})); }catch(_){}
+}
+loadSave();
+
+/* --------------------------------------------------------------- 2. layout */
+
+const rinkCv = document.getElementById('rink');
+const inkCv  = document.getElementById('ink');
+const rctx = rinkCv.getContext('2d');
+const ictx = inkCv.getContext('2d', {willReadFrequently:false});
+const stageEl = document.getElementById('stage');
+const wrapEl  = document.getElementById('boardWrap');
+
+function layout(){
+  const availW = Math.max(200, stageEl.clientWidth - 16);
+  const availH = Math.max(160, stageEl.clientHeight - 16);
+  const k = Math.min(availW / RINK_W, availH / RINK_H);
+  const cssW = Math.max(1, Math.floor(RINK_W * k));
+  const cssH = Math.max(1, Math.floor(RINK_H * k));
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
+
+  wrapEl.style.width = cssW + 'px';
+  wrapEl.style.height = cssH + 'px';
+
+  [[rinkCv, rctx], [inkCv, ictx]].forEach(function(pair){
+    const cv = pair[0], ctx = pair[1];
+    cv.width  = Math.max(1, Math.round(RINK_W * DPR));
+    cv.height = Math.max(1, Math.round(RINK_H * DPR));
+    ctx.setTransform(cv.width / RINK_W, 0, 0, cv.height / RINK_H, 0, 0);
+    ctx.lineJoin = 'round';
+    ctx.lineCap  = 'round';
+  });
+
+  drawRink(rctx);
+  redrawInk();
+}
+
+/* ----------------------------------------------------------- 3. rink draw */
+
+function roundRectPath(ctx,x,y,w,h,r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr, y);
+  ctx.arcTo(x+w, y, x+w, y+h, rr);
+  ctx.arcTo(x+w, y+h, x, y+h, rr);
+  ctx.arcTo(x, y+h, x, y, rr);
+  ctx.arcTo(x, y, x+w, y, rr);
+  ctx.closePath();
+}
+
+function drawRink(ctx){
+  ctx.clearRect(0, 0, RINK_W, RINK_H);
+  const x0 = PAD, y0 = PAD, w = RINK_W - PAD*2, h = RINK_H - PAD*2, r = h*0.30;
+  const yT = y0, yB = y0+h, cx = x0+w/2, cy = y0+h/2;
+
+  roundRectPath(ctx, x0, y0, w, h, r);
+  ctx.fillStyle = '#eef6fb';
+  ctx.fill();
+
+  ctx.save();
+  roundRectPath(ctx, x0, y0, w, h, r);
+  ctx.clip();
+
+  const blueX1 = x0 + w*0.32, blueX2 = x0 + w*0.68;
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 7;
+  [blueX1, blueX2].forEach(function(bx){
+    ctx.beginPath(); ctx.moveTo(bx, yT); ctx.lineTo(bx, yB); ctx.stroke();
+  });
+
+  const glX1 = x0 + w*0.10, glX2 = x0 + w*0.90;
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.5;
+  [glX1, glX2].forEach(function(gx){
+    ctx.beginPath(); ctx.moveTo(gx, yT); ctx.lineTo(gx, yB); ctx.stroke();
+  });
+
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(cx, yT); ctx.lineTo(cx, yB); ctx.stroke();
+
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#2563eb';
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fill();
+
+  const zoneXs = [x0 + w*0.205, x0 + w*0.795];
+  const zoneYs = [y0 + h*0.24, y0 + h*0.76];
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
+  zoneXs.forEach(function(zx){
+    zoneYs.forEach(function(zy){
+      ctx.beginPath(); ctx.arc(zx, zy, 40, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath(); ctx.arc(zx, zy, 3.5, 0, Math.PI*2); ctx.fill();
+    });
+  });
+
+  ctx.fillStyle = 'rgba(37,99,235,.15)';
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(glX1, cy, 34, -Math.PI/2, Math.PI/2); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(glX2, cy, 34, Math.PI/2, Math.PI*1.5); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255,255,255,.6)';
+  ctx.strokeStyle = '#12335c'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.rect(glX1-20, cy-20, 16, 40); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.rect(glX2+4, cy-20, 16, 40); ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+
+  roundRectPath(ctx, x0, y0, w, h, r);
+  ctx.strokeStyle = '#12335c'; ctx.lineWidth = 6;
+  ctx.stroke();
+}
+
+/* ------------------------------------------------- 4. ops + undo / redo */
+
+function snapshotForUndo(){
+  undoStack.push({ops: cloneOps(), num: nextPlayerNum});
+  if(undoStack.length > UNDO_CAP) undoStack.shift();
+  redoStack.length = 0;
+  updateUndoRedoButtons();
+}
+function doUndo(){
+  if(!undoStack.length) return;
+  redoStack.push({ops: cloneOps(), num: nextPlayerNum});
+  const prev = undoStack.pop();
+  ops = prev.ops; nextPlayerNum = prev.num;
+  redrawInk(); writeSave(); updateUndoRedoButtons();
+}
+function doRedo(){
+  if(!redoStack.length) return;
+  undoStack.push({ops: cloneOps(), num: nextPlayerNum});
+  const nxt = redoStack.pop();
+  ops = nxt.ops; nextPlayerNum = nxt.num;
+  redrawInk(); writeSave(); updateUndoRedoButtons();
+}
+function updateUndoRedoButtons(){
+  btnUndo.disabled = undoStack.length === 0;
+  btnRedo.disabled = redoStack.length === 0;
+}
+function clearBoard(){
+  if(!ops.length) return;
+  if(!confirm('Start a new play? This clears the board.')) return;
+  snapshotForUndo();
+  ops = [];
+  nextPlayerNum = 1;
+  redrawInk();
+  writeSave();
+}
+function hitTestStamp(type, x, y){
+  for(let i = ops.length-1; i >= 0; i--){
+    const o = ops[i];
+    if(o.type === type && Math.hypot(o.x-x, o.y-y) <= GRAB_R) return o;
+  }
+  return null;
+}
+function makeStamp(type, x, y){
+  if(type === 'player'){
+    const obj = {type:'player', x:clampX(x), y:clampY(y), num:nextPlayerNum};
+    nextPlayerNum++;
+    return obj;
+  }
+  return {type:type, x:clampX(x), y:clampY(y)};
+}
+
+/* --------------------------------------------------------- 5. rendering */
+
+function strokePath(ctx, pts){
+  if(pts.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.stroke();
+}
+function drawArrowHead(ctx, x1,y1,x2,y2, fill, lw){
+  const ang = Math.atan2(y2-y1, x2-x1);
+  const size = Math.max(15, lw*2.2);
+  ctx.save();
+  ctx.translate(x2, y2);
+  ctx.rotate(ang);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-size, size*0.5);
+  ctx.lineTo(-size*0.62, 0);
+  ctx.lineTo(-size, -size*0.5);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.restore();
+}
+function renderOp(ctx, op){
+  if(op.type === 'pen'){
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = op.color; ctx.lineWidth = op.width;
+    strokePath(ctx, op.points);
+  } else if(op.type === 'eraser'){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.strokeStyle = '#000'; ctx.lineWidth = op.width;
+    strokePath(ctx, op.points);
+    ctx.globalCompositeOperation = 'source-over';
+  } else if(op.type === 'line'){
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = op.color; ctx.lineWidth = op.width;
+    ctx.beginPath(); ctx.moveTo(op.x1, op.y1); ctx.lineTo(op.x2, op.y2); ctx.stroke();
+    drawArrowHead(ctx, op.x1, op.y1, op.x2, op.y2, op.color, op.width);
+  } else if(op.type === 'player'){
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.beginPath(); ctx.arc(op.x, op.y, 20, 0, Math.PI*2);
+    ctx.fillStyle = PLAYER_COLOR; ctx.fill();
+    ctx.strokeStyle = PLAYER_STROKE; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 18px ' + FONT_STACK;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(op.num), op.x, op.y+1);
+  } else if(op.type === 'opponent'){
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = OPPONENT_COLOR; ctx.lineWidth = 5;
+    const s = 14;
+    ctx.beginPath(); ctx.moveTo(op.x-s, op.y-s); ctx.lineTo(op.x+s, op.y+s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(op.x+s, op.y-s); ctx.lineTo(op.x-s, op.y+s); ctx.stroke();
+  } else if(op.type === 'puck'){
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.beginPath(); ctx.ellipse(op.x, op.y, 11, 8, 0, 0, Math.PI*2);
+    ctx.fillStyle = PUCK_COLOR; ctx.fill();
+    ctx.strokeStyle = PUCK_STROKE; ctx.lineWidth = 1.2; ctx.stroke();
+  }
+}
+function redrawInk(){
+  ictx.clearRect(0, 0, RINK_W, RINK_H);
+  for(let i=0;i<ops.length;i++) renderOp(ictx, ops[i]);
+  ictx.globalCompositeOperation = 'source-over';
+}
+
+/* --------------------------------------------------------- 6. touch/mouse input */
+
+/* Raw touchstart/touchmove/touchend with {passive:false} + preventDefault(),
+   matching every other game on this site — Pointer Events were tried first
+   but iOS Safari does not reliably honor preventDefault() on pointer events
+   to block page scroll/bounce, even with touch-action:none. This pattern is
+   the proven one. */
+
+let dragState = null;
+let activeTouchId = null;
+let mouseDown = false;
+
+function toLogical(clientX, clientY){
+  const rect = inkCv.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) / rect.width  * RINK_W,
+    y: (clientY - rect.top)  / rect.height * RINK_H
+  };
+}
+function renderLive(){
+  redrawInk();
+  if(dragState && (dragState.kind === 'stroke' || dragState.kind === 'line')){
+    renderOp(ictx, dragState);
+  }
+}
+function beginDrag(clientX, clientY){
+  const p = toLogical(clientX, clientY);
+  if(tool === 'pen' || tool === 'eraser'){
+    snapshotForUndo();
+    dragState = {kind:'stroke', type:tool, color: tool==='eraser' ? '#000' : color, width:WIDTHS[widthIdx], points:[[p.x,p.y]]};
+  } else if(tool === 'line'){
+    snapshotForUndo();
+    dragState = {kind:'line', type:'line', x1:p.x, y1:p.y, x2:p.x, y2:p.y, color:color, width:WIDTHS[widthIdx]};
+  } else if(tool === 'player' || tool === 'opponent' || tool === 'puck'){
+    const hit = hitTestStamp(tool, p.x, p.y);
+    snapshotForUndo();
+    const obj = hit || (function(){ const o = makeStamp(tool, p.x, p.y); ops.push(o); return o; })();
+    dragState = {kind:'stamp', obj:obj};
+  }
+  renderLive();
+}
+function moveDrag(clientX, clientY){
+  if(!dragState) return;
+  const p = toLogical(clientX, clientY);
+  if(dragState.kind === 'stroke'){
+    const last = dragState.points[dragState.points.length-1];
+    if(Math.hypot(p.x-last[0], p.y-last[1]) > 2) dragState.points.push([p.x, p.y]);
+  } else if(dragState.kind === 'line'){
+    dragState.x2 = p.x; dragState.y2 = p.y;
+  } else if(dragState.kind === 'stamp'){
+    dragState.obj.x = clampX(p.x); dragState.obj.y = clampY(p.y);
+  }
+  renderLive();
+}
+function endDrag(){
+  if(!dragState) return;
+  if(dragState.kind === 'stroke'){
+    let pts = dragState.points;
+    if(pts.length === 1) pts = [pts[0], pts[0]];
+    ops.push({type:dragState.type, color:dragState.color, width:dragState.width, points:pts});
+  } else if(dragState.kind === 'line'){
+    const d = Math.hypot(dragState.x2-dragState.x1, dragState.y2-dragState.y1);
+    if(d > 6) ops.push({type:'line', x1:dragState.x1, y1:dragState.y1, x2:dragState.x2, y2:dragState.y2, color:dragState.color, width:dragState.width});
+  }
+  dragState = null;
+  redrawInk();
+  writeSave();
+  updateUndoRedoButtons();
+}
+function findTouch(list, id){
+  for(let i=0;i<list.length;i++) if(list[i].identifier === id) return list[i];
+  return null;
+}
+
+inkCv.addEventListener('touchstart', function(e){
+  e.preventDefault();
+  if(activeTouchId !== null) return;
+  const t = e.changedTouches[0];
+  activeTouchId = t.identifier;
+  beginDrag(t.clientX, t.clientY);
+}, {passive:false});
+inkCv.addEventListener('touchmove', function(e){
+  e.preventDefault();
+  if(activeTouchId === null) return;
+  const t = findTouch(e.changedTouches, activeTouchId) || findTouch(e.touches, activeTouchId);
+  if(!t) return;
+  moveDrag(t.clientX, t.clientY);
+}, {passive:false});
+function onTouchEnd(e){
+  e.preventDefault();
+  if(activeTouchId === null) return;
+  const t = findTouch(e.changedTouches, activeTouchId);
+  if(!t) return;
+  activeTouchId = null;
+  endDrag();
+}
+inkCv.addEventListener('touchend', onTouchEnd, {passive:false});
+inkCv.addEventListener('touchcancel', onTouchEnd, {passive:false});
+
+inkCv.addEventListener('mousedown', function(e){
+  e.preventDefault();
+  mouseDown = true;
+  beginDrag(e.clientX, e.clientY);
+});
+window.addEventListener('mousemove', function(e){
+  if(!mouseDown) return;
+  moveDrag(e.clientX, e.clientY);
+});
+window.addEventListener('mouseup', function(){
+  if(!mouseDown) return;
+  mouseDown = false;
+  endDrag();
+});
+
+/* -------------------------------------------------------- 7. toolbar UI */
+
+const btnUndo = document.getElementById('btnUndo');
+const btnRedo = document.getElementById('btnRedo');
+const btnMenu = document.getElementById('btnMenu');
+const menu    = document.getElementById('menu');
+const subpad  = document.getElementById('subpad');
+const colorRow = document.getElementById('colorRow');
+const widthRow = document.getElementById('widthRow');
+
+const toolBtns = Array.prototype.slice.call(document.querySelectorAll('.tool-btn'));
+toolBtns.forEach(function(btn){
+  btn.addEventListener('click', function(){
+    tool = btn.getAttribute('data-tool');
+    toolBtns.forEach(function(b){ b.classList.toggle('on', b === btn); });
+    updateSubpad();
+  });
+});
+function updateSubpad(){
+  const needsColor = (tool === 'pen' || tool === 'line');
+  const needsWidth = (tool === 'pen' || tool === 'line' || tool === 'eraser');
+  subpad.classList.toggle('show', needsColor || needsWidth);
+  colorRow.style.display = needsColor ? 'flex' : 'none';
+  widthRow.style.display = needsWidth ? 'flex' : 'none';
+}
+updateSubpad();
+
+const colorBtns = Array.prototype.slice.call(document.querySelectorAll('.color-btn'));
+colorBtns.forEach(function(btn, i){
+  btn.style.background = COLORS[i];
+  btn.addEventListener('click', function(){
+    color = COLORS[i];
+    colorBtns.forEach(function(b){ b.classList.toggle('on', b === btn); });
+  });
+});
+
+const widthBtns = Array.prototype.slice.call(document.querySelectorAll('.width-btn'));
+widthBtns.forEach(function(btn){
+  btn.addEventListener('click', function(){
+    widthIdx = parseInt(btn.getAttribute('data-w'), 10);
+    widthBtns.forEach(function(b){ b.classList.toggle('on', b === btn); });
+  });
+});
+
+btnUndo.addEventListener('click', doUndo);
+btnRedo.addEventListener('click', doRedo);
+
+btnMenu.addEventListener('click', function(e){
+  e.stopPropagation();
+  menu.classList.toggle('open');
+});
+document.addEventListener('click', function(e){
+  if(menu.classList.contains('open') && !menu.contains(e.target) && e.target !== btnMenu){
+    menu.classList.remove('open');
+  }
+});
+document.getElementById('miShare').addEventListener('click', function(){ menu.classList.remove('open'); exportPNG(); });
+document.getElementById('miPrint').addEventListener('click', function(){ menu.classList.remove('open'); exportPrint(); });
+document.getElementById('miClear').addEventListener('click', function(){ menu.classList.remove('open'); clearBoard(); });
+
+/* ---------------------------------------------------- 8. export / print */
+
+function renderComposite(scale){
+  scale = scale || 2.5;
+  const off = document.createElement('canvas');
+  off.width = Math.round(RINK_W * scale);
+  off.height = Math.round(RINK_H * scale);
+  const octx = off.getContext('2d');
+  octx.setTransform(scale, 0, 0, scale, 0, 0);
+  octx.lineJoin = 'round'; octx.lineCap = 'round';
+  drawRink(octx);
+  for(let i=0;i<ops.length;i++) renderOp(octx, ops[i]);
+  return off;
+}
+function dataURLToBlob(dataURL){
+  const parts = dataURL.split(',');
+  const meta = parts[0];
+  const mimeMatch = meta.match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+  const binary = atob(parts[1]);
+  const u8 = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) u8[i] = binary.charCodeAt(i);
+  return new Blob([u8], {type:mime});
+}
+function fileNameStamp(){
+  const d = new Date();
+  const pad2 = function(n){ return String(n).padStart(2,'0'); };
+  return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+'-'+pad2(d.getHours())+pad2(d.getMinutes());
+}
+function downloadBlob(blob, fname){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+async function exportPNG(){
+  const off = renderComposite(2.5);
+  const dataURL = off.toDataURL('image/png');
+  const blob = dataURLToBlob(dataURL);
+  const fname = 'hockey-play-' + fileNameStamp() + '.png';
+  let shared = false;
+  try{
+    if(typeof File !== 'undefined'){
+      const file = new File([blob], fname, {type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:'Hockey Play'});
+        shared = true;
+      }
+    }
+  }catch(_){ /* share cancelled or unsupported — fall back to download */ }
+  if(!shared) downloadBlob(blob, fname);
+}
+const printImg = document.getElementById('printImg');
+function exportPrint(){
+  const off = renderComposite(3);
+  const dataURL = off.toDataURL('image/png');
+  printImg.onload = function(){
+    printImg.onload = null;
+    window.print();
+  };
+  printImg.src = dataURL;
+}
+
+/* ---------------------------------------------------------------- 9. boot */
+
+layout();
+updateUndoRedoButtons();
+window.addEventListener('resize', layout);
+window.addEventListener('orientationchange', function(){ setTimeout(layout, 120); });
+if(window.visualViewport) window.visualViewport.addEventListener('resize', layout);
+if(window.ResizeObserver){
+  try{ new ResizeObserver(layout).observe(stageEl); }catch(_){}
+}
+
+})();
+</script>
+</body>
+</html>
