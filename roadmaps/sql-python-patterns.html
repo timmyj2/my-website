@@ -562,7 +562,7 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
 <!-- ============ COMPARING ============ -->
 <section id="compare">
   <div class="shead"><span class="snum">03</span><h2>Comparing &mdash; the reconciliation toolkit</h2></div>
-  <p class="slede">Three patterns for "these two things should match and don't" &mdash; the most valuable class of work you can do in a finance organisation.</p>
+  <p class="slede">Three patterns for "these two things should match and don't" &mdash; the most valuable work you can do in a finance organisation.</p>
 
   <figure class="fig">
     <svg viewBox="0 0 700 320" preserveAspectRatio="xMidYMid meet" role="img">
@@ -622,25 +622,25 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
       <path d="M40,286 V276 M660,286 V276 M40,286 H660" stroke="var(--dim)" stroke-width="1.1" fill="none"/>
       <text x="350" y="300" text-anchor="middle" font-size="9.5" fill="var(--dim)">FULL OUTER JOIN &#8594; all three, in one pass</text>
     </svg>
-    <figcaption><b>Pick the join by what you need to see.</b> An inner join is enough if you only care about rows on both sides. Reach for the anti-join (pattern 10) when the question is purely "what's missing". Use the full outer join (pattern 11) when you need to report all three buckets at once &mdash; which is almost always what "reconcile these" actually means.</figcaption>
+    <figcaption><b>Pick the join by what you need to see.</b> Inner join if you only care about rows on both sides. Anti-join (pattern 10) when the question is purely "what's missing". Full outer join (pattern 11) to report all three buckets at once &mdash; usually what "reconcile these" actually means.</figcaption>
   </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">10</span><h3>Anti-join &mdash; what's in A but not B</h3></div>
-    <p class="want"><b>You want this when:</b> "which invoices didn't make it across", "which employees have no cost centre", "what's missing". The single fastest way to find a data problem.</p>
+    <p class="want"><b>You want this when:</b> "which invoices didn't make it across", "which employees have no cost centre", "what's missing". The fastest way to find a data problem.</p>
     <pre><code><span class="c">-- readable and fast: no rows on the right</span>
 <span class="k">SELECT</span> a.*
 <span class="k">FROM</span> source_system a
 <span class="k">LEFT JOIN</span> target_system b <span class="k">ON</span> b.doc_id = a.doc_id
 <span class="k">WHERE</span> b.doc_id <span class="k">IS NULL</span>;</code></pre>
-    <div class="note warn"><b>NOT IN will hurt you</b><code>WHERE id NOT IN (SELECT id FROM b)</code> returns <em>zero rows</em> if that subquery contains a single NULL. It's silent, it's baffling, and it has burned everyone once. Use LEFT JOIN&hellip;IS NULL or NOT EXISTS instead.</div>
+    <div class="note warn"><b>NOT IN will hurt you</b><code>WHERE id NOT IN (SELECT id FROM b)</code> returns <em>zero rows</em> if that subquery contains a single NULL. Silent, baffling, has burned everyone once. Use LEFT JOIN&hellip;IS NULL or NOT EXISTS instead.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">11</span><h3>Full reconciliation &mdash; both sides, with reasons</h3></div>
-    <p class="want"><b>You want this when:</b> two systems disagree and you need to explain the gap, not just measure it. This is the deliverable that ends arguments &mdash; and the one people remember you for.</p>
+    <p class="want"><b>You want this when:</b> two systems disagree and you need to explain the gap, not just measure it. The deliverable that ends arguments.</p>
     <span class="mini">The idea in words</span>
-    <p class="want"><code>FULL OUTER JOIN</code> keeps rows that exist on either side, so you catch all three failure modes at once: missing on the left, missing on the right, and present on both but different. Then <b>categorise every difference</b> &mdash; that categorisation is the actual product.</p>
+    <p class="want"><code>FULL OUTER JOIN</code> keeps rows on either side, catching all three failure modes at once. Then <b>categorise every difference</b> &mdash; that's the actual product.</p>
     <pre><code><span class="k">SELECT</span>
   <span class="f">COALESCE</span>(a.doc_id, b.doc_id)          <span class="k">AS</span> doc_id,
   a.amount                              <span class="k">AS</span> source_amount,
@@ -655,12 +655,12 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
   <span class="k">END</span> <span class="k">AS</span> reason
 <span class="k">FROM</span> source_ledger a
 <span class="k">FULL OUTER JOIN</span> target_ledger b <span class="k">ON</span> b.doc_id = a.doc_id;</code></pre>
-    <div class="note"><b>Why this wins</b>Nobody expects zero difference. What they want is that <em>every</em> difference has a name, and the "Unexplained" bucket is small and shrinking. Report that bucket as your metric &mdash; it's honest, trackable, and it makes the work visible.</div>
+    <div class="note"><b>Why this wins</b>Nobody expects zero difference. They want <em>every</em> difference named, and the "Unexplained" bucket small and shrinking. Report that bucket as your metric &mdash; honest, trackable, visible.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">12</span><h3>Cleaning keys before you join</h3></div>
-    <p class="want"><b>You want this when:</b> a join returns far fewer rows than expected and you can't see why. The answer is almost always invisible characters &mdash; and you'll lose an hour to this if you don't check it first.</p>
+    <p class="want"><b>You want this when:</b> a join returns far fewer rows than expected and you can't see why. Almost always invisible characters &mdash; check this first or lose an hour.</p>
     <pre><code><span class="c">-- the usual suspects, in order of how often they're the culprit</span>
 <span class="k">SELECT</span>
   <span class="f">UPPER</span>(<span class="f">TRIM</span>(doc_id))                      <span class="k">AS</span> clean_id,   <span class="c">-- case + spaces</span>
@@ -673,14 +673,14 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
   (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> doc_id) <span class="k">FROM</span> a)                        <span class="k">AS</span> keys_a,
   (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> doc_id) <span class="k">FROM</span> b)                        <span class="k">AS</span> keys_b,
   (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> a.doc_id) <span class="k">FROM</span> a <span class="k">JOIN</span> b <span class="k">ON</span> b.doc_id=a.doc_id) <span class="k">AS</span> overlap;</code></pre>
-    <div class="note warn"><b>The row-count explosion</b>If a join returns <em>more</em> rows than you started with, you have duplicates on one side &mdash; you've made a many-to-many by accident. Check the count before and after every join; when it jumps, go back to pattern 01.</div>
+    <div class="note warn"><b>The row-count explosion</b>Join returns <em>more</em> rows than you started with? Duplicates on one side &mdash; an accidental many-to-many. Check the count before and after every join; when it jumps, go back to pattern 01.</div>
   </div>
 </section>
 
 <!-- ============ PYTHON ============ -->
 <section id="python">
   <div class="shead"><span class="snum">04</span><h2>When to reach for Python instead</h2></div>
-  <p class="slede">You have a notebook. The useful question isn't "which is better" &mdash; it's "which one is this job shaped like?"</p>
+  <p class="slede">The useful question isn't "which is better" &mdash; it's "which one is this job shaped like?"</p>
 
   <div class="tscroll"><table>
     <tr><th>Use SQL when</th><th>Use Python when</th></tr>
@@ -692,7 +692,7 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
 
   <div class="card">
     <h3>The four Python moves worth having by heart</h3>
-    <p>You don't need to learn Python properly to be effective in a notebook. These four cover most of what a data job actually needs, and the rest you can prompt your way through.</p>
+    <p>These four cover most of what a data job needs from a notebook. The rest you can prompt your way through.</p>
     <pre><code><span class="c"># 1. read many files as one table — the folder loop, done properly</span>
 df = spark.read.option(<span class="s">"header"</span>,<span class="k">True</span>).csv(<span class="s">"Files/landing/2026/*.csv"</span>)
 
@@ -706,12 +706,12 @@ df.summary().show()                              <span class="c"># ranges, nulls
 
 <span class="c"># 4. write it back as a table others can use</span>
 df.write.mode(<span class="s">"overwrite"</span>).saveAsTable(<span class="s">"silver_invoices"</span>)</code></pre>
-    <div class="note py"><b>The vibe coder's edge</b>You don't have to know the syntax &mdash; you have to know that the pattern exists and what it's called. "Unpivot these month columns into rows" gets you working code from any assistant instantly. "Fix this spreadsheet" does not. <b>The vocabulary is the skill</b>, and that's what this page is for.</div>
+    <div class="note py"><b>The vibe coder's edge</b>You don't need the syntax &mdash; you need to know the pattern exists and what it's called. "Unpivot these month columns" gets working code from any assistant instantly. "Fix this spreadsheet" does not. <b>The vocabulary is the skill.</b></div>
   </div>
 
   <div class="card">
     <h3>Mixing them in one notebook</h3>
-    <p>You don't have to choose. In a Fabric notebook you can run SQL against your lakehouse and hand the result to Python, or register a dataframe so SQL can see it. Use each for what it's good at within a single job.</p>
+    <p>You don't have to choose. In a Fabric notebook, run SQL against your lakehouse and hand the result to Python, or register a dataframe so SQL can see it &mdash; use each for what it's good at.</p>
     <pre><code><span class="c"># SQL for the set-based part…</span>
 df = spark.sql(<span class="s">"""
   SELECT customer_id, SUM(amount) AS total
@@ -729,7 +729,7 @@ spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).sh
 <!-- ============ CHEAT SHEET ============ -->
 <section id="ref">
   <div class="shead"><span class="snum">05</span><h2>The naming sheet</h2></div>
-  <p class="slede">The actual deliverable of this page: symptom on the left, name on the right. When you can say the right-hand column, you can ask anyone &mdash; human or AI &mdash; for exactly what you need.</p>
+  <p class="slede">The actual deliverable: symptom on the left, name on the right. Say the right-hand column and you can ask anyone &mdash; human or AI &mdash; for exactly what you need.</p>
 
   <div class="tscroll"><table>
     <tr><th>When you catch yourself saying&hellip;</th><th>You want&hellip;</th></tr>
@@ -750,9 +750,9 @@ spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).sh
   <div class="card">
     <h3>Three habits that prevent most bugs</h3>
     <ul class="plain">
-      <li><b>Count before and after every join.</b> A row count that grows means accidental many-to-many; one that shrinks means a key problem. Thirty seconds, catches most silent errors.</li>
-      <li><b>Never trust a number you haven't seen at row level.</b> Before you publish a total, look at ten of the rows behind it. It's astonishing how often that alone finds the problem.</li>
-      <li><b>Write the check query alongside the build query.</b> If you can't write a query that would prove it's wrong, you don't yet understand what "right" means here.</li>
+      <li><b>Count before and after every join.</b> Growth means accidental many-to-many; shrinkage means a key problem. Thirty seconds, catches most silent errors.</li>
+      <li><b>Never trust a number you haven't seen at row level.</b> Before publishing a total, look at ten rows behind it. Astonishing how often that alone finds the problem.</li>
+      <li><b>Write the check query alongside the build query.</b> Can't write one that would prove it's wrong? You don't yet understand what "right" means here.</li>
     </ul>
   </div>
 </section>
@@ -760,7 +760,7 @@ spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).sh
 <a class="backlink" href="../index.html">&larr; back to the tool belt</a>
 
 <footer>
-  <p>A vocabulary page, not a syntax reference. SQL is written for Fabric's SQL endpoint, Warehouse or Snowflake; dialect differences are noted where they matter.</p>
+  <p>A vocabulary page, not a syntax reference. SQL targets Fabric's SQL endpoint, Warehouse, or Snowflake; dialect differences are noted where they matter.</p>
   <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#4ade80">◆</span> SQL &amp; Python Patterns</p>
 </footer>
 

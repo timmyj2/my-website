@@ -486,51 +486,49 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
       <path d="M63.5,200 L68,190 L72.5,200 Z" fill="var(--vs)" aria-hidden="true"/>
       <text x="383" y="252" text-anchor="middle" font-size="11.5" fill="var(--dim)">next time you sit down, start again at 1 &#8212; not at 2</text>
     </svg>
-    <figcaption><b>Only the two ends touch GitHub.</b> Steps 2 to 5 happen entirely on your own machine, which is what makes experimenting safe &mdash; nothing is shared until the last click. The step people skip is the first one, and that is where most conflicts come from.</figcaption>
+    <figcaption><b>Only the two ends touch GitHub.</b> Steps 2&ndash;5 are all local, which is what makes experimenting safe. Skipping step 1 is where most conflicts start.</figcaption>
   </figure>
 
   <ol class="steps">
     <li>
       <h4>Start from a fresh copy &mdash; <span class="ui">Sync Changes</span></h4>
-      <p>Before you touch anything, pull down what's changed. The <span class="ui">↻</span> in the bottom-left status bar, or <span class="ui">⋯</span> &rarr; <span class="ui">Pull</span>. Starting stale is the number one cause of the conflicts in section 4.</p>
+      <p>Pull down what's changed first: the <span class="ui">↻</span> in the status bar, or <span class="ui">⋯</span> &rarr; <span class="ui">Pull</span>. Starting stale is the top cause of conflicts.</p>
     </li>
     <li>
       <h4>Make a branch &mdash; click the branch name, bottom-left</h4>
-      <p>Click the branch name in the status bar &rarr; <span class="ui">Create new branch&hellip;</span> &rarr; type a name like <code>fix-mobile-nav</code>. You're now working in a parallel copy and <code>main</code> is safe no matter what you do.</p>
-      <p>Do this <em>every time</em>, even for small things. It costs three seconds and it means you can always abandon an idea cleanly.</p>
+      <p>Branch name &rarr; <span class="ui">Create new branch&hellip;</span> &rarr; name it, e.g. <code>fix-mobile-nav</code>. <code>main</code> stays safe no matter what &mdash; do this even for small changes, it costs three seconds.</p>
     </li>
     <li>
       <h4>Change things &mdash; normally</h4>
-      <p>Edit files, let Claude Code edit files, whatever. Files appear under <b>Changes</b> as you go. Nothing is recorded yet.</p>
+      <p>Edit files as normal. They appear under <b>Changes</b> &mdash; nothing's recorded yet.</p>
     </li>
     <li>
       <h4>Read the diffs, then stage &mdash; the <span class="ui">+</span> buttons</h4>
-      <p>Click each file, read the diff, then <span class="ui">+</span> to stage it. To stage everything at once, hover <b>Changes</b> and click the <span class="ui">+</span> on that header row.</p>
+      <p>Click each file, read the diff, then <span class="ui">+</span> to stage. Hover the <b>Changes</b> header and click its <span class="ui">+</span> to stage everything at once.</p>
     </li>
     <li>
       <h4>Write a message and hit <span class="ui">Commit</span></h4>
-      <p>One line describing <em>what changed and why</em>. Your future self reads these when hunting for when something broke &mdash; "updates" tells them nothing.</p>
-      <p>Still local. Nothing has left your machine yet, and you can still change your mind.</p>
+      <p>One line: what changed and why &mdash; "updates" tells your future self nothing. Still local; you can still change your mind.</p>
     </li>
     <li>
       <h4><span class="ui">Publish Branch</span> / <span class="ui">Sync Changes</span> &rarr; then the PR in the browser</h4>
-      <p>The blue button becomes <span class="ui">Publish Branch</span> the first time, then <span class="ui">Sync Changes</span> afterwards. Once pushed, GitHub shows a <b>Compare &amp; pull request</b> banner &mdash; click it, write a sentence, create the PR, merge it. That's the workflow you're already using.</p>
+      <p>Blue button: <span class="ui">Publish Branch</span> the first time, <span class="ui">Sync Changes</span> after. Pushed &rarr; GitHub's <b>Compare &amp; pull request</b> banner &rarr; write a sentence, create the PR, merge.</p>
     </li>
   </ol>
 
-  <div class="tip"><b>Commit more often than feels necessary</b>A commit is a save point you can return to, not a formal statement of completion. Ten small commits with clear messages are far more useful than one giant one at the end &mdash; and if something breaks, you can find the exact one that did it.</div>
+  <div class="tip"><b>Commit more often than feels necessary</b>A commit is a save point, not a statement of completion. Ten small clear commits beat one giant one &mdash; and pinpoint exactly what broke.</div>
 </section>
 
 <!-- ============ CONFLICTS ============ -->
 <section id="conflict">
   <div class="shead"><span class="snum">04</span><h2>Merge conflicts &mdash; what they actually are</h2></div>
-  <p class="slede">The thing everyone dreads, and it's genuinely not that bad once you know what Git is asking you. Worth reading properly, because you hit this every time two branches touch the same card grid.</p>
+  <p class="slede">Not as bad as it feels once you know what Git's actually asking. You'll hit this whenever two branches touch the same lines.</p>
 
   <div class="card">
     <h3>What's actually happening</h3>
-    <p>Git merges automatically whenever it can. It only stops when <b>two branches changed the same lines of the same file</b> and it can't tell which one you meant. That's the entire cause.</p>
-    <p>It is not an error, and nothing is broken or lost. Git is asking you one question: <b>"which of these do you want &mdash; or both?"</b> You answer, you commit, it's over.</p>
-    <p>This is exactly what happens when two feature branches each add a card to the same grid in <code>index.html</code>: both edited the same spot, and both changes are wanted. The answer is nearly always <b>both</b>.</p>
+    <p>Git merges automatically whenever it can, and only stops when <b>two branches changed the same lines of the same file</b> &mdash; it can't tell which you meant.</p>
+    <p>Nothing is broken or lost. Git is asking one question: <b>which of these do you want &mdash; or both?</b> Answer, commit, done.</p>
+    <p>Classic case: two branches each add a card to the same grid in <code>index.html</code>. Both are wanted &mdash; the answer is nearly always <b>both</b>.</p>
   </div>
 
   <figure class="fig">
@@ -600,7 +598,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
       <text x="352" y="234" font-size="11.5" fill="#a6a6ae">Nothing is broken. Git is asking you one question:</text>
       <text x="352" y="256" font-size="13" font-weight="600" fill="#e9e9ec">which of these should the file end up with &#8212; or both?</text>
     </svg>
-    <figcaption><b>Both sides are kept.</b> Git never throws either version away &mdash; it writes both into the file, fenced by the three marker lines, and leaves the choice to you. The markers disappear the moment you click one of the Accept links, which is why the file below looks alarming and isn't.</figcaption>
+    <figcaption><b>Both sides are kept.</b> Git fences them with marker lines and leaves the choice to you. The markers vanish the moment you click Accept, so the file below looks scarier than it is.</figcaption>
   </figure>
 
   <div class="mock">
@@ -650,7 +648,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
       <text x="64" y="248" font-family="Inter,sans-serif" font-size="10.5" fill="#a6a6ae">The &lt;&lt;&lt;&lt;&lt;&lt;&lt;, ======= and &gt;&gt;&gt;&gt;&gt;&gt;&gt; marker lines vanish automatically. Tidy the</text>
       <text x="64" y="266" font-family="Inter,sans-serif" font-size="10.5" fill="#a6a6ae">blank lines, save, stage the file, and commit. The conflict is over.</text>
     </svg>
-    <p class="mockcap"><b>Illustration of the inline conflict view.</b> The four blue links appear above every conflict block. <span style="color:#4ec9b0">Green</span> = your branch, <span style="color:#4fb8ff">blue</span> = what you're merging in.</p>
+    <p class="mockcap">The four blue links appear above every conflict block. <span style="color:#4ec9b0">Green</span> = your branch, <span style="color:#4fb8ff">blue</span> = what's merging in.</p>
   </div>
 
   <div class="card">
@@ -658,35 +656,35 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     <ol class="steps" style="margin-top:12px">
       <li>
         <h4>Open the file &mdash; it's marked <span class="ui">C</span> in Source Control</h4>
-        <p>VS Code jumps you to the conflict and colours the two competing blocks.</p>
+        <p>VS Code jumps to the conflict and colours both competing blocks.</p>
       </li>
       <li>
         <h4>Read both sides and decide</h4>
-        <p><b>Current</b> is your branch. <b>Incoming</b> is what you're merging in. Ask plainly: which of these should the file end up with?</p>
+        <p><b>Current</b> = your branch. <b>Incoming</b> = what you're merging in. Which should the file end up with?</p>
       </li>
       <li>
         <h4>Click the answer</h4>
-        <p><span class="ui">Accept Current</span>, <span class="ui">Accept Incoming</span>, or <span class="ui">Accept Both</span>. For two cards in a grid, it's <b>Accept Both</b> nearly every time. If neither is right, just edit the text by hand and delete the marker lines yourself &mdash; that's completely legitimate.</p>
+        <p><span class="ui">Accept Current</span>, <span class="ui">Accept Incoming</span>, or <span class="ui">Accept Both</span> &mdash; usually <b>Both</b> for two added cards. Or edit by hand and delete the markers yourself.</p>
       </li>
       <li>
         <h4>Check no markers survive</h4>
-        <p>Search the file for <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>. If any remain, you missed a conflict further down the file &mdash; a big file can have several.</p>
+        <p>Search for <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>. Any left means a conflict further down &mdash; big files can have several.</p>
       </li>
       <li>
         <h4>Save, stage, commit</h4>
         <p>Staging a conflicted file is how you tell Git it's resolved. Commit, and the merge completes.</p>
       </li>
     </ol>
-    <div class="tip"><b>The three-way Merge Editor</b>Click <span class="ui">Resolve in Merge Editor</span> for a nicer view: your version left, theirs right, the result at the bottom, with checkboxes to include either side. For anything more complicated than two added blocks, use it &mdash; it's much easier to see what you're producing.</div>
+    <div class="tip"><b>The three-way Merge Editor</b><span class="ui">Resolve in Merge Editor</span> gives yours/theirs/result side by side with checkboxes. Use it for anything messier than two added blocks.</div>
   </div>
 
-  <div class="tip warn"><b>How to stop having them</b>Conflicts come from branches drifting apart. Three habits kill most of them: <b>sync before you start</b>, <b>keep branches short-lived</b> (merge within a day or two), and <b>merge main into your branch</b> if it's been open a while, so you deal with a small conflict now instead of a big one later. Two branches that both edit one shared file for a week will always fight.</div>
+  <div class="tip warn"><b>How to stop having them</b>Conflicts come from branches drifting apart. Sync before you start, keep branches short-lived, and merge <code>main</code> in if a branch runs long &mdash; small conflicts now beat big ones later.</div>
 </section>
 
 <!-- ============ UNDO ============ -->
 <section id="undo">
   <div class="shead"><span class="snum">05</span><h2>Undoing things &mdash; ranked by how much you'll want them</h2></div>
-  <p class="slede">The real confidence unlock. Once you know you can undo anything, you stop being cautious in the ways that slow you down.</p>
+  <p class="slede">Once you know almost everything's undoable, you stop being cautious in ways that slow you down.</p>
 
   <div class="tscroll"><table>
     <tr><th>You want to&hellip;</th><th>Do this in the GUI</th><th>Safe?</th></tr>
@@ -722,36 +720,36 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     </tr>
   </table></div>
 
-  <div class="tip warn"><b>The one genuinely dangerous button</b><span class="ui">Discard Changes</span> (the <span class="ui">↺</span>) deletes uncommitted work with no way back &mdash; Git never had a copy, so there's nothing to restore. VS Code's own local file history sometimes saves you, but don't rely on it. <b>If you're unsure, commit first.</b> A messy commit you delete later is free; lost work isn't.</div>
+  <div class="tip warn"><b>The one genuinely dangerous button</b><span class="ui">Discard Changes</span> (the <span class="ui">↺</span>) deletes uncommitted work with no way back &mdash; Git never had a copy. VS Code's local file history sometimes saves you, but don't rely on it. <b>If unsure, commit first.</b></div>
 
   <div class="card">
     <h3>The safety net worth knowing about</h3>
-    <p>Committed work is <b>extremely</b> hard to lose permanently &mdash; Git keeps a log of where every branch has pointed for weeks, so even a "deleted" commit is usually recoverable by someone who knows where to look. Uncommitted work has no such protection.</p>
-    <p>Which reduces to one rule: <b>commit early, commit messily.</b> Tidy history is a nice-to-have. Not losing an afternoon's work is not.</p>
+    <p>Committed work is hard to lose &mdash; Git logs every place a branch has pointed for weeks, so even a "deleted" commit is usually recoverable. Uncommitted work has no such net.</p>
+    <p>One rule: <b>commit early, commit messily.</b> Tidy history is nice-to-have; not losing an afternoon's work isn't.</p>
   </div>
 </section>
 
 <!-- ============ FABRIC ============ -->
 <section id="fabric">
   <div class="shead"><span class="snum">06</span><h2>The same buttons, in Fabric</h2></div>
-  <p class="slede">You've already connected a workspace to GitHub, so this will look familiar &mdash; Fabric's Git integration is deliberately the same model with fewer buttons.</p>
+  <p class="slede">Same model, fewer buttons &mdash; Fabric's Git integration deliberately mirrors this.</p>
 
   <div class="card">
     <h3>What the workspace source control panel gives you</h3>
     <ul class="plain">
-      <li><b>Source control</b> in the workspace shows changed items with the same status idea &mdash; edited here, edited in the repo, or both (which is a conflict).</li>
-      <li><b>Commit</b> pushes your workspace changes up. <b>Update</b> pulls repo changes down into the workspace. Same push/pull, different words.</li>
-      <li><b>Branch out to a new workspace</b> is the killer feature and has no VS Code equivalent: it creates a whole isolated workspace from a branch, so you can develop without touching what anyone else is using.</li>
-      <li>PRs still happen on GitHub in the browser &mdash; Fabric doesn't do the review step, which is fine, because that's the part the browser is good at.</li>
+      <li><b>Source control</b> shows changed items with the same status idea &mdash; edited here, in the repo, or both (a conflict).</li>
+      <li><b>Commit</b> pushes workspace changes up. <b>Update</b> pulls repo changes down. Same push/pull, different words.</li>
+      <li><b>Branch out to a new workspace</b> &mdash; no VS Code equivalent: an isolated workspace from a branch, so you don't touch what others are using.</li>
+      <li>PRs still happen on GitHub in the browser &mdash; that's the part the browser's good at.</li>
     </ul>
-    <div class="tip"><b>Where it differs from code</b>Fabric items are serialised into folders of JSON and metadata, so a conflict inside a semantic model is much harder to read than a conflict in HTML. Practical rule: <b>avoid conflicts in Fabric rather than resolving them.</b> One person per item at a time, short-lived branches, update before you start.</div>
+    <div class="tip"><b>Where it differs from code</b>Fabric items serialise to JSON/metadata, so a conflict there is far harder to read than in HTML. Rule: <b>avoid conflicts rather than resolve them</b> &mdash; one person per item, short-lived branches, update before you start.</div>
   </div>
 </section>
 
 <!-- ============ CLI FOOTNOTE ============ -->
 <section id="cli">
   <div class="shead"><span class="snum">07</span><h2>What each button runs &mdash; for translation only</h2></div>
-  <p class="slede">You don't need these. They're here so that when documentation or an AI answer mentions a command, you can map it to the button you already know.</p>
+  <p class="slede">You don't need these &mdash; they're here to map a suggested command back to the button you already clicked.</p>
 
   <div class="tscroll"><table>
     <tr><th>The button you click</th><th>What it runs</th></tr>
@@ -765,7 +763,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     <tr><td>Revert (right-click a commit)</td><td><code>git revert &lt;commit&gt;</code></td></tr>
   </table></div>
 
-  <div class="tip ok"><b>Where the GUI genuinely beats the terminal</b>Reading a diff and resolving a conflict. Side-by-side colour and click-to-accept are objectively better than staring at markers in a text file &mdash; plenty of people who are fluent in the command line still switch to VS Code for exactly these two jobs. Using the GUI isn't a beginner compromise; for these tasks it's the better tool.</div>
+  <div class="tip ok"><b>Where the GUI genuinely beats the terminal</b>Reading a diff and resolving a conflict &mdash; side-by-side colour and click-to-accept beat staring at markers in a text file. Plenty of terminal-fluent people still switch to VS Code for exactly these two jobs.</div>
 </section>
 
 <a class="backlink" href="../index.html">&larr; back to the tool belt</a>
