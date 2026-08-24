@@ -475,25 +475,37 @@ SUMMARIZECOLUMNS (
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">Tabular Editor edits the model's metadata (the Tabular Object Model) directly, without loading data. That's why creating twenty measures takes seconds instead of twenty refresh-and-wait cycles — and why it feels like cheating the first week you use it.</p>
+      <p class="blurb">TE edits the model's metadata directly, without loading data — twenty measures take seconds, not twenty refresh cycles.</p>
+      <div class="diagram" aria-hidden="true">
+        <svg viewBox="0 0 300 70">
+          <line x1="10" y1="16" x2="280" y2="16" stroke="var(--dim)" stroke-width="1.6" stroke-dasharray="4 5"/>
+          <circle cx="10" cy="16" r="4" fill="var(--dim)"/>
+          <circle cx="90" cy="16" r="4" fill="var(--dim)"/>
+          <circle cx="170" cy="16" r="4" fill="var(--dim)"/>
+          <circle cx="250" cy="16" r="4" fill="var(--dim)"/>
+          <path d="M270,10 L280,16 L270,22" fill="none" stroke="var(--dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="10" y1="52" x2="70" y2="52" stroke="var(--azure)" stroke-width="2"/>
+          <circle cx="10" cy="52" r="4.5" fill="var(--azure)"/>
+          <path d="M60,46 L70,52 L60,58" fill="none" stroke="var(--azure)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="diagram-cap"><span>Old: edit &rarr; refresh &rarr; wait &rarr; repeat</span><span>TE: edit &rarr; Ctrl+S &rarr; done</span></div>
+      </div>
       <p class="gh">Learn this</p>
       <ul class="checks">
-        <li><label><input type="checkbox" data-k="b6-1"><span>Install TE2 and launch it from the External Tools ribbon against a live Power BI Desktop model</span></label></li>
-        <li><label><input type="checkbox" data-k="b6-2"><span>Learn the explorer tree: tables, columns, measures, hierarchies grouped by display folders — and the filter/search box above it</span></label></li>
-        <li><label><input type="checkbox" data-k="b6-3"><span>Do your first bulk edit: multi-select 10 measures and set the format string, display folder, and description in one action</span></label></li>
-        <li><label><input type="checkbox" data-k="b6-4"><span>Drag whole display folders to reorganize dozens of objects at once; use Ctrl+Z freely — undo is unlimited</span></label></li>
-        <li><label><input type="checkbox" data-k="b6-5"><span>Understand saving: Ctrl+S writes changes back to the connected Desktop model instantly, with no visual re-render</span></label></li>
-        <li><label><input type="checkbox" data-k="b6-6"><span>Know the boundaries: which operations Microsoft supports against Desktop, and what the "allow unsupported features" preference really means</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-1"><span>Install TE2 and launch it from the External Tools ribbon against a live Desktop model</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-2"><span>Learn the explorer tree: tables/columns/measures grouped by display folders, plus the filter box</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-3"><span>Bulk-edit: multi-select 10 measures, set format string, folder, and description in one action</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-4"><span>Drag whole display folders to reorganize dozens of objects; use Ctrl+Z freely — undo is unlimited</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-5"><span>Ctrl+S writes back to the connected Desktop model instantly, with no visual re-render</span></label></li>
+        <li><label><input type="checkbox" data-k="b6-6"><span>Know the boundaries: what Microsoft supports against Desktop vs "allow unsupported features"</span></label></li>
       </ul>
       <p class="gh">Go deeper</p>
       <ul class="links">
-        <li><a href="https://github.com/TabularEditor/TabularEditor" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Tabular Editor 2 on GitHub — free download, actively maintained</span><span class="dom">github.com</span></a></li>
-        <li><a href="https://docs.tabulareditor.com/te2/Getting-Started.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE2 Getting Started — connections, workflow, and deployment basics</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://docs.tabulareditor.com/te2/Features-at-a-glance.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Features at a glance — the quick tour of what TE2 can do</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://data-goblins.com/power-bi/learning-tabular-editor-part-1-beginner" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins: learning Tabular Editor series — the best community walkthrough, start at part 1</span><span class="dom">data-goblins.com</span></a></li>
-        <li><a href="https://www.sqlbi.com/tools/tabular-editor/" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">SQLBI's Tabular Editor page — context, release notes, and why they recommend it</span><span class="dom">sqlbi.com</span></a></li>
+        <li><a href="https://github.com/TabularEditor/TabularEditor" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Tabular Editor 2 — free download</span><span class="dom">github.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Getting-Started.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">TE2 Getting Started — connections, workflow</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://data-goblins.com/power-bi/learning-tabular-editor-part-1-beginner" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins: learning Tabular Editor, part 1</span><span class="dom">data-goblins.com</span></a></li>
       </ul>
-      <div class="tip"><b>Field note</b>The instant-save loop is the whole pitch: edit a measure in TE, Ctrl+S, alt-tab to Desktop, and it's already there. Once your hands learn that rhythm, the formula bar starts to feel like dial-up.</div>
+      <div class="tip"><b>Field note</b>Edit in TE, Ctrl+S, alt-tab to Desktop — it's already there. The formula bar starts to feel like dial-up.</div>
     </div>
   </div>
 
