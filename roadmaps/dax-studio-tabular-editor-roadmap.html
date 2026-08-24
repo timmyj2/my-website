@@ -519,24 +519,22 @@ SUMMARIZECOLUMNS (
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">BPA scans your model against a rule set — performance, DAX expressions, formatting, naming — and lists every violation with a reason and often a one-click fix. Newer Tabular Editor builds ship with rules preloaded; the standard sets below are the ones the Microsoft Fabric CAT team runs with customers.</p>
+      <p class="blurb">BPA scans your model against a rule set — performance, DAX, formatting, naming — and lists violations with a reason and often a one-click fix.</p>
       <p class="gh">Learn this</p>
       <ul class="checks">
         <li><label><input type="checkbox" data-k="b7-1"><span>Load the standard rule sets (Tabular Editor's and/or Microsoft's) via Manage BPA Rules &rarr; Include Rule File from URL</span></label></li>
-        <li><label><input type="checkbox" data-k="b7-2"><span>Run a scan on a real model and triage by category — fix performance findings first, cosmetics later</span></label></li>
-        <li><label><input type="checkbox" data-k="b7-3"><span>Use Generate Fix Script on a rule and review the C# it produces before applying — this is also a scripting lesson</span></label></li>
-        <li><label><input type="checkbox" data-k="b7-4"><span>Ignore a rule or an object deliberately, and understand where those ignore annotations get stored</span></label></li>
-        <li><label><input type="checkbox" data-k="b7-5"><span>Write one custom rule that encodes a convention of yours (e.g., every visible measure must have a description)</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-2"><span>Run a scan on a real model, triage by category — fix performance findings first, cosmetics later</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-3"><span>Use Generate Fix Script and review the C# before applying — free scripting lesson</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-4"><span>Ignore a rule or object deliberately, and know where those ignore annotations get stored</span></label></li>
+        <li><label><input type="checkbox" data-k="b7-5"><span>Write one custom rule for a convention of yours (e.g., every visible measure needs a description)</span></label></li>
       </ul>
       <p class="gh">Go deeper</p>
       <ul class="links">
-        <li><a href="https://docs.tabulareditor.com/te2/Best-Practice-Analyzer.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">BPA in TE2 — rule collections, precedence, and the management UI</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://github.com/TabularEditor/BestPracticeRules" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Official standard rules — the community-maintained BPARules.json</span><span class="dom">github.com</span></a></li>
-        <li><a href="https://github.com/microsoft/Analysis-Services/tree/master/BestPracticeRules" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Microsoft's rule set — the Fabric CAT team collection (Kovalsky's rules)</span><span class="dom">github.com</span></a></li>
-        <li><a href="https://tabulareditor.com/blog/best-practice-analyzer-bpa-rules-for-semantic-models" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">BPA rules for semantic models — current guidance incl. writing custom rules (with AI help)</span><span class="dom">tabulareditor.com</span></a></li>
-        <li><a href="https://data-mozart.com/mastering-dp-500-dp-600-exam-optimize-data-model-with-tabular-editor/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Mozart: BPA walkthrough — loading rules and fixing a deliberately broken model</span><span class="dom">data-mozart.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Best-Practice-Analyzer.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">BPA in TE2 — rule collections, precedence</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://github.com/TabularEditor/BestPracticeRules" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Official standard rules — BPARules.json</span><span class="dom">github.com</span></a></li>
+        <li><a href="https://github.com/microsoft/Analysis-Services/tree/master/BestPracticeRules" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Microsoft's rule set — Fabric CAT collection</span><span class="dom">github.com</span></a></li>
       </ul>
-      <div class="tip"><b>Field note</b>Make "BPA clean, or every ignore documented" your definition of done before anything ships. It costs five minutes and catches the bi-directional relationships and auto date/time bloat that cost hours later.</div>
+      <div class="tip"><b>Field note</b>"BPA clean, or every ignore documented" — five minutes now catches hours of pain later.</div>
     </div>
   </div>
 
@@ -550,14 +548,14 @@ SUMMARIZECOLUMNS (
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">This is the pandora's box — the feature that turns Tabular Editor from a fast editor into a force multiplier. Ten lines of C# against the model's object tree can do what used to be an afternoon of clicking. You don't need to be a C# developer; you need to steal well and read loops.</p>
+      <p class="blurb">Ten lines of C# against the model's object tree replace an afternoon of clicking. You don't need to be a C# dev — just steal well and read loops.</p>
       <p class="gh">Learn this</p>
       <ul class="checks">
-        <li><label><input type="checkbox" data-k="b8-1"><span>Learn the object model vocabulary: <code>Model</code>, <code>Selected</code>, and iterating <code>Tables</code> / <code>Columns</code> / <code>Measures</code></span></label></li>
+        <li><label><input type="checkbox" data-k="b8-1"><span>Learn the vocabulary: <code>Model</code>, <code>Selected</code>, iterating <code>Tables</code> / <code>Columns</code> / <code>Measures</code></span></label></li>
         <li><label><input type="checkbox" data-k="b8-2"><span>Run the classic first script: generate SUM measures for every selected numeric column (below)</span></label></li>
-        <li><label><input type="checkbox" data-k="b8-3"><span>Write a hygiene script: hide all key/FK columns, or apply <code>FormatDax()</code> to every measure in the model</span></label></li>
+        <li><label><input type="checkbox" data-k="b8-3"><span>Write a hygiene script: hide all key/FK columns, or apply <code>FormatDax()</code> to every measure</span></label></li>
         <li><label><input type="checkbox" data-k="b8-4"><span>Save a script as a macro (custom action) so it lives in your right-click menu forever</span></label></li>
-        <li><label><input type="checkbox" data-k="b8-5"><span>Raid the public script libraries below before writing anything from scratch — most problems are already solved</span></label></li>
+        <li><label><input type="checkbox" data-k="b8-5"><span>Raid the public script libraries below before writing anything from scratch</span></label></li>
         <li><label><input type="checkbox" data-k="b8-6"><span>Bulk-write measure descriptions (from a CSV, or drafted with an LLM) so the model documents itself</span></label></li>
       </ul>
       <pre><code><span class="cm">// The classic: SUM measures for every selected column</span>
@@ -572,13 +570,11 @@ SUMMARIZECOLUMNS (
 }</code></pre>
       <p class="gh">Go deeper</p>
       <ul class="links">
-        <li><a href="https://docs.tabulareditor.com/te2/Advanced-Scripting.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">C# scripting in TE2 — the object model and how scripts execute</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://docs.tabulareditor.com/te2/Useful-script-snippets.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Useful script snippets — the official copy-paste library</span><span class="dom">docs.tabulareditor.com</span></a></li>
-        <li><a href="https://github.com/m-kovalsky/Tabular" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Michael Kovalsky's script collection — VertiPaq annotations, BPA automation, model exports, and more</span><span class="dom">github.com</span></a></li>
-        <li><a href="https://www.elegantbi.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Elegant BI — Kovalsky's articles on automating tabular development end to end</span><span class="dom">elegantbi.com</span></a></li>
-        <li><a href="https://data-goblins.com/" target="_blank" rel="noopener"><span class="tag blog">Blog</span><span class="lt">Data Goblins — Kurt Buhler's script-heavy deep dives (DMVs, macros, assessments)</span><span class="dom">data-goblins.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Advanced-Scripting.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">C# scripting in TE2 — the object model</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://docs.tabulareditor.com/te2/Useful-script-snippets.html" target="_blank" rel="noopener"><span class="tag docs">Docs</span><span class="lt">Useful script snippets — official library</span><span class="dom">docs.tabulareditor.com</span></a></li>
+        <li><a href="https://github.com/m-kovalsky/Tabular" target="_blank" rel="noopener"><span class="tag repo">Repo</span><span class="lt">Kovalsky's script collection — VertiPaq, BPA, exports</span><span class="dom">github.com</span></a></li>
       </ul>
-      <div class="tip"><b>Field note</b>The test for whether something should be a script: did you just do the same edit three times in a row? Then it's a macro. Your future self inherits every macro you save this year — TE3 will carry them forward.</div>
+      <div class="tip"><b>Field note</b>Did the same edit three times? Make it a macro — TE3 will carry every one forward.</div>
     </div>
   </div>
 
