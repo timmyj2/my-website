@@ -138,6 +138,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 
 /* ---- inline figures (hand-drawn schematics, not screenshots) ---- */
 .fig{margin:13px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 20px 11px}
+.fig.inset{background:var(--panel2)}
 .fig svg{display:block;width:100%;height:auto}
 .fig svg text{font-family:var(--mono)}
 .fig svg .ff-disp{font-family:var(--disp)}
@@ -167,19 +168,18 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 <header class="hero">
   <p class="eyebrow">Tool-belt series &middot; SQL &middot; Python &middot; Vocabulary</p>
   <h1>Twelve shapes that solve<br>most of the <span class="g">actual work</span>.</h1>
-  <p class="sub">Every real data problem is a recombination of about a dozen patterns. This page names each one in plain English first &mdash; what you're trying to do and how to recognise it &mdash; then gives you the SQL, then the Python where Python is genuinely better. The point isn't to memorise syntax. It's <b>vocabulary</b>: you can't ask an AI, a colleague, or a search box for something you can't name.</p>
+  <p class="sub">Every data problem is a recombination of about a dozen patterns &mdash; named in plain English, then shown in SQL, then Python where Python wins. The point is <b>vocabulary</b>: you can't ask for what you can't name.</p>
 
   <div class="premise">
     <h2>How to use this if you learn by doing</h2>
-    <p>Don't read it end to end. Skim the twelve headings once so the names land, then come back when you hit a problem and think "this is the one where&hellip;". <b>Naming the pattern is 80% of solving it</b> &mdash; once you know you need a window function, the syntax is a two-minute lookup or one prompt away.</p>
-    <p>The SQL is written to run on Fabric's SQL endpoint, a Warehouse, or Snowflake with minimal changes. Where a dialect differs meaningfully, it says so.</p>
+    <p>Skim the twelve headings once so the names land, then come back when you hit a problem. <b>Naming it is 80% of solving it</b> &mdash; the syntax itself is a two-minute lookup away. SQL targets Fabric/Warehouse/Snowflake; dialect quirks are called out inline.</p>
   </div>
 </header>
 
 <!-- ============ WINDOW FUNCTIONS ============ -->
 <section id="window">
   <div class="shead"><span class="snum">01</span><h2>Window functions &mdash; the single highest-leverage thing to learn</h2></div>
-  <p class="slede">If you learn one thing on this page, learn these. A window function looks at other rows <em>while staying on the current row</em> &mdash; that's the whole idea, and it's what separates people who write awkward self-joins from people who write four clean lines. Five of the twelve patterns below are just window functions wearing different hats.</p>
+  <p class="slede">If you learn one thing here, learn these. A window function looks at other rows <em>while staying on the current row</em> &mdash; that's the whole idea. Five of the twelve patterns below are just this wearing different hats.</p>
 
   <figure class="fig">
     <svg viewBox="0 0 760 280" preserveAspectRatio="xMidYMid meet" role="img">
@@ -229,14 +229,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
       <text x="566" y="90" font-size="9.5" fill="var(--mut)">top of partition</text>
       <text x="566" y="104" font-size="9.5" fill="var(--mut)">down to here &#8594;</text>
     </svg>
-    <figcaption><b>Same shape, three settings.</b> PARTITION BY says where to restart counting &mdash; watch the running total drop back to 120 the moment customer B begins. ORDER BY says which row is first. The frame says how many rows feed the current row's answer; here it's "everything in this partition so far", which is what turns a plain SUM into a running total.</figcaption>
+    <figcaption><b>Same shape, three settings.</b> PARTITION BY restarts counting per group &mdash; watch the total drop back to 120 when customer B begins. ORDER BY says which row is first. The frame says how many rows feed the answer; here, "everything so far" &mdash; which turns a plain SUM into a running total.</figcaption>
   </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">01</span><h3>Deduplicate &mdash; keep one row per thing</h3></div>
-    <p class="want"><b>You want this when:</b> an extract has the same record more than once and you need exactly one &mdash; usually <em>the most recent</em>. This is the most-used pattern in this entire page.</p>
+    <p class="want"><b>You want this when:</b> an extract has duplicate records and you need exactly one &mdash; usually <em>the most recent</em>. The most-used pattern on this page.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Number the rows within each group, ordered so the one you want is number 1. Then keep number 1. That's it &mdash; and once you see it, you'll use it constantly.</p>
+    <p class="want">Number the rows within each group so the one you want lands on 1. Keep 1.</p>
     <pre><code><span class="k">WITH</span> ranked <span class="k">AS</span> (
   <span class="k">SELECT</span> *,
     <span class="f">ROW_NUMBER</span>() <span class="k">OVER</span> (
@@ -246,15 +246,15 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
   <span class="k">FROM</span> raw_customer
 )
 <span class="k">SELECT</span> * <span class="k">FROM</span> ranked <span class="k">WHERE</span> rn = <span class="n">1</span>;</code></pre>
-    <div class="note"><b>Read it aloud</b>"Partition by" = start counting again for each. "Order by" = which one gets to be number 1. Change those two lines and this same shape solves a dozen different問 problems.</div>
-    <div class="note warn"><b>Watch out</b>If two rows tie on <code>updated_at</code>, which one wins is arbitrary and can change between runs &mdash; producing a table that differs each load for no visible reason. Add a tiebreaker to the ORDER BY (a surrogate key, a load timestamp) whenever the result has to be stable.</div>
+    <div class="note"><b>Read it aloud</b>"Partition by" = start counting again for each group. "Order by" = which one gets to be number 1. Change those two lines and this shape solves a dozen other problems.</div>
+    <div class="note warn"><b>Watch out</b>A tie on <code>updated_at</code> makes the winner arbitrary and unstable across runs. Add a tiebreaker (a surrogate key, a load timestamp) whenever the result must be stable.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">02</span><h3>Compare to the previous period</h3></div>
-    <p class="want"><b>You want this when:</b> anyone says "versus last month", "change on prior", "movement", or "delta". Which in a finance org is roughly every second request.</p>
+    <p class="want"><b>You want this when:</b> anyone says "versus last month", "change on prior", or "movement" &mdash; roughly every second request in a finance org.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Reach backwards a fixed number of rows and pull that value onto the current row, so you can subtract them side by side. <code>LAG</code> looks back; <code>LEAD</code> looks forward.</p>
+    <p class="want">Pull a prior row's value onto the current row so you can subtract them side by side. <code>LAG</code> looks back; <code>LEAD</code> looks forward.</p>
     <pre><code><span class="k">SELECT</span>
   period,
   cost_centre,
@@ -262,14 +262,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
   <span class="f">LAG</span>(amount) <span class="k">OVER</span> (<span class="k">PARTITION BY</span> cost_centre <span class="k">ORDER BY</span> period) <span class="k">AS</span> prior_amount,
   amount - <span class="f">LAG</span>(amount) <span class="k">OVER</span> (<span class="k">PARTITION BY</span> cost_centre <span class="k">ORDER BY</span> period) <span class="k">AS</span> movement
 <span class="k">FROM</span> monthly_actuals;</code></pre>
-    <div class="note warn"><b>The classic bug</b>If a cost centre has no rows in March, LAG gives you February &mdash; and silently calls it "prior month". If gaps are possible, join to a date spine first (pattern 07) so missing periods exist as zero rather than vanishing.</div>
+    <div class="note warn"><b>The classic bug</b>No rows in March? LAG silently hands you February and calls it "prior month". Join to a date spine first (pattern 07) so gaps read as zero instead of vanishing.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">03</span><h3>Running totals and rolling averages</h3></div>
-    <p class="want"><b>You want this when:</b> "cumulative year to date", "3-month rolling average", "balance over time". Anything that accumulates.</p>
+    <p class="want"><b>You want this when:</b> "year to date", "3-month rolling average", "balance over time" &mdash; anything that accumulates.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Same window, but instead of one specific row you define a <em>range</em> of rows to aggregate over &mdash; "everything up to here", or "these three".</p>
+    <p class="want">Same window, but the frame spans a <em>range</em> of rows &mdash; "everything up to here", or "these three" &mdash; instead of one.</p>
     <pre><code><span class="k">SELECT</span>
   period, amount,
   <span class="f">SUM</span>(amount) <span class="k">OVER</span> (
@@ -281,26 +281,78 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     <span class="k">ROWS BETWEEN</span> <span class="n">2</span> <span class="k">PRECEDING AND CURRENT ROW</span>            <span class="c">-- 3-month rolling</span>
   ) <span class="k">AS</span> rolling_3m
 <span class="k">FROM</span> monthly_actuals;</code></pre>
-    <div class="note"><b>In Power BI, don't</b>If the destination is a semantic model, do this in DAX with time-intelligence measures instead &mdash; it stays responsive to whatever the user filters. Precompute it in SQL only when the grain is fixed and the cost of recalculating is real.</div>
+    <div class="note"><b>In Power BI, don't</b>Feeding a semantic model? Use DAX time-intelligence measures instead &mdash; they stay responsive to filters. Precompute in SQL only when the grain is fixed.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">04</span><h3>Rank within a group &mdash; top N per category</h3></div>
-    <p class="want"><b>You want this when:</b> "top 5 customers per region", "biggest three variances per department". Note this is pattern 01 with a different filter &mdash; same machinery.</p>
+    <p class="want"><b>You want this when:</b> "top 5 per region", "biggest three variances per department" &mdash; pattern 01's machinery, different filter.</p>
     <pre><code><span class="k">WITH</span> r <span class="k">AS</span> (
   <span class="k">SELECT</span> region, customer, revenue,
     <span class="f">DENSE_RANK</span>() <span class="k">OVER</span> (<span class="k">PARTITION BY</span> region <span class="k">ORDER BY</span> revenue <span class="k">DESC</span>) <span class="k">AS</span> rk
   <span class="k">FROM</span> sales
 )
 <span class="k">SELECT</span> * <span class="k">FROM</span> r <span class="k">WHERE</span> rk &lt;= <span class="n">5</span>;</code></pre>
-    <div class="note"><b>Which ranking function</b><code>ROW_NUMBER</code> never ties (1,2,3,4). <code>RANK</code> ties then skips (1,1,3). <code>DENSE_RANK</code> ties without skipping (1,1,2). For "top 5" you almost always want DENSE_RANK, otherwise a tie silently costs you a row.</div>
+    <div class="note"><b>Which ranking function</b><code>ROW_NUMBER</code> never ties (1,2,3,4). <code>RANK</code> ties then skips (1,1,3). <code>DENSE_RANK</code> ties without skipping (1,1,2). Want DENSE_RANK for "top 5" &mdash; otherwise a tie silently costs you a row.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">05</span><h3>Gaps and islands &mdash; find consecutive runs</h3></div>
-    <p class="want"><b>You want this when:</b> "how many days in a row was this breached", "find the missing invoice numbers", "how long was each outage". Sounds exotic, comes up constantly once you can name it.</p>
+    <p class="want"><b>You want this when:</b> "how many days in a row was this breached", "find the missing invoice numbers", "how long was each outage". Sounds exotic, comes up constantly.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">The trick that makes it click: if you number the rows sequentially and subtract that from the date, <b>every row in a consecutive run gets the same answer</b>. Group by that answer and you've found your runs. It's a genuinely clever trick and it's worth sitting with for a minute.</p>
+    <p class="want">Number the rows sequentially and subtract that from the date: <b>every row in a consecutive run lands on the same value</b>. Group by that value and you've found your runs.</p>
+
+    <figure class="fig inset">
+      <svg viewBox="0 0 760 236" preserveAspectRatio="xMidYMid meet" role="img">
+        <title>A five-row breach table where subtracting an ascending row number from each date produces a grp column that stays constant across a run of consecutive days, then jumps to a new value once a day is skipped. Grouping by grp collapses the two runs into two summary rows with a start date, end date, and day count.</title>
+
+        <text x="8" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">daily_breaches &mdash; one row per day</text>
+        <text x="466" y="12" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">one row per run</text>
+
+        <!-- left: per-day table -->
+        <rect x="8" y="20" width="330" height="180" fill="none" stroke="var(--line)"/>
+        <rect x="8" y="50" width="330" height="90" fill="var(--green-soft)"/>
+        <rect x="8" y="140" width="330" height="60" fill="var(--cyan-soft)"/>
+        <path d="M138,20 V200 M208,20 V200" stroke="var(--line)"/>
+        <path d="M8,50 H338 M8,80 H338 M8,110 H338 M8,140 H338 M8,170 H338" stroke="var(--line)"/>
+        <g font-size="10.5" font-weight="600" fill="var(--mut)">
+          <text x="73" y="38" text-anchor="middle">breach_date</text>
+          <text x="173" y="38" text-anchor="middle">rn</text>
+          <text x="273" y="38" text-anchor="middle">grp</text>
+        </g>
+        <g font-size="10.5" fill="var(--ink)">
+          <text x="73" y="68" text-anchor="middle">Jan 1</text><text x="173" y="68" text-anchor="middle">1</text><text x="273" y="68" text-anchor="middle" font-weight="600">Dec 31</text>
+          <text x="73" y="98" text-anchor="middle">Jan 2</text><text x="173" y="98" text-anchor="middle">2</text><text x="273" y="98" text-anchor="middle" font-weight="600">Dec 31</text>
+          <text x="73" y="128" text-anchor="middle">Jan 3</text><text x="173" y="128" text-anchor="middle">3</text><text x="273" y="128" text-anchor="middle" font-weight="600">Dec 31</text>
+          <text x="73" y="158" text-anchor="middle">Jan 6</text><text x="173" y="158" text-anchor="middle">4</text><text x="273" y="158" text-anchor="middle" font-weight="600">Jan 2</text>
+          <text x="73" y="188" text-anchor="middle">Jan 7</text><text x="173" y="188" text-anchor="middle">5</text><text x="273" y="188" text-anchor="middle" font-weight="600">Jan 2</text>
+        </g>
+        <text x="173" y="216" text-anchor="middle" font-size="9" fill="var(--dim)">Jan 4&ndash;5 breached nothing, so rn jumps and grp jumps with it</text>
+
+        <!-- arrow -->
+        <path d="M352,95 H430" stroke="var(--dim)" stroke-width="1.4" fill="none"/>
+        <path d="M424,89 L434,95 L424,101 Z" fill="var(--dim)"/>
+        <text x="391" y="83" text-anchor="middle" font-size="9" font-weight="600" letter-spacing="0.05em" fill="var(--mut)">GROUP BY grp</text>
+
+        <!-- right: run summary -->
+        <rect x="440" y="20" width="312" height="120" fill="none" stroke="var(--line)"/>
+        <rect x="440" y="50" width="312" height="35" fill="var(--green-soft)"/>
+        <rect x="440" y="105" width="312" height="35" fill="var(--cyan-soft)"/>
+        <path d="M596,20 V140 M674,20 V140" stroke="var(--line)"/>
+        <path d="M440,50 H752 M440,85 H752 M440,105 H752" stroke="var(--line)"/>
+        <g font-size="10" font-weight="600" fill="var(--mut)">
+          <text x="518" y="38" text-anchor="middle">run_start</text>
+          <text x="635" y="38" text-anchor="middle">run_end</text>
+          <text x="713" y="38" text-anchor="middle">days</text>
+        </g>
+        <g font-size="10.5" fill="var(--ink)">
+          <text x="518" y="72" text-anchor="middle">Jan 1</text><text x="635" y="72" text-anchor="middle">Jan 3</text><text x="713" y="72" text-anchor="middle" font-weight="700">3</text>
+          <text x="518" y="127" text-anchor="middle">Jan 6</text><text x="635" y="127" text-anchor="middle">Jan 7</text><text x="713" y="127" text-anchor="middle" font-weight="700">2</text>
+        </g>
+      </svg>
+      <figcaption><b>Subtracting a running count cancels the day-to-day increment.</b> While the dates advance by one each row, so does <code>rn</code> &mdash; so <code>date &minus; rn</code> stays flat. The moment a day is skipped, only the date jumps, so <code>grp</code> jumps too, marking a new run.</figcaption>
+    </figure>
+
     <pre><code><span class="k">WITH</span> g <span class="k">AS</span> (
   <span class="k">SELECT</span> breach_date,
     <span class="f">DATEADD</span>(day,
@@ -380,14 +432,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
         <text x="490" y="216" text-anchor="middle">Payroll</text><text x="575" y="216" text-anchor="middle">Mar</text><text x="655" y="216" text-anchor="middle">18,900</text>
       </g>
     </svg>
-    <figcaption><b>Same three numbers, colour-matched across both tables.</b> The Rent row's three cells become three rows on the right; Payroll's become three more. Long is three times as many rows and one third as many columns &mdash; which is exactly why every analytical tool downstream prefers it.</figcaption>
+    <figcaption><b>Same numbers, colour-matched across both tables.</b> Rent's three cells become three rows; Payroll's become three more. Long is three times the rows, a third of the columns &mdash; why every tool downstream prefers it.</figcaption>
   </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">06</span><h3>Unpivot &mdash; columns that should be rows</h3></div>
-    <p class="want"><b>You want this when:</b> a finance extract has a column per month (<code>Jan</code>, <code>Feb</code>, <code>Mar</code>&hellip;). Humans love this layout; every analytical tool hates it. Almost every spreadsheet-sourced dataset needs this first.</p>
+    <p class="want"><b>You want this when:</b> a finance extract has a column per month (<code>Jan</code>, <code>Feb</code>&hellip;). Humans love this layout; every analytical tool hates it.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Turn twelve columns into two: one saying <em>which month</em>, one saying <em>the value</em>. Long and boring beats wide and clever &mdash; every time, for anything downstream.</p>
+    <p class="want">Turn twelve columns into two: <em>which month</em>, and <em>the value</em>. Long and boring beats wide and clever, every time, downstream.</p>
     <pre><code><span class="c">-- portable version: works everywhere</span>
 <span class="k">SELECT</span> account, <span class="s">'Jan'</span> <span class="k">AS</span> period, jan <span class="k">AS</span> amount <span class="k">FROM</span> budget
 <span class="k">UNION ALL SELECT</span> account, <span class="s">'Feb'</span>, feb <span class="k">FROM</span> budget
@@ -397,14 +449,70 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 <span class="k">SELECT</span> account, period, amount
 <span class="k">FROM</span> budget
 <span class="k">UNPIVOT</span> (amount <span class="k">FOR</span> period <span class="k">IN</span> (jan, feb, mar)) <span class="k">AS</span> u;</code></pre>
-    <div class="note py"><b>Python is better here</b>If there are 36 columns, don't write 36 UNION ALLs. One line of pandas: <code>df.melt(id_vars=['account'], var_name='period', value_name='amount')</code>. This is exactly the kind of job where a notebook beats SQL.</div>
+    <div class="note py"><b>Python is better here</b>36 columns? Don't write 36 UNION ALLs. One line of pandas: <code>df.melt(id_vars=['account'], var_name='period', value_name='amount')</code>.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">07</span><h3>Date spine &mdash; make the missing rows exist</h3></div>
-    <p class="want"><b>You want this when:</b> a month with no activity vanishes from your report instead of showing zero, so charts have gaps and prior-period comparisons quietly lie (see pattern 02).</p>
+    <p class="want"><b>You want this when:</b> a month with no activity vanishes from your report instead of showing zero, so charts have gaps and prior-period comparisons quietly lie (pattern 02).</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Build a table of every date you care about, then <code>LEFT JOIN</code> your data onto it. Now absence is visible as a zero rather than invisible as a missing row &mdash; which is nearly always what people actually meant.</p>
+    <p class="want">Build a table of every date you care about, then <code>LEFT JOIN</code> your data onto it. Absence becomes a visible zero instead of an invisible missing row.</p>
+
+    <figure class="fig inset">
+      <svg viewBox="0 0 760 236" preserveAspectRatio="xMidYMid meet" role="img">
+        <title>A row of six months where March and May have no source row at all, dashed and unfilled, next to the same six months after a LEFT JOIN to a full date spine, where March and May now exist as real rows holding zero instead of being absent.</title>
+
+        <text x="8" y="14" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">monthly_actuals &mdash; as extracted</text>
+        <g font-size="10.5" font-weight="600">
+          <text x="90" y="34" text-anchor="middle" fill="var(--mut)">Jan</text>
+          <text x="212" y="34" text-anchor="middle" fill="var(--mut)">Feb</text>
+          <text x="334" y="34" text-anchor="middle" fill="var(--rose)">Mar</text>
+          <text x="456" y="34" text-anchor="middle" fill="var(--mut)">Apr</text>
+          <text x="578" y="34" text-anchor="middle" fill="var(--rose)">May</text>
+          <text x="700" y="34" text-anchor="middle" fill="var(--mut)">Jun</text>
+        </g>
+        <g>
+          <rect x="50" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="90" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,200</text>
+          <rect x="172" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="212" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,550</text>
+          <rect x="294" y="42" width="80" height="46" rx="6" fill="none" stroke="var(--rose)" stroke-width="1.3" stroke-dasharray="4 3"/>
+          <text x="334" y="70" text-anchor="middle" font-size="9.5" fill="var(--rose)">no row</text>
+          <rect x="416" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="456" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,800</text>
+          <rect x="538" y="42" width="80" height="46" rx="6" fill="none" stroke="var(--rose)" stroke-width="1.3" stroke-dasharray="4 3"/>
+          <text x="578" y="70" text-anchor="middle" font-size="9.5" fill="var(--rose)">no row</text>
+          <rect x="660" y="42" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="700" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">5,100</text>
+        </g>
+
+        <path d="M380,100 V128" stroke="var(--dim)" stroke-width="1.4" fill="none"/>
+        <path d="M376,124 L380,134 L384,124 Z" fill="var(--dim)"/>
+        <text x="395" y="118" font-size="9.5" font-weight="600" letter-spacing="0.04em" fill="var(--mut)">LEFT JOIN spine, COALESCE(amount,0)</text>
+
+        <text x="8" y="152" class="ff-disp" font-size="10.5" letter-spacing="0.08em" fill="var(--dim)">after the join &mdash; every month exists</text>
+        <g font-size="10.5" font-weight="600" fill="var(--mut)">
+          <text x="90" y="172" text-anchor="middle">Jan</text><text x="212" y="172" text-anchor="middle">Feb</text><text x="334" y="172" text-anchor="middle">Mar</text>
+          <text x="456" y="172" text-anchor="middle">Apr</text><text x="578" y="172" text-anchor="middle">May</text><text x="700" y="172" text-anchor="middle">Jun</text>
+        </g>
+        <g>
+          <rect x="50" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="90" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,200</text>
+          <rect x="172" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="212" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,550</text>
+          <rect x="294" y="180" width="80" height="46" rx="6" fill="var(--amber-soft)" stroke="var(--amber)"/>
+          <text x="334" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="var(--amber)">0</text>
+          <rect x="416" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="456" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">4,800</text>
+          <rect x="538" y="180" width="80" height="46" rx="6" fill="var(--amber-soft)" stroke="var(--amber)"/>
+          <text x="578" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="var(--amber)">0</text>
+          <rect x="660" y="180" width="80" height="46" rx="6" fill="var(--green-soft)" stroke="var(--green)"/>
+          <text x="700" y="208" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">5,100</text>
+        </g>
+      </svg>
+      <figcaption><b>The spine supplies the row; the data supplies the value.</b> March and May had no source record at all &mdash; not a zero, an absence. After the LEFT JOIN they're real rows holding zero, so charts don't gap and LAG (pattern 02) doesn't skip a month by accident.</figcaption>
+    </figure>
+
     <pre><code><span class="k">WITH</span> spine <span class="k">AS</span> (
   <span class="k">SELECT</span> <span class="f">CAST</span>(<span class="s">'2024-01-01'</span> <span class="k">AS</span> date) <span class="k">AS</span> d
   <span class="k">UNION ALL</span>
@@ -414,12 +522,12 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 <span class="k">FROM</span> spine s
 <span class="k">LEFT JOIN</span> monthly_actuals a <span class="k">ON</span> a.period = s.d
 <span class="k">OPTION</span> (MAXRECURSION <span class="n">0</span>);</code></pre>
-    <div class="note"><b>Do it once, properly</b>Better still: keep a permanent date dimension table with month, quarter, fiscal year and period-end flags. Every model you build will use it, and your fiscal calendar lives in exactly one place instead of being reinvented in each report.</div>
+    <div class="note"><b>Do it once, properly</b>Better: keep a permanent date dimension table with month, quarter, fiscal year and period-end flags. Every model uses it; your fiscal calendar lives in exactly one place.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">08</span><h3>Banding &mdash; turn numbers into categories</h3></div>
-    <p class="want"><b>You want this when:</b> "group these into small / medium / large", ageing buckets, materiality tiers. Any time a continuous number needs to become something you can group by.</p>
+    <p class="want"><b>You want this when:</b> "group these into small / medium / large", ageing buckets, materiality tiers &mdash; any continuous number that needs to become groupable.</p>
     <pre><code><span class="k">SELECT</span> invoice_id, days_overdue,
   <span class="k">CASE</span>
     <span class="k">WHEN</span> days_overdue &lt;= <span class="n">0</span>  <span class="k">THEN</span> <span class="s">'Current'</span>
@@ -428,14 +536,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
     <span class="k">ELSE</span> <span class="s">'60+'</span>
   <span class="k">END</span> <span class="k">AS</span> ageing_bucket
 <span class="k">FROM</span> receivables;</code></pre>
-    <div class="note warn"><b>Better as a table</b>Hard-coded CASE logic gets copied into six reports and then diverges. Put the bands in a small lookup table and join to it &mdash; then changing "60+" to "90+" is one row, not a search across your estate.</div>
+    <div class="note warn"><b>Better as a table</b>Hard-coded CASE logic gets copied into six reports and diverges. Put the bands in a lookup table and join to it &mdash; changing "60+" to "90+" becomes one row, not an estate-wide search.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">09</span><h3>Slowly changing dimensions &mdash; keeping history</h3></div>
-    <p class="want"><b>You want this when:</b> a customer moves region, a cost centre is renamed, an account is remapped &mdash; and last year's report must still show what was true <em>then</em>. This is the pattern that makes you sound senior, because most people never learn it.</p>
+    <p class="want"><b>You want this when:</b> a customer moves region, a cost centre is renamed &mdash; and last year's report must still show what was true <em>then</em>. Most people never learn this one.</p>
     <span class="mini">The idea in words</span>
-    <p class="want">Instead of overwriting the row, close the old one off with an end date and insert a new one. Each row becomes "this was true between these dates", and you join on the date to get the version that applied at the time.</p>
+    <p class="want">Instead of overwriting the row, close the old one off with an end date and insert a new one. Join on the date to get the version that applied at the time.</p>
     <pre><code><span class="c">-- one row per version, not per entity</span>
 customer_key | customer_id | region | valid_from | valid_to   | is_current
 <span class="n">1</span>            | C100        | North  | 2024-01-01 | 2025-06-30 | 0
@@ -447,14 +555,14 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
 <span class="k">JOIN</span> dim_customer c
   <span class="k">ON</span> c.customer_id = t.customer_id
  <span class="k">AND</span> t.txn_date <span class="k">BETWEEN</span> c.valid_from <span class="k">AND</span> c.valid_to;</code></pre>
-    <div class="note"><b>Decide deliberately</b>Overwriting (type 1) is fine for typos. Versioning (type 2) is required when history must be restatement-proof. Getting asked "why did last year's number change?" is what happens when you picked type 1 and should have picked type 2.</div>
+    <div class="note"><b>Decide deliberately</b>Overwriting (type 1) is fine for typos. Versioning (type 2) is required when history must be restatement-proof. "Why did last year's number change?" is what happens when you picked wrong.</div>
   </div>
 </section>
 
 <!-- ============ COMPARING ============ -->
 <section id="compare">
   <div class="shead"><span class="snum">03</span><h2>Comparing &mdash; the reconciliation toolkit</h2></div>
-  <p class="slede">Three patterns for "these two things should match and don't" &mdash; the most valuable class of work you can do in a finance organisation.</p>
+  <p class="slede">Three patterns for "these two things should match and don't" &mdash; the most valuable work you can do in a finance organisation.</p>
 
   <figure class="fig">
     <svg viewBox="0 0 700 320" preserveAspectRatio="xMidYMid meet" role="img">
@@ -514,25 +622,25 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
       <path d="M40,286 V276 M660,286 V276 M40,286 H660" stroke="var(--dim)" stroke-width="1.1" fill="none"/>
       <text x="350" y="300" text-anchor="middle" font-size="9.5" fill="var(--dim)">FULL OUTER JOIN &#8594; all three, in one pass</text>
     </svg>
-    <figcaption><b>Pick the join by what you need to see.</b> An inner join is enough if you only care about rows on both sides. Reach for the anti-join (pattern 10) when the question is purely "what's missing". Use the full outer join (pattern 11) when you need to report all three buckets at once &mdash; which is almost always what "reconcile these" actually means.</figcaption>
+    <figcaption><b>Pick the join by what you need to see.</b> Inner join if you only care about rows on both sides. Anti-join (pattern 10) when the question is purely "what's missing". Full outer join (pattern 11) to report all three buckets at once &mdash; usually what "reconcile these" actually means.</figcaption>
   </figure>
 
   <div class="pat">
     <div class="ptop"><span class="pn">10</span><h3>Anti-join &mdash; what's in A but not B</h3></div>
-    <p class="want"><b>You want this when:</b> "which invoices didn't make it across", "which employees have no cost centre", "what's missing". The single fastest way to find a data problem.</p>
+    <p class="want"><b>You want this when:</b> "which invoices didn't make it across", "which employees have no cost centre", "what's missing". The fastest way to find a data problem.</p>
     <pre><code><span class="c">-- readable and fast: no rows on the right</span>
 <span class="k">SELECT</span> a.*
 <span class="k">FROM</span> source_system a
 <span class="k">LEFT JOIN</span> target_system b <span class="k">ON</span> b.doc_id = a.doc_id
 <span class="k">WHERE</span> b.doc_id <span class="k">IS NULL</span>;</code></pre>
-    <div class="note warn"><b>NOT IN will hurt you</b><code>WHERE id NOT IN (SELECT id FROM b)</code> returns <em>zero rows</em> if that subquery contains a single NULL. It's silent, it's baffling, and it has burned everyone once. Use LEFT JOIN&hellip;IS NULL or NOT EXISTS instead.</div>
+    <div class="note warn"><b>NOT IN will hurt you</b><code>WHERE id NOT IN (SELECT id FROM b)</code> returns <em>zero rows</em> if that subquery contains a single NULL. Silent, baffling, has burned everyone once. Use LEFT JOIN&hellip;IS NULL or NOT EXISTS instead.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">11</span><h3>Full reconciliation &mdash; both sides, with reasons</h3></div>
-    <p class="want"><b>You want this when:</b> two systems disagree and you need to explain the gap, not just measure it. This is the deliverable that ends arguments &mdash; and the one people remember you for.</p>
+    <p class="want"><b>You want this when:</b> two systems disagree and you need to explain the gap, not just measure it. The deliverable that ends arguments.</p>
     <span class="mini">The idea in words</span>
-    <p class="want"><code>FULL OUTER JOIN</code> keeps rows that exist on either side, so you catch all three failure modes at once: missing on the left, missing on the right, and present on both but different. Then <b>categorise every difference</b> &mdash; that categorisation is the actual product.</p>
+    <p class="want"><code>FULL OUTER JOIN</code> keeps rows on either side, catching all three failure modes at once. Then <b>categorise every difference</b> &mdash; that's the actual product.</p>
     <pre><code><span class="k">SELECT</span>
   <span class="f">COALESCE</span>(a.doc_id, b.doc_id)          <span class="k">AS</span> doc_id,
   a.amount                              <span class="k">AS</span> source_amount,
@@ -547,12 +655,12 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
   <span class="k">END</span> <span class="k">AS</span> reason
 <span class="k">FROM</span> source_ledger a
 <span class="k">FULL OUTER JOIN</span> target_ledger b <span class="k">ON</span> b.doc_id = a.doc_id;</code></pre>
-    <div class="note"><b>Why this wins</b>Nobody expects zero difference. What they want is that <em>every</em> difference has a name, and the "Unexplained" bucket is small and shrinking. Report that bucket as your metric &mdash; it's honest, trackable, and it makes the work visible.</div>
+    <div class="note"><b>Why this wins</b>Nobody expects zero difference. They want <em>every</em> difference named, and the "Unexplained" bucket small and shrinking. Report that bucket as your metric &mdash; honest, trackable, visible.</div>
   </div>
 
   <div class="pat">
     <div class="ptop"><span class="pn">12</span><h3>Cleaning keys before you join</h3></div>
-    <p class="want"><b>You want this when:</b> a join returns far fewer rows than expected and you can't see why. The answer is almost always invisible characters &mdash; and you'll lose an hour to this if you don't check it first.</p>
+    <p class="want"><b>You want this when:</b> a join returns far fewer rows than expected and you can't see why. Almost always invisible characters &mdash; check this first or lose an hour.</p>
     <pre><code><span class="c">-- the usual suspects, in order of how often they're the culprit</span>
 <span class="k">SELECT</span>
   <span class="f">UPPER</span>(<span class="f">TRIM</span>(doc_id))                      <span class="k">AS</span> clean_id,   <span class="c">-- case + spaces</span>
@@ -565,14 +673,14 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
   (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> doc_id) <span class="k">FROM</span> a)                        <span class="k">AS</span> keys_a,
   (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> doc_id) <span class="k">FROM</span> b)                        <span class="k">AS</span> keys_b,
   (<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> a.doc_id) <span class="k">FROM</span> a <span class="k">JOIN</span> b <span class="k">ON</span> b.doc_id=a.doc_id) <span class="k">AS</span> overlap;</code></pre>
-    <div class="note warn"><b>The row-count explosion</b>If a join returns <em>more</em> rows than you started with, you have duplicates on one side &mdash; you've made a many-to-many by accident. Check the count before and after every join; when it jumps, go back to pattern 01.</div>
+    <div class="note warn"><b>The row-count explosion</b>Join returns <em>more</em> rows than you started with? Duplicates on one side &mdash; an accidental many-to-many. Check the count before and after every join; when it jumps, go back to pattern 01.</div>
   </div>
 </section>
 
 <!-- ============ PYTHON ============ -->
 <section id="python">
   <div class="shead"><span class="snum">04</span><h2>When to reach for Python instead</h2></div>
-  <p class="slede">You have a notebook. The useful question isn't "which is better" &mdash; it's "which one is this job shaped like?"</p>
+  <p class="slede">The useful question isn't "which is better" &mdash; it's "which one is this job shaped like?"</p>
 
   <div class="tscroll"><table>
     <tr><th>Use SQL when</th><th>Use Python when</th></tr>
@@ -584,7 +692,7 @@ customer_key | customer_id | region | valid_from | valid_to   | is_current
 
   <div class="card">
     <h3>The four Python moves worth having by heart</h3>
-    <p>You don't need to learn Python properly to be effective in a notebook. These four cover most of what a data job actually needs, and the rest you can prompt your way through.</p>
+    <p>These four cover most of what a data job needs from a notebook. The rest you can prompt your way through.</p>
     <pre><code><span class="c"># 1. read many files as one table — the folder loop, done properly</span>
 df = spark.read.option(<span class="s">"header"</span>,<span class="k">True</span>).csv(<span class="s">"Files/landing/2026/*.csv"</span>)
 
@@ -598,12 +706,12 @@ df.summary().show()                              <span class="c"># ranges, nulls
 
 <span class="c"># 4. write it back as a table others can use</span>
 df.write.mode(<span class="s">"overwrite"</span>).saveAsTable(<span class="s">"silver_invoices"</span>)</code></pre>
-    <div class="note py"><b>The vibe coder's edge</b>You don't have to know the syntax &mdash; you have to know that the pattern exists and what it's called. "Unpivot these month columns into rows" gets you working code from any assistant instantly. "Fix this spreadsheet" does not. <b>The vocabulary is the skill</b>, and that's what this page is for.</div>
+    <div class="note py"><b>The vibe coder's edge</b>You don't need the syntax &mdash; you need to know the pattern exists and what it's called. "Unpivot these month columns" gets working code from any assistant instantly. "Fix this spreadsheet" does not. <b>The vocabulary is the skill.</b></div>
   </div>
 
   <div class="card">
     <h3>Mixing them in one notebook</h3>
-    <p>You don't have to choose. In a Fabric notebook you can run SQL against your lakehouse and hand the result to Python, or register a dataframe so SQL can see it. Use each for what it's good at within a single job.</p>
+    <p>You don't have to choose. In a Fabric notebook, run SQL against your lakehouse and hand the result to Python, or register a dataframe so SQL can see it &mdash; use each for what it's good at.</p>
     <pre><code><span class="c"># SQL for the set-based part…</span>
 df = spark.sql(<span class="s">"""
   SELECT customer_id, SUM(amount) AS total
@@ -621,7 +729,7 @@ spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).sh
 <!-- ============ CHEAT SHEET ============ -->
 <section id="ref">
   <div class="shead"><span class="snum">05</span><h2>The naming sheet</h2></div>
-  <p class="slede">The actual deliverable of this page: symptom on the left, name on the right. When you can say the right-hand column, you can ask anyone &mdash; human or AI &mdash; for exactly what you need.</p>
+  <p class="slede">The actual deliverable: symptom on the left, name on the right. Say the right-hand column and you can ask anyone &mdash; human or AI &mdash; for exactly what you need.</p>
 
   <div class="tscroll"><table>
     <tr><th>When you catch yourself saying&hellip;</th><th>You want&hellip;</th></tr>
@@ -642,9 +750,9 @@ spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).sh
   <div class="card">
     <h3>Three habits that prevent most bugs</h3>
     <ul class="plain">
-      <li><b>Count before and after every join.</b> A row count that grows means accidental many-to-many; one that shrinks means a key problem. Thirty seconds, catches most silent errors.</li>
-      <li><b>Never trust a number you haven't seen at row level.</b> Before you publish a total, look at ten of the rows behind it. It's astonishing how often that alone finds the problem.</li>
-      <li><b>Write the check query alongside the build query.</b> If you can't write a query that would prove it's wrong, you don't yet understand what "right" means here.</li>
+      <li><b>Count before and after every join.</b> Growth means accidental many-to-many; shrinkage means a key problem. Thirty seconds, catches most silent errors.</li>
+      <li><b>Never trust a number you haven't seen at row level.</b> Before publishing a total, look at ten rows behind it. Astonishing how often that alone finds the problem.</li>
+      <li><b>Write the check query alongside the build query.</b> Can't write one that would prove it's wrong? You don't yet understand what "right" means here.</li>
     </ul>
   </div>
 </section>
@@ -652,7 +760,7 @@ spark.sql(<span class="s">"SELECT * FROM totals WHERE total > 100000"</span>).sh
 <a class="backlink" href="../index.html">&larr; back to the tool belt</a>
 
 <footer>
-  <p>A vocabulary page, not a syntax reference. SQL is written for Fabric's SQL endpoint, Warehouse or Snowflake; dialect differences are noted where they matter.</p>
+  <p>A vocabulary page, not a syntax reference. SQL targets Fabric's SQL endpoint, Warehouse, or Snowflake; dialect differences are noted where they matter.</p>
   <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#4ade80">◆</span> SQL &amp; Python Patterns</p>
 </footer>
 

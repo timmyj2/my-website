@@ -188,12 +188,12 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 <header class="hero">
   <p class="eyebrow">Tool-belt series &middot; Microsoft Fabric &middot; Application layer</p>
   <h1>Fabric stopped being<br>a <span class="t">data platform</span> and became an <span class="v">application platform</span>.</h1>
-  <p class="sub">Fabric Apps is a first-class workspace item for building real web applications on top of your Fabric data &mdash; with Entra sign-in, managed hosting and a backend provisioned for you. It closes the two gaps the BI stack never covered: <b>writing data back</b>, and <b>interfaces that aren't a report</b>. This is the short orientation to read before you get access.</p>
+  <p class="sub">Fabric Apps is a first-class workspace item for real web applications on your Fabric data &mdash; Entra sign-in, managed hosting, a backend provisioned for you. It closes the two gaps BI never covered: <b>writing data back</b>, and <b>interfaces that aren't a report</b>.</p>
 
   <div class="statusbox">
     <h2>Status &mdash; read this first</h2>
-    <p>Fabric Apps went to <b>public preview on 2 June 2026</b>, announced at Microsoft Build. Preview means the shape is real but the details will move: expect API changes, gaps in ALM, and licensing that isn't fully settled. Don't put a month-end process on it yet.</p>
-    <p>What preview is genuinely good for: <b>learning the model now</b>, so that when it reaches your tenant you're the person who already knows what it replaces and what it doesn't.</p>
+    <p>Public preview since <b>2 June 2026</b> (Microsoft Build). The shape is real, the details aren't &mdash; expect API changes, ALM gaps, and unsettled licensing. Don't put a month-end process on it yet.</p>
+    <p>What preview is good for: <b>learning the model now</b>, so you're already the person who knows what it replaces once it reaches your tenant.</p>
   </div>
 </header>
 
@@ -204,11 +204,36 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 
   <div class="card">
     <h3>The one-paragraph version</h3>
-    <p>You build a browser-based application. Fabric hosts it as a managed service, provisions its backend, wires up <b>Entra ID authentication</b> so users sign in with their work account, and gives it governed access to your data. No web server to run, no embed tokens to mint, no separate app registration to babysit, no App Service to pay for and patch. The app is an item in a workspace &mdash; so the same roles, the same Git integration, and the same governance that cover your lakehouses cover your app.</p>
-    <p>That last point is the one that matters strategically. Every previous "let's build a small app on our data" story meant leaving the data platform and taking on a second stack. This keeps it in one place, under one permission model.</p>
+    <p>You build a browser-based app; Fabric hosts it, provisions the backend, and wires up <b>Entra ID</b> sign-in &mdash; no web server, no embed tokens, no app registration, no App Service bill. It's an item in a workspace, so the same roles, Git integration and governance that cover your lakehouses cover it too.</p>
+    <p>That's the strategic point: every earlier "build a small app on our data" story meant a second stack. This keeps it in one place, under one permission model.</p>
   </div>
 
-  <div class="tip"><b>Why this exists</b>Fabric's arc is fairly legible: an analytics platform in 2023, a data platform in 2024 when SQL database arrived, an intelligent platform in 2025 with Copilot and data agents &mdash; and an application platform in 2026 with Apps. Each step absorbed a thing organisations were previously buying separately.</div>
+  <div class="arch">
+    <svg viewBox="0 0 880 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline: Fabric became an analytics platform in 2023, a data platform in 2024, an intelligent platform in 2025, and an application platform in 2026 with Apps">
+      <path d="M50,49 H830" stroke="#243150" stroke-width="1.3" stroke-dasharray="4 4"/>
+      <path d="M830,49 l-9,-5 v10 z" fill="#243150"/>
+
+      <circle cx="90" cy="49" r="6.5" fill="#131b2e" stroke="#657394" stroke-width="1.6"/>
+      <text x="90" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#657394">2023</text>
+      <text x="90" y="75" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#9aa8c4">Analytics</text>
+
+      <circle cx="310" cy="49" r="6.5" fill="#131b2e" stroke="#2ec4b6" stroke-width="1.6"/>
+      <text x="310" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#2ec4b6">2024</text>
+      <text x="310" y="75" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#5eead4">Data</text>
+      <text x="310" y="90" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#657394">SQL database</text>
+
+      <circle cx="530" cy="49" r="6.5" fill="#131b2e" stroke="#fbbf24" stroke-width="1.6"/>
+      <text x="530" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#fbbf24">2025</text>
+      <text x="530" y="75" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#fcd34d">Intelligent</text>
+      <text x="530" y="90" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#657394">Copilot, agents</text>
+
+      <circle cx="790" cy="49" r="8.5" fill="#2a1a4d" stroke="#a78bfa" stroke-width="2"/>
+      <text x="790" y="18" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="600" fill="#a78bfa">2026 &mdash; now</text>
+      <text x="790" y="75" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#c4b5fd">Application</text>
+      <text x="790" y="90" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#9aa8c4">Fabric Apps</text>
+    </svg>
+    <p class="archcap"><b>Why this exists</b> &mdash; each step absorbed something organisations used to buy separately.</p>
+  </div>
 </section>
 
 <!-- ============ TWO FLAVOURS ============ -->
@@ -235,6 +260,43 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
         <li><b>Key trait:</b> it reuses your existing semantic model, so your measures, RLS and business logic still apply. You are not rebuilding the model.</li>
       </ul>
     </div>
+  </div>
+
+  <div class="arch">
+    <svg viewBox="0 0 880 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Operational apps let a person write data into a SQL database; data apps let a person read data out of a semantic model">
+      <line x1="440" y1="10" x2="440" y2="96" stroke="#243150" stroke-width="1" stroke-dasharray="3 5"/>
+
+      <rect x="12" y="24" width="96" height="46" rx="9" fill="#131b2e" stroke="#3a4a6b" stroke-width="1.5"/>
+      <text x="60" y="52" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#9aa8c4">Person</text>
+      <path d="M112,47 H140" stroke="#2ec4b6" stroke-width="1.6"/><path d="M140,47 l-7,-4.5 v9 z" fill="#2ec4b6"/>
+
+      <rect x="146" y="20" width="132" height="54" rx="9" fill="#131b2e" stroke="#2ec4b6" stroke-width="1.6"/>
+      <text x="212" y="44" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="700" fill="#5eead4">Operational</text>
+      <text x="212" y="59" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="700" fill="#5eead4">app</text>
+      <path d="M280,47 H306" stroke="#2ec4b6" stroke-width="1.6"/><path d="M306,47 l-7,-4.5 v9 z" fill="#2ec4b6"/>
+
+      <rect x="312" y="24" width="112" height="46" rx="9" fill="#131b2e" stroke="#2ec4b6" stroke-width="1.5"/>
+      <text x="368" y="44" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10.5" font-weight="600" fill="#5eead4">SQL</text>
+      <text x="368" y="58" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10.5" font-weight="600" fill="#5eead4">database</text>
+
+      <text x="218" y="94" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="600" letter-spacing="1.5" fill="#2ec4b6">WRITES IN &#8594;</text>
+
+      <rect x="456" y="24" width="112" height="46" rx="9" fill="#131b2e" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="512" y="44" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10.5" font-weight="600" fill="#7dd3fc">Semantic</text>
+      <text x="512" y="58" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10.5" font-weight="600" fill="#7dd3fc">model</text>
+      <path d="M574,47 H600" stroke="#38bdf8" stroke-width="1.6"/><path d="M600,47 l-7,-4.5 v9 z" fill="#38bdf8"/>
+
+      <rect x="606" y="20" width="132" height="54" rx="9" fill="#131b2e" stroke="#38bdf8" stroke-width="1.6"/>
+      <text x="672" y="44" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="700" fill="#7dd3fc">Data</text>
+      <text x="672" y="59" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="700" fill="#7dd3fc">app</text>
+      <path d="M744,47 H772" stroke="#38bdf8" stroke-width="1.6"/><path d="M772,47 l-7,-4.5 v9 z" fill="#38bdf8"/>
+
+      <rect x="778" y="24" width="96" height="46" rx="9" fill="#131b2e" stroke="#3a4a6b" stroke-width="1.5"/>
+      <text x="826" y="52" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#9aa8c4">Person</text>
+
+      <text x="666" y="94" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="600" letter-spacing="1.5" fill="#38bdf8">&#8592; READS OUT</text>
+    </svg>
+    <p class="archcap">Same shape, opposite direction &mdash; that's the whole distinction.</p>
   </div>
 
   <div class="tip go"><b>The distinction in one line</b>Operational app = <b>people put data in</b>. Data app = <b>people get data out, in a shape a report can't do</b>. If someone types a number and expects it saved, that's operational.</div>
@@ -299,27 +361,27 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 
   <div class="card">
     <h3>Rayfin &mdash; the developer side</h3>
-    <p>Alongside Apps, Microsoft published <b>Rayfin</b>, an <b>open-source SDK and CLI</b> for defining and deploying app backends. It's the code-first path: developers &mdash; and AI coding agents &mdash; declare the backend, and Fabric provisions it with enterprise security and governance attached from the start.</p>
-    <p>The interesting implication is that Apps is deliberately designed to be built <em>by agents</em>, not only by hand. If you already drive Copilot or Claude over a codebase, that skill transfers directly here.</p>
+    <p>Alongside Apps, Microsoft published <b>Rayfin</b>, an <b>open-source SDK and CLI</b> for defining and deploying app backends. Developers &mdash; or AI coding agents &mdash; declare the backend; Fabric provisions it with governance attached from the start.</p>
+    <p>Apps is deliberately designed to be built <em>by agents</em>, not only by hand. If you already drive Copilot or Claude over a codebase, that skill transfers directly.</p>
   </div>
 </section>
 
 <!-- ============ WHEN ============ -->
 <section id="when">
   <div class="shead"><span class="snum">04</span><h2>When to use it &mdash; and when not to</h2></div>
-  <p class="slede">The value of knowing this early is being able to say "no, that's a report" or "no, that's a Power App" with confidence, instead of building the wrong thing enthusiastically.</p>
+  <p class="slede">Knowing this early means saying "no, that's a report" with confidence &mdash; instead of building the wrong thing enthusiastically.</p>
 
   <div class="tscroll"><table>
     <tr><th>If you need&hellip;</th><th>Use</th><th>Because</th></tr>
-    <tr><td>A dashboard people read</td><td><b>Power BI report</b></td><td>Faster to build, easier to govern, and everyone already knows how to consume it. Don't build an app to redraw a bar chart.</td></tr>
+    <tr><td>A dashboard people read</td><td><b>Power BI report</b></td><td>Faster to build, easier to govern, already familiar &mdash; don't build an app to redraw a bar chart.</td></tr>
     <tr><td>An interactive experience a report can't express</td><td><b>Data app</b></td><td>Custom interaction and layout, over multiple semantic models, reusing your existing measures and RLS.</td></tr>
     <tr><td>Users to enter or correct data</td><td><b>Operational app</b></td><td>Real write-back with its own SQL backend that mirrors into OneLake &mdash; no Dataverse, no second platform.</td></tr>
-    <tr><td>A simple form for a handful of people</td><td><b>Power Apps</b> (for now)</td><td>Mature, low-code, well understood. Fabric Apps is preview and is code-first &mdash; use it where its strengths matter.</td></tr>
+    <tr><td>A simple form for a handful of people</td><td><b>Power Apps</b> (for now)</td><td>Mature, low-code, well understood &mdash; Fabric Apps is preview and code-first; use it where its strengths matter.</td></tr>
     <tr><td>Analytics embedded in an existing product</td><td><b>Power BI Embedded</b></td><td>Fabric Apps assumes users sign in with Entra to a Fabric-hosted app; it isn't a drop-in embed story for external customers.</td></tr>
     <tr><td>A question answered in English</td><td><b>Data agent</b></td><td>Cheaper and faster than any UI you'd build for the same purpose.</td></tr>
   </table></div>
 
-  <div class="tip warn"><b>Preview cautions</b>Licensing and capacity consumption for Apps are still settling &mdash; a hosted, always-available app is a different consumption profile from a report someone opens twice a week. Confirm the cost model with whoever owns your capacity before anything goes near production, and expect the ALM story (Git, deployment pipelines) to firm up over the preview.</div>
+  <div class="tip warn"><b>Preview cautions</b>Licensing and capacity consumption are still settling &mdash; an always-on app has a different cost profile than a report opened twice a week. Confirm it with whoever owns your capacity before production, and expect the ALM story (Git, deployment pipelines) to firm up.</div>
 </section>
 
 <!-- ============ PREP ============ -->
@@ -330,23 +392,23 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   <ol class="steps">
     <li>
       <h4>Write down the write-back problem you already have</h4>
-      <p>Every finance and operations team has one: a spreadsheet of adjustments, a forecast entry file, a mapping table someone maintains by hand and emails round. That's your first operational app, and you can identify it today.</p>
+      <p>A spreadsheet of adjustments, a forecast file, a mapping table someone emails around by hand &mdash; every team has one. That's your first operational app.</p>
     </li>
     <li>
       <h4>Get the semantic model right first</h4>
-      <p>A data app queries your model with DAX. If the measures are inconsistent or the model is a flat table, the app inherits every one of those problems. Gold-layer modelling is the prerequisite, not an afterthought.</p>
+      <p>A data app queries your model with DAX &mdash; inconsistent measures or a flat table become the app's problems too. Gold-layer modelling is the prerequisite, not an afterthought.</p>
     </li>
     <li>
       <h4>Learn the GraphQL API in Fabric now</h4>
-      <p>It's already generally available independent of Apps, and it's the same access path an operational app uses. Building one API over a lakehouse this month means the app layer is the only new thing to learn later.</p>
+      <p>Already GA, independent of Apps &mdash; and the same access path an operational app uses. Build one over a lakehouse now; the app layer will be the only new thing left to learn.</p>
     </li>
     <li>
       <h4>Decide who owns apps in your organisation</h4>
-      <p>An app is software: it needs an owner, a support route and a lifecycle. The teams that struggle with Apps will be the ones who treated it like a report. Raise this before the first one ships, not after.</p>
+      <p>An app is software: it needs an owner, a support route, a lifecycle. Teams that treat it like a report will struggle. Raise this before the first one ships.</p>
     </li>
     <li>
       <h4>Watch the monthly Fabric feature summaries</h4>
-      <p>Preview features change fast. Fifteen minutes a month on the Fabric blog keeps you the best-informed person in the room on this &mdash; which is most of what being the expert consists of.</p>
+      <p>Preview features move fast. Fifteen minutes a month on the Fabric blog keeps you the best-informed person in the room.</p>
     </li>
   </ol>
 
@@ -359,9 +421,8 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   <p>Orientation notes on a preview feature, written August 2026. Fabric Apps entered public preview on 2 June 2026 &mdash; treat specifics as a moving target and check the docs before you build.</p>
   <div class="srcs">
     Sources &mdash;
-    <a href="https://azure.microsoft.com/en-us/blog/microsoft-build-2026-building-agentic-apps-with-microsoft-fabric-and-microsoft-databases/">Microsoft Build 2026: agentic apps with Fabric (Azure Blog)</a> &middot;
+    <a href="https://azure.microsoft.com/en-us/blog/microsoft-build-2026-building-agentic-apps-with-microsoft-fabric-and-microsoft-databases/">Microsoft Build 2026: agentic apps with Fabric</a> &middot;
     <a href="https://www.element61.be/en/resource/fabric-just-became-application-platform-what-fabric-apps-mean-you">Fabric just became an application platform (element61)</a> &middot;
-    <a href="https://tabulareditor.com/blog/fabric-apps-explained-visualization-as-code-in-a-data-app-dashboard">Fabric Apps explained (Tabular Editor)</a> &middot;
     <a href="https://blog.fabric.microsoft.com/">Fabric blog &mdash; monthly feature summaries</a>
   </div>
   <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#7c3aed">◆</span> Fabric Apps</p>

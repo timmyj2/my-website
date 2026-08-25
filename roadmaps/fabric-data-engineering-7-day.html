@@ -98,6 +98,11 @@ a{color:inherit}
   letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:7px}
 .stack-cap .g{color:var(--teal)}
 
+/* inline section diagrams */
+.diag{margin:14px 0 6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 16px 10px}
+.diag svg{display:block;width:100%;height:auto}
+.diag-cap{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-top:6px;text-align:center}
+
 /* ---------- day cards ---------- */
 .sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
 .sec.done{border-color:var(--acc)}
@@ -198,13 +203,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   .stitle .ssub{display:none}
   .sec-body{padding:4px 14px 14px}
   .stack{padding:11px 14px 8px}
+  .diag{padding:10px 12px 8px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 @media print{
   body{background:#fff;color:#111;background-image:none}
   .topbar,.chev,.tbtn{display:none}
   .sec-body{display:block!important}
-  .sec,.stack,.startbox,.close{border-color:#bbb;background:#fff;box-shadow:none}
+  .sec,.stack,.startbox,.close,.diag{border-color:#bbb;background:#fff;box-shadow:none}
   pre{background:#f5f5f5}code{color:#111}a{color:#111}
 }
 
@@ -244,7 +250,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 <header class="hero">
   <p class="eyebrow">Tool-belt series &middot; Microsoft Fabric &middot; Data engineering</p>
   <h1>Seven days to the person<br>who <span class="t">actually knows</span> how <span class="l">Fabric</span> fits together.</h1>
-  <p class="sub">Ten minutes a day. One idea, one thing you do in your own tenant, one question to ask about your organisation. By Day 7 you can defend an architecture in a meeting &mdash; not just build a pipeline. Written for someone who has already put a Delta table in a lakehouse from a notebook and wired a workspace to Git, and wants the layer above that.</p>
+  <p class="sub">Ten minutes a day: one idea, one hands-on step in your own tenant, one question for your org. By Day 7 you can defend an architecture in a meeting, not just build a pipeline. For anyone who's already put a Delta table in a lakehouse from a notebook and wired a workspace to Git.</p>
 
   <div class="stack" aria-hidden="true">
     <svg viewBox="0 0 880 244" xmlns="http://www.w3.org/2000/svg">
@@ -297,8 +303,7 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 
   <div class="startbox">
     <h2>How to run this</h2>
-    <p>One day per sitting, in order &mdash; each is <b>5&ndash;10 minutes</b>. Every day has the same three parts: <b>the idea</b> (why this exists and when it's the wrong choice), <b>do this</b> (something small in your own tenant &mdash; that's where it sticks), and <b>for your org</b> (a question to bring to work). Tick items as you go; <span id="persistNote">progress and collapsed days save in this browser on this device.</span></p>
-    <p>You need a Fabric-enabled workspace on any capacity, including a trial. Everything here works on an F2 or a trial SKU &mdash; nothing requires a big capacity. Where a feature is preview or still rolling out, it says so.</p>
+    <p>One day per sitting, 5&ndash;10 min each: <b>the idea</b>, <b>do this</b> (in your own tenant), <b>for your org</b> (a question to bring to work). Tick as you go &mdash; <span id="persistNote">progress saves in this browser on this device.</span> Any Fabric capacity works, including a trial F2. Preview features are marked as such.</p>
   </div>
 </header>
 
@@ -314,31 +319,30 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">You already did the thing this whole platform is built around, and it probably felt routine: a notebook wrote a Delta table into a lakehouse. Here's what actually happened. That table landed in <b>OneLake</b> &mdash; one storage account for the entire tenant &mdash; as open Delta/Parquet files. The moment it landed, it became queryable by <em>every other engine in Fabric without being copied</em>: T-SQL through the lakehouse's SQL analytics endpoint, DAX through a Direct Lake semantic model, Spark from any other notebook, and external tools through the OneLake APIs.</p>
-    <p class="blurb">That is the whole pitch. Traditional stacks copy data between a lake, a warehouse, and a BI model &mdash; three copies, three refresh windows, three chances to disagree. Fabric separates <b>storage</b> (OneLake, one copy, open format) from <b>compute</b> (Spark, T-SQL, KQL, DAX, Power Query). Every Fabric item you see in the portal is one of those engines pointed at that store, or something that orchestrates them.</p>
+    <p class="blurb">You already did the core trick: a notebook wrote a Delta table into a lakehouse, and it landed in <b>OneLake</b> &mdash; one store for the whole tenant, as open Delta/Parquet. Every engine reads it with <em>zero copies</em>: T-SQL via the SQL endpoint, DAX via Direct Lake, Spark, external tools via the OneLake APIs. Traditional stacks copy data between a lake, a warehouse and a BI model &mdash; three copies, three refresh windows, three chances to disagree. Fabric splits <b>storage</b> (OneLake) from <b>compute</b> (Spark, T-SQL, KQL, DAX, Power Query); every item in the portal is just one of those engines pointed at the same store.</p>
 
     <p class="gh">The item zoo, grouped so it stops being noise</p>
     <div class="tscroll"><table>
       <tr><th>Group</th><th>Items</th><th>What it's for</th></tr>
-      <tr><td><b>Store</b></td><td>Lakehouse, Warehouse, Eventhouse, SQL database, Mirrored database</td><td>Where tables live. Differ by engine and by who's meant to write to them.</td></tr>
-      <tr><td><b>Move</b></td><td>Data pipeline, Dataflow Gen2, Copy job, Eventstream, Shortcut, Mirroring</td><td>Getting data in &mdash; or deliberately <em>not</em> moving it (Day 2).</td></tr>
-      <tr><td><b>Transform</b></td><td>Notebook, Spark job definition, Stored procedure, Materialized lake view</td><td>Turning raw into usable.</td></tr>
-      <tr><td><b>Serve</b></td><td>Semantic model, Report, SQL endpoint, GraphQL API, Data agent, Fabric App</td><td>How humans and systems actually consume it.</td></tr>
+      <tr><td><b>Store</b></td><td>Lakehouse, Warehouse, Eventhouse, SQL database, Mirrored database</td><td>Where tables live &mdash; differ by engine and by who writes.</td></tr>
+      <tr><td><b>Move</b></td><td>Data pipeline, Dataflow Gen2, Copy job, Eventstream, Shortcut, Mirroring</td><td>Getting data in &mdash; or deliberately not moving it (Day 2).</td></tr>
+      <tr><td><b>Transform</b></td><td>Notebook, Spark job definition, Stored procedure, Materialized lake view</td><td>Raw into usable.</td></tr>
+      <tr><td><b>Serve</b></td><td>Semantic model, Report, SQL endpoint, GraphQL API, Data agent, Fabric App</td><td>How people and systems consume it.</td></tr>
       <tr><td><b>React</b></td><td>Activator, Alerts</td><td>Doing something when a number crosses a line.</td></tr>
-      <tr><td><b>Govern</b></td><td>Domains, Workspaces, Deployment pipelines, Variable libraries, OneLake catalog</td><td>Keeping it findable, shippable and trustworthy (Day 6).</td></tr>
+      <tr><td><b>Govern</b></td><td>Domains, Workspaces, Deployment pipelines, Variable libraries, OneLake catalog</td><td>Findable, shippable, trustworthy (Day 6).</td></tr>
     </table></div>
 
     <p class="gh">Do this &mdash; 4 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d1-1"><span>Open the lakehouse you already built. Switch the top-right selector from <b>Lakehouse</b> to <b>SQL analytics endpoint</b> and run <code>SELECT TOP 10 * FROM your_table</code>. Same bytes, different engine, zero copies.</span></label></li>
-      <li><label><input type="checkbox" data-k="d1-2"><span>In the lakehouse explorer, note the path: <code>Tables/</code> vs <code>Files/</code>. <b>Tables</b> is the managed Delta area the SQL endpoint sees; <b>Files</b> is raw storage it doesn't.</span></label></li>
-      <li><label><input type="checkbox" data-k="d1-3"><span>Install <b>OneLake File Explorer</b> (or open the item's OneLake path) and see your table as actual Parquet files in folders. Demystifies the whole thing.</span></label></li>
-      <li><label><input type="checkbox" data-k="d1-4"><span>Say out loud which engine each of these uses: a Power BI report, a SQL endpoint query, your notebook, a Dataflow Gen2. If you hesitate on any, re-read the diagram above.</span></label></li>
-      <li><label><input type="checkbox" data-k="d1-5"><span>Write down, in one sentence, the difference between an <b>item</b> and a <b>workspace</b>. You'll need this vocabulary all week.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-1"><span>Open your lakehouse, switch the selector to <b>SQL analytics endpoint</b>, run <code>SELECT TOP 10 * FROM your_table</code> &mdash; same bytes, zero copies.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-2"><span>Compare <code>Tables/</code> (managed Delta, SQL-endpoint visible) with <code>Files/</code> (raw, not SQL-visible).</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-3"><span>Open <b>OneLake File Explorer</b> (or the item's OneLake path) and see your table as real Parquet files.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-4"><span>Name the engine behind each: a Power BI report, a SQL query, your notebook, a Dataflow Gen2.</span></label></li>
+      <li><label><input type="checkbox" data-k="d1-5"><span>Write one sentence on the difference between an <b>item</b> and a <b>workspace</b>.</span></label></li>
     </ul>
 
-    <div class="tip gotcha"><b>The distinction people get wrong</b>A lakehouse's <b>SQL analytics endpoint is read-only</b>. If someone says "we'll just write back through SQL," they mean a <b>Warehouse</b>, not a lakehouse. Getting this wrong picks the wrong item for a project &mdash; it's the single most common early Fabric mistake.</div>
-    <div class="tip org"><b>For your org</b>Where does your organisation copy the same numbers between systems today &mdash; a lake, then a warehouse, then an import model? Each hop is a refresh window and a reconciliation argument. That list is your business case, and it's more persuasive than any feature demo.</div>
+    <div class="tip gotcha"><b>The distinction people get wrong</b>A lakehouse's <b>SQL endpoint is read-only</b>. Need write-back through SQL? That's a <b>Warehouse</b>, not a lakehouse &mdash; the most common early Fabric mis-pick.</div>
+    <div class="tip org"><b>For your org</b>Where does your organisation copy the same numbers between systems today? Each hop is a refresh window and a reconciliation argument &mdash; that list is your business case.</div>
   </div>
 </div>
 
@@ -354,32 +358,46 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">Most people's instinct is "write a pipeline to copy it in." In Fabric that should be your <em>third</em> instinct. The first question is always: <b>do I need a copy at all?</b> Every copy you avoid is a schedule you don't maintain, a latency you don't explain, and storage you don't pay for.</p>
+    <p class="blurb">Instinct says "write a pipeline to copy it in." In Fabric that should be your <em>third</em> instinct. The first question is always: do I need a copy at all? Every copy you avoid is a schedule you don't maintain and storage you don't pay for.</p>
 
-    <p class="gh">The ladder &mdash; work down it, stop at the first one that fits</p>
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 172" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="10" width="386" height="150" rx="12" fill="#fff1f3" stroke="#fb7185" stroke-width="1.4"/><text x="24" y="32" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.4" fill="#db0020">THE COPY WAY</text>
+        <rect x="24" y="48" width="120" height="40" rx="8" fill="#fff" stroke="#fb7185" stroke-width="1.2"/><text x="84" y="72" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" fill="#121316">Source</text>
+        <path d="M148 68 H230" stroke="#db0020" stroke-width="1.6" marker-end="url(#arrC)"/><rect x="238" y="48" width="140" height="26" rx="6" fill="#fff" stroke="#fb7185" stroke-width="1.1"/><rect x="244" y="42" width="140" height="26" rx="6" fill="#fff" stroke="#fb7185" stroke-width="1.1"/><text x="314" y="60" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="9.5" fill="#121316">Copy in OneLake</text>
+        <text x="24" y="128" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#8a0018">+ storage</text><text x="24" y="144" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#8a0018">+ a refresh schedule to own</text>
+        <rect x="426" y="10" width="386" height="150" rx="12" fill="#eaf6fc" stroke="#0678ab" stroke-width="1.4"/><text x="442" y="32" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.4" fill="#0075ad">THE SHORTCUT WAY</text>
+        <rect x="442" y="48" width="120" height="40" rx="8" fill="#fff" stroke="#0678ab" stroke-width="1.2"/><text x="502" y="72" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" fill="#121316">Source</text>
+        <path d="M566 68 H648" stroke="#0075ad" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrS)"/><rect x="652" y="48" width="140" height="40" rx="8" fill="#fff" stroke="#0678ab" stroke-width="1.2" stroke-dasharray="3 3"/><text x="722" y="72" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="10" fill="#121316">Lakehouse (pointer)</text>
+        <text x="442" y="128" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#005580">zero copy</text><text x="442" y="144" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#005580">zero schedule &middot; always current</text>
+        <defs><marker id="arrC" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#db0020"/></marker><marker id="arrS" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0075ad"/></marker></defs>
+      </svg>
+    </div>
+
+    <p class="gh">The ladder &mdash; work down it, stop at the first fit</p>
     <div class="tscroll"><table>
       <tr><th>Option</th><th>What it does</th><th>Reach for it when</th></tr>
-      <tr><td><b>Shortcut</b></td><td>A pointer. Data stays where it is (another lakehouse, ADLS Gen2, S3, Google Cloud Storage, Dataverse) and appears in your lakehouse as if local.</td><td>The data already sits in a lake somewhere and you just need to read it. <b>Zero copy, zero schedule.</b></td></tr>
-      <tr><td><b>Mirroring</b></td><td>Near-real-time managed replication of an operational database (Azure SQL, SQL Server, Cosmos DB, Snowflake, Databricks catalog, PostgreSQL) into OneLake as Delta.</td><td>You need an operational system's data continuously, without building or owning CDC yourself.</td></tr>
-      <tr><td><b>Copy job</b></td><td>A guided copy with batch or incremental modes, no pipeline authoring.</td><td>Straight source-to-destination movement where a full pipeline is overkill.</td></tr>
-      <tr><td><b>Data pipeline</b></td><td>Orchestration: copy activities, notebook/stored-proc invocation, control flow, parameters, scheduling, failure handling.</td><td>You need <em>orchestration</em> &mdash; several steps in order, with dependencies and retries.</td></tr>
-      <tr><td><b>Dataflow Gen2</b></td><td>Power Query in the service. Now on a modern .NET-based evaluation engine with far better performance across 80+ connectors.</td><td>Messy connector-shaped sources and Power Query is genuinely the fastest way to shape it &mdash; or the author lives in Power Query, not Python.</td></tr>
-      <tr><td><b>Eventstream</b></td><td>Streaming ingestion into Eventhouse/lakehouse from event sources.</td><td>The data arrives continuously and lateness matters in seconds, not hours.</td></tr>
+      <tr><td><b>Shortcut</b></td><td>A pointer &mdash; data stays put, appears local (another lakehouse, ADLS, S3, GCS, Dataverse).</td><td>Already in a lake you can reach. Zero copy, zero schedule.</td></tr>
+      <tr><td><b>Mirroring</b></td><td>Managed near-real-time replication (Azure SQL, Cosmos DB, Snowflake, Databricks, PostgreSQL) into OneLake as Delta.</td><td>Need an operational system continuously, without building CDC.</td></tr>
+      <tr><td><b>Copy job</b></td><td>Guided batch/incremental copy, no pipeline authoring.</td><td>A simple source&rarr;destination move.</td></tr>
+      <tr><td><b>Data pipeline</b></td><td>Orchestration: copy, notebook/proc calls, control flow, retries, scheduling.</td><td>Several steps with dependencies.</td></tr>
+      <tr><td><b>Dataflow Gen2</b></td><td>Power Query in the service, modern engine, 80+ connectors.</td><td>Messy connector sources, or the author lives in Power Query.</td></tr>
+      <tr><td><b>Eventstream</b></td><td>Streaming ingestion into Eventhouse/lakehouse.</td><td>Lateness matters in seconds, not hours.</td></tr>
     </table></div>
 
-    <p class="blurb">A rule that holds up in review meetings: <b>shortcut what you can, mirror what you must, pipeline what you have to transform, and only use a dataflow when Power Query is genuinely the right tool.</b> "Notebook everything" is as wrong as "dataflow everything" &mdash; the skill is matching the tool to the shape of the source and to who has to maintain it after you.</p>
+    <p class="blurb">A rule that holds up in review meetings: <b>shortcut what you can, mirror what you must, pipeline what needs transforming, and dataflow only when Power Query is genuinely the right tool.</b></p>
 
     <p class="gh">Do this &mdash; 5 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d2-1"><span>In a second lakehouse, create a <b>shortcut</b> to the Delta table you already built. Query it. Notice you didn't schedule anything and the data isn't duplicated.</span></label></li>
-      <li><label><input type="checkbox" data-k="d2-2"><span>Open the <b>New shortcut</b> dialog and read the full source list &mdash; ADLS, S3, GCS, Dataverse, OneLake. Knowing what's on that list changes what you propose at work.</span></label></li>
-      <li><label><input type="checkbox" data-k="d2-3"><span>Open <b>Mirroring</b> and read the supported sources, even if you can't set one up. This is the answer to "can we get the ERP data without a nightly extract?"</span></label></li>
-      <li><label><input type="checkbox" data-k="d2-4"><span>Take one existing copy job in your org and ask honestly: could this be a shortcut or a mirror instead?</span></label></li>
-      <li><label><input type="checkbox" data-k="d2-5"><span>Note the ownership question: a shortcut means <em>someone else</em> controls that data's lifecycle. Decide whether that's a feature or a risk in your case.</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-1"><span>Create a <b>shortcut</b> in a second lakehouse to your existing table. Query it &mdash; no schedule, no duplicate.</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-2"><span>Skim the <b>New shortcut</b> source list &mdash; ADLS, S3, GCS, Dataverse, OneLake.</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-3"><span>Open <b>Mirroring</b> and read the supported sources &mdash; the answer to "ERP data without a nightly extract?"</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-4"><span>Pick one existing copy job at work: could it be a shortcut or a mirror instead?</span></label></li>
+      <li><label><input type="checkbox" data-k="d2-5"><span>Note the trade-off: a shortcut means someone else owns that data's lifecycle. Feature or risk, in your case?</span></label></li>
     </ul>
 
-    <div class="tip gotcha"><b>Gotcha worth knowing early</b><b>Shortcuts are not carried by deployment pipelines.</b> Promote dev to test and the shortcut doesn't come with it &mdash; you recreate it per workspace, or automate it via REST/SDK/notebook. This surprises teams the first time they promote, and knowing it in advance makes you look like you've done this before.</div>
-    <div class="tip org"><b>For your org</b>Ask where your source systems physically are. If finance data already lands in an ADLS account, a shortcut may deliver in an afternoon what a copy pipeline delivers in a fortnight &mdash; with nothing to keep in sync afterwards.</div>
+    <div class="tip gotcha"><b>Gotcha worth knowing early</b><b>Shortcuts aren't carried by deployment pipelines.</b> Promote dev to test and the shortcut doesn't come with it &mdash; recreate it per workspace, or automate via REST/SDK/notebook.</div>
+    <div class="tip org"><b>For your org</b>If a source already sits in ADLS, a shortcut can deliver in an afternoon what a copy pipeline takes a fortnight to build &mdash; with nothing to keep in sync afterwards.</div>
   </div>
 </div>
 
@@ -395,26 +413,39 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">Four things in Fabric hold tables. They are not interchangeable, and picking correctly is most of what "architecture" means day to day.</p>
+    <p class="blurb">Four things hold tables in Fabric. They aren't interchangeable, and picking correctly is most of what "architecture" means day to day.</p>
     <div class="tscroll"><table>
       <tr><th>Store</th><th>Write with</th><th>Choose it when</th></tr>
-      <tr><td><b>Lakehouse</b></td><td>Spark, pipelines, dataflows</td><td>Files <em>and</em> tables, Python/Spark transformation, semi-structured or large data. Its SQL endpoint is <b>read-only</b>.</td></tr>
-      <tr><td><b>Warehouse</b></td><td>T-SQL (full DML)</td><td>The team is SQL-first, or you need multi-table transactions and stored procedures. Full read/write T-SQL over the same OneLake Delta.</td></tr>
-      <tr><td><b>Eventhouse / KQL</b></td><td>Eventstream, KQL</td><td>High-volume time-series, logs, telemetry &mdash; append-heavy data queried by time window.</td></tr>
-      <tr><td><b>SQL database</b></td><td>T-SQL, apps</td><td>You need genuine <b>OLTP</b> &mdash; an application writing rows. It auto-replicates into OneLake for analytics.</td></tr>
+      <tr><td><b>Lakehouse</b></td><td>Spark, pipelines, dataflows</td><td>Files <em>and</em> tables, Python/Spark, semi-structured data. SQL endpoint is <b>read-only</b>.</td></tr>
+      <tr><td><b>Warehouse</b></td><td>T-SQL (full DML)</td><td>SQL-first team, multi-table transactions, stored procedures.</td></tr>
+      <tr><td><b>Eventhouse / KQL</b></td><td>Eventstream, KQL</td><td>High-volume time-series, logs, telemetry.</td></tr>
+      <tr><td><b>SQL database</b></td><td>T-SQL, apps</td><td>Genuine <b>OLTP</b> &mdash; an app writing rows. Auto-replicates to OneLake.</td></tr>
     </table></div>
-    <p class="blurb">The honest heuristic: <em>Lakehouse if your team writes Python, Warehouse if your team writes SQL, Eventhouse if the data is events, SQL database if an application needs to write.</em> All four end up as Delta in OneLake, so the choice is about the authoring experience and the write pattern &mdash; not about where the bytes go.</p>
+    <p class="blurb"><em>Python team &rarr; Lakehouse. SQL team &rarr; Warehouse. Events &rarr; Eventhouse. App writes &rarr; SQL database.</em> All four end up as Delta in OneLake &mdash; the choice is about authoring experience and write pattern, not where the bytes go.</p>
 
-    <p class="gh">What Delta actually is &mdash; the 90-second version</p>
-    <p class="blurb">A Delta table is a folder of <b>Parquet</b> files plus a <b>transaction log</b> (<code>_delta_log</code>) recording every commit. That log is what gives you ACID transactions, time travel, and safe concurrent writes on plain cloud storage. Consequences you actually feel:</p>
+    <p class="gh">What Delta actually is &mdash; the 60-second version</p>
+    <p class="blurb">A Delta table is <b>Parquet files plus a transaction log</b> (<code>_delta_log</code>) recording every commit. That log is what gives you ACID transactions, time travel, and safe concurrent writes on plain cloud storage.</p>
+
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 176" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="10" width="360" height="112" rx="10" fill="#f5faec" stroke="#8bab3f" stroke-width="1.3" stroke-dasharray="4 3"/><text x="22" y="28" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.2" fill="#4e7a00">MANY SMALL FILES</text>
+        <g fill="#fff" stroke="#8bab3f" stroke-width="1.1"><rect x="22" y="40" width="46" height="16" rx="3"/><rect x="74" y="40" width="30" height="16" rx="3"/><rect x="22" y="62" width="60" height="16" rx="3"/><rect x="88" y="62" width="24" height="16" rx="3"/><rect x="22" y="84" width="34" height="16" rx="3"/><rect x="62" y="84" width="50" height="16" rx="3"/><rect x="140" y="40" width="40" height="16" rx="3"/><rect x="186" y="40" width="55" height="16" rx="3"/><rect x="140" y="62" width="70" height="16" rx="3"/><rect x="140" y="84" width="45" height="16" rx="3"/></g>
+        <text x="22" y="112" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">slow to scan</text>
+        <path d="M378 66 H452" stroke="#4e7a00" stroke-width="1.6" marker-end="url(#arrO)"/><text x="382" y="56" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="600" fill="#4e7a00">OPTIMIZE</text>
+        <rect x="456" y="10" width="356" height="112" rx="10" fill="#f5faec" stroke="#4e7a00" stroke-width="1.4"/><text x="470" y="28" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.2" fill="#4e7a00">COMPACTED</text>
+        <rect x="470" y="46" width="150" height="50" rx="6" fill="#fff" stroke="#4e7a00" stroke-width="1.2"/><rect x="632" y="46" width="150" height="50" rx="6" fill="#fff" stroke="#4e7a00" stroke-width="1.2"/><text x="470" y="112" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">fast to scan</text>
+        <rect x="8" y="140" width="804" height="30" rx="8" fill="#eef8f6" stroke="#8bab3f" stroke-width="1.1"/><text x="20" y="159" font-family="JetBrains Mono,monospace" font-size="10" fill="#4e7a00">_delta_log/ — every commit, forever → ACID · time travel · safe concurrent writes</text>
+        <defs><marker id="arrO" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4e7a00"/></marker></defs>
+      </svg>
+    </div>
+
     <ul class="plain">
-      <li><b>Small files kill you.</b> Thousands of tiny Parquet files from frequent appends make every read slow. <code>OPTIMIZE</code> compacts them.</li>
-      <li><b>Deletes aren't immediate.</b> Old files linger for time travel until <code>VACUUM</code> removes them &mdash; which also sets how far back you can look.</li>
-      <li><b>V-Order</b> is Fabric's write optimisation that makes Parquet dramatically faster to read from VertiPaq/Direct Lake. On by default; worth knowing the name.</li>
-      <li><b>Time travel</b> is now available from the SQL analytics endpoint too, using a <code>TIMESTAMP</code> clause &mdash; query the table as it looked before last night's load.</li>
-      <li><b>Don't partition small tables.</b> Under a few GB, partitioning usually makes things worse by creating exactly the small-file problem above.</li>
+      <li><b>Deletes aren't immediate</b> &mdash; old files linger until <code>VACUUM</code>, which also caps how far back you can time-travel.</li>
+      <li><b>V-Order</b> is Fabric's write optimisation, making Parquet much faster for VertiPaq/Direct Lake reads. On by default.</li>
+      <li><b>Time travel</b> now works from the SQL analytics endpoint too, via a <code>TIMESTAMP</code> clause.</li>
+      <li><b>Don't partition small tables</b> &mdash; under a few GB it usually recreates the small-file problem.</li>
     </ul>
-    <pre><code><span class="c"># in your notebook — run these on the table you already built</span>
+    <pre><code><span class="c"># run these on the table you already built</span>
 spark.sql(<span class="s">"DESCRIBE HISTORY your_table"</span>).show(<span class="f">10</span>, truncate=<span class="k">False</span>)   <span class="c"># every commit</span>
 spark.sql(<span class="s">"OPTIMIZE your_table"</span>)                                  <span class="c"># compact small files</span>
 spark.sql(<span class="s">"DESCRIBE DETAIL your_table"</span>).show(truncate=<span class="k">False</span>)      <span class="c"># file count &amp; size</span>
@@ -424,15 +455,15 @@ df = spark.read.format(<span class="s">"delta"</span>).option(<span class="s">"v
 
     <p class="gh">Do this &mdash; 5 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d3-1"><span>Run <code>DESCRIBE HISTORY</code> on your table. Read the operation column &mdash; that's your table's audit trail, free.</span></label></li>
-      <li><label><input type="checkbox" data-k="d3-2"><span>Run <code>DESCRIBE DETAIL</code> and look at <code>numFiles</code> versus <code>sizeInBytes</code>. That ratio is the small-file problem, quantified.</span></label></li>
-      <li><label><input type="checkbox" data-k="d3-3"><span>Run <code>OPTIMIZE</code>, then <code>DESCRIBE DETAIL</code> again and compare. You just did performance tuning.</span></label></li>
-      <li><label><input type="checkbox" data-k="d3-4"><span>Read your table at an earlier version with <code>versionAsOf</code>. This is the answer to "what did the report say on Tuesday?"</span></label></li>
-      <li><label><input type="checkbox" data-k="d3-5"><span>Create a Warehouse in the same workspace. Note you can write to it with plain <code>INSERT</code> &mdash; the thing the lakehouse endpoint won't let you do.</span></label></li>
-      <li><label><input type="checkbox" data-k="d3-6"><span>Decide which of the four stores your org's main use case should sit in, and be able to say why in one sentence.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-1"><span>Run <code>DESCRIBE HISTORY</code> &mdash; that's your free audit trail.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-2"><span>Run <code>DESCRIBE DETAIL</code>, compare <code>numFiles</code> vs <code>sizeInBytes</code> &mdash; that ratio is the small-file problem.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-3"><span>Run <code>OPTIMIZE</code>, then <code>DESCRIBE DETAIL</code> again. You just did performance tuning.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-4"><span>Read an earlier version with <code>versionAsOf</code> &mdash; "what did the report say Tuesday?"</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-5"><span>Create a Warehouse in the same workspace; write to it with plain <code>INSERT</code>.</span></label></li>
+      <li><label><input type="checkbox" data-k="d3-6"><span>Decide which of the four stores your org's main use case belongs in &mdash; and why, in one sentence.</span></label></li>
     </ul>
 
-    <div class="tip"><b>Expert framing</b>When someone asks "lakehouse or warehouse?", the useful answer isn't a feature list &mdash; it's a question back: "who is writing to it, and in what language?" That reframe is what makes you sound senior, and it gets to the right answer faster.</div>
+    <div class="tip"><b>Expert framing</b>"Lakehouse or warehouse?" isn't a feature question &mdash; it's "who's writing to it, and in what language?" That reframe alone reads as senior.</div>
   </div>
 </div>
 
@@ -448,13 +479,24 @@ df = spark.read.format(<span class="s">"delta"</span>).option(<span class="s">"v
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">Your notebook works. The gap between that and a notebook that runs unattended at 3am is four things: <b>where its dependencies come from, how it gets its inputs, how it loads data the second time, and what it costs.</b></p>
+    <p class="blurb">Your notebook works. The gap to running unattended at 3am is four things: where dependencies come from, how it gets its inputs, how it loads data the second time, and what it costs.</p>
 
-    <p class="gh">1. Environments &mdash; stop installing libraries in cell one</p>
-    <p class="blurb">An <b>Environment</b> is a Fabric item holding your Spark runtime version, libraries, and Spark configuration, attachable to notebooks and Spark job definitions. It's how you stop <code>%pip install</code> at the top of every notebook and get reproducible runs. It's also the honest answer to "why did it work yesterday?"</p>
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 100" xmlns="http://www.w3.org/2000/svg">
+        <g font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#121316">
+          <rect x="24" y="14" width="34" height="34" rx="6" fill="none" stroke="#8c6b00" stroke-width="1.6"/><path d="M24 24 H58 M24 34 H58" stroke="#8c6b00" stroke-width="1.3"/><text x="14" y="72">Environment</text><text x="14" y="86" font-family="JetBrains Mono,monospace" font-size="8.5" font-weight="400" fill="#8b9098">libraries, runtime</text>
+          <g transform="translate(210,0)"><rect x="24" y="20" width="40" height="20" rx="10" fill="none" stroke="#8c6b00" stroke-width="1.6"/><circle cx="52" cy="30" r="7" fill="#8c6b00"/><text x="14" y="72">Parameters</text><text x="14" y="86" font-family="JetBrains Mono,monospace" font-size="8.5" font-weight="400" fill="#8b9098">callable, not fixed</text></g>
+          <g transform="translate(420,0)"><path d="M20 16 L40 30 L20 44" fill="none" stroke="#8c6b00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 16 L40 30 L60 44" fill="none" stroke="#8c6b00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="14" y="72">MERGE</text><text x="14" y="86" font-family="JetBrains Mono,monospace" font-size="8.5" font-weight="400" fill="#8b9098">upsert, not overwrite</text></g>
+          <g transform="translate(630,0)"><path d="M20 42 A20 20 0 0 1 60 42" fill="none" stroke="#8c6b00" stroke-width="1.6"/><path d="M40 42 L52 26" stroke="#8c6b00" stroke-width="1.6" stroke-linecap="round"/><text x="14" y="72">Cost (CU)</text><text x="14" y="86" font-family="JetBrains Mono,monospace" font-size="8.5" font-weight="400" fill="#8b9098">one shared pool</text></g>
+        </g>
+      </svg>
+    </div>
 
-    <p class="gh">2. Parameters &mdash; the toggle cell that makes it callable</p>
-    <p class="blurb">Mark a cell as the <b>parameter cell</b> (cell menu &rarr; Toggle parameter cell). Values declared there are overridden when a pipeline or another notebook calls it. This is the single change that turns a script into a component.</p>
+    <p class="gh">1. Environments</p>
+    <p class="blurb">An <b>Environment</b> holds Spark runtime, libraries and config, attached to notebooks or Spark job definitions. It's how you stop <code>%pip install</code> in cell one &mdash; and the honest answer to "why did it work yesterday?"</p>
+
+    <p class="gh">2. Parameters</p>
+    <p class="blurb">Mark a cell as the <b>parameter cell</b> (cell menu &rarr; Toggle parameter cell). A pipeline or another notebook overrides those values when calling it &mdash; the single change that turns a script into a component.</p>
     <pre><code><span class="c"># parameter cell — defaults for interactive runs, overridden by the caller</span>
 load_date = <span class="s">"2026-08-01"</span>
 source_system = <span class="s">"sap"</span>
@@ -465,8 +507,8 @@ full_reload = <span class="k">False</span>
 notebookutils.notebook.run(<span class="s">"transform_silver"</span>, <span class="f">300</span>, {<span class="s">"load_date"</span>: load_date})
 notebookutils.notebook.exit(<span class="s">"success"</span>)   <span class="c"># returned to the calling pipeline</span></code></pre>
 
-    <p class="gh">3. Incremental loads &mdash; MERGE, not overwrite</p>
-    <p class="blurb">The move from beginner to practitioner is loading <em>changes</em> rather than rewriting the table. Delta's <code>MERGE</code> does upserts in one atomic commit:</p>
+    <p class="gh">3. Incremental loads</p>
+    <p class="blurb">Loading <em>changes</em> instead of rewriting the table is the beginner&rarr;practitioner jump. Delta's <code>MERGE</code> upserts in one atomic commit:</p>
     <pre><code><span class="k">from</span> delta.tables <span class="k">import</span> DeltaTable
 
 target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
@@ -475,23 +517,23 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
   .whenMatchedUpdateAll()
   .whenNotMatchedInsertAll()
   .execute())</code></pre>
-    <p class="blurb">Add <code>.option("mergeSchema", "true")</code> on writes when upstream columns legitimately change &mdash; but know that you've just made schema drift silent. Most teams want it on in bronze and off in gold.</p>
+    <p class="blurb">Turn on <code>.option("mergeSchema", "true")</code> when upstream columns legitimately change &mdash; but that makes schema drift silent. Usually on in bronze, off in gold.</p>
 
-    <p class="gh">4. Cost &mdash; because someone will ask</p>
-    <p class="blurb">Everything in Fabric consumes <b>Capacity Units</b> from one shared pool: Spark, SQL, pipelines, Power BI, all of it. Spark sessions are the classic silent burner &mdash; an idle attached session still holds resources. Autoscale billing for Spark lets Spark jobs bill serverlessly rather than competing for the capacity, which is worth knowing exists when a Spark job starts throttling everyone's reports.</p>
+    <p class="gh">4. Cost</p>
+    <p class="blurb">Everything in Fabric draws from one shared <b>Capacity Unit</b> pool &mdash; Spark, SQL, pipelines, Power BI. An idle attached Spark session is the classic silent burner. <b>Autoscale billing for Spark</b> lets Spark jobs bill serverlessly instead of competing for capacity.</p>
 
     <p class="gh">Do this &mdash; 6 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d4-1"><span>Create an <b>Environment</b>, attach it to your notebook, and move any <code>%pip install</code> into it.</span></label></li>
-      <li><label><input type="checkbox" data-k="d4-2"><span>Add a <b>parameter cell</b> to your existing notebook with a date parameter.</span></label></li>
-      <li><label><input type="checkbox" data-k="d4-3"><span>Create a <b>data pipeline</b> with one notebook activity, pass the date parameter in, and run it. That's your first orchestrated job.</span></label></li>
-      <li><label><input type="checkbox" data-k="d4-4"><span>Rewrite one <code>overwrite</code> write as a <code>MERGE</code>. This is the most transferable skill this week.</span></label></li>
-      <li><label><input type="checkbox" data-k="d4-5"><span>Open the <b>Fabric Capacity Metrics</b> app and find what consumed the most CUs in the last day. Even on a trial.</span></label></li>
-      <li><label><input type="checkbox" data-k="d4-6"><span>Stop your Spark session manually when you finish. Then notice how rarely anyone does.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-1"><span>Create an <b>Environment</b>, attach it, move <code>%pip install</code> into it.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-2"><span>Add a <b>parameter cell</b> with a date parameter.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-3"><span>Build a <b>data pipeline</b> with one notebook activity passing that parameter in &mdash; your first orchestrated job.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-4"><span>Rewrite one <code>overwrite</code> write as a <code>MERGE</code>.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-5"><span>Open <b>Fabric Capacity Metrics</b>, find what burned the most CUs yesterday.</span></label></li>
+      <li><label><input type="checkbox" data-k="d4-6"><span>Stop your Spark session when you're done. Notice how rarely anyone does.</span></label></li>
     </ul>
 
-    <div class="tip gotcha"><b>Cost trap</b>An attached notebook session left open all afternoon burns capacity doing nothing. On a shared F-SKU that's not just money &mdash; capacity smoothing and throttling mean one careless Spark session can slow other people's reports. Knowing this makes you the person who diagnoses it rather than causes it.</div>
-    <div class="tip org"><b>For your org</b>Find out what SKU your organisation runs, whether it's shared across teams, and who watches the metrics app. In most companies the honest answer is "nobody" &mdash; and that's an open lane for you.</div>
+    <div class="tip gotcha"><b>Cost trap</b>An attached notebook session left open all afternoon burns capacity doing nothing. On a shared F-SKU, one careless session can throttle everyone else's reports.</div>
+    <div class="tip org"><b>For your org</b>Find out what SKU your organisation runs, whether it's shared across teams, and who watches the metrics app. Often the honest answer is "nobody" &mdash; an open lane for you.</div>
   </div>
 </div>
 
@@ -507,33 +549,59 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">Medallion architecture is three layers, and the value is entirely in the discipline of not skipping one:</p>
-    <ul class="plain">
-      <li><b>Bronze &mdash; raw, as it arrived.</b> No cleaning, no business logic. Append-only, with the load timestamp and source. You keep it so you can rebuild everything downstream without going back to the source system.</li>
-      <li><b>Silver &mdash; cleaned and conformed.</b> Types fixed, duplicates resolved, keys standardised, entities from different systems reconciled into one shape. Still fairly granular.</li>
-      <li><b>Gold &mdash; shaped for consumption.</b> Business-ready, aggregated where it makes sense, and modelled as a <b>star schema</b>: fact tables of numbers, dimension tables of the things you slice by.</li>
-    </ul>
-    <p class="blurb">Why star schema, still, in 2026? Because <b>VertiPaq &mdash; the engine behind every Power BI semantic model &mdash; is built for it.</b> One wide flat table looks simpler and performs worse: it compresses badly, it makes measures ambiguous, and it makes every filter scan more data. If your organisation is on Power BI, gold being a star schema is not a stylistic preference, it's the difference between a report that returns instantly and one that doesn't.</p>
+    <p class="blurb">Medallion architecture is three layers, and the value is entirely in not skipping one:</p>
 
-    <p class="gh">Materialized lake views &mdash; the layer that automates the layers</p>
-    <p class="blurb">Rather than hand-orchestrating bronze&rarr;silver&rarr;gold refreshes, <b>materialized lake views</b> let you declare the transformation and let Fabric manage materialisation and lineage. As of mid-2026 lineage extends across layers and workspaces: define one refresh schedule on your gold lakehouse and it cascades back through silver and bronze automatically. That's a meaningful reduction in pipeline plumbing &mdash; and a very current thing to be able to name.</p>
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 168" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="20" width="230" height="70" rx="10" fill="#f2ede6" stroke="#a67c52" stroke-width="1.4"/><text x="24" y="44" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#7a5a36">Bronze</text><text x="24" y="62" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">raw, as it arrived</text><text x="24" y="76" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">append-only</text>
+        <path d="M240 55 H288" stroke="#8b9098" stroke-width="1.6" marker-end="url(#arrM1)"/>
+        <rect x="292" y="20" width="230" height="70" rx="10" fill="#eaf3fb" stroke="#4f8fc2" stroke-width="1.4"/><text x="308" y="44" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#0075ad">Silver</text><text x="308" y="62" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">cleaned, conformed</text><text x="308" y="76" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">keys standardised</text>
+        <path d="M524 55 H572" stroke="#8b9098" stroke-width="1.6" marker-end="url(#arrM1)"/>
+        <rect x="576" y="20" width="236" height="70" rx="10" fill="#f6f2fe" stroke="#724dff" stroke-width="1.4"/><text x="592" y="44" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#511bf3">Gold</text><text x="592" y="62" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">star schema</text><text x="592" y="76" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">facts + dimensions</text>
+        <path d="M694 90 V112" stroke="#724dff" stroke-width="1.6" marker-end="url(#arrM1)"/>
+        <rect x="576" y="116" width="236" height="34" rx="8" fill="#511bf3" fill-opacity=".08" stroke="#724dff" stroke-width="1.2" stroke-dasharray="3 3"/><text x="694" y="137" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#511bf3">Direct Lake model</text>
+        <defs><marker id="arrM1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8b9098"/></marker></defs>
+      </svg>
+    </div>
+
+    <ul class="plain">
+      <li><b>Bronze</b> &mdash; raw, no cleaning, append-only with load timestamp + source. Lets you rebuild everything without re-hitting the source.</li>
+      <li><b>Silver</b> &mdash; cleaned and conformed: types fixed, duplicates resolved, keys standardised.</li>
+      <li><b>Gold</b> &mdash; shaped for consumption, modelled as a <b>star schema</b>: fact tables of numbers, dimensions you slice by.</li>
+    </ul>
+    <p class="blurb">Why star schema, still, in 2026? Because <b>VertiPaq &mdash; the engine behind every Power BI model &mdash; is built for it.</b> One wide flat table compresses worse, makes measures ambiguous, and scans more per filter. On Power BI, gold-as-star-schema is the difference between a report that returns instantly and one that doesn't.</p>
+
+    <p class="gh">Materialized lake views</p>
+    <p class="blurb">Instead of hand-orchestrating bronze&rarr;silver&rarr;gold refreshes, <b>materialized lake views</b> let you declare the transform and let Fabric manage materialisation and lineage. Lineage now spans layers and workspaces: one schedule on gold cascades back through silver and bronze automatically.</p>
 
     <p class="gh">Direct Lake &mdash; and the trap that will bite you</p>
-    <p class="blurb">A <b>Direct Lake</b> semantic model reads Delta files from OneLake straight into memory. No import refresh, no DirectQuery round-trip &mdash; import-like speed on data that's current as of the last commit. It's the reason gold-layer modelling matters so much.</p>
-    <div class="tip gotcha"><b>The Direct Lake trap</b>Views cannot be framed by Direct Lake &mdash; they're SQL objects resolved at query time, not Delta tables in OneLake. Add <em>one</em> view to a Direct Lake model and it falls back to DirectQuery &mdash; and the fallback is <b>not</b> isolated to that table: the <b>entire model</b> switches to DirectQuery, for every table. Reports get slower and nobody can see why. The fix: materialise the view as a Delta table (notebook, stored procedure, or materialized lake view) so the model only ever reads Delta.</div>
-    <p class="blurb">Knowing that one paragraph puts you ahead of most people who use Fabric daily. It is the most common invisible performance regression in the platform.</p>
+    <p class="blurb">A <b>Direct Lake</b> model reads Delta from OneLake straight into memory &mdash; import speed, no refresh, always current. It's why gold-layer modelling matters so much.</p>
+
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 156" xmlns="http://www.w3.org/2000/svg">
+        <text x="8" y="18" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.2" fill="#18823e">ALL DELTA TABLES</text>
+        <g fill="#fff" stroke="#18823e" stroke-width="1.2"><rect x="8" y="26" width="60" height="30" rx="5"/><rect x="76" y="26" width="60" height="30" rx="5"/><rect x="144" y="26" width="60" height="30" rx="5"/></g>
+        <path d="M212 41 H300" stroke="#18823e" stroke-width="1.6" marker-end="url(#arrG)"/><rect x="304" y="20" width="220" height="42" rx="8" fill="#e9f7ee" stroke="#18823e" stroke-width="1.3"/><text x="414" y="46" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#18823e">Direct Lake — fast, in-memory</text>
+        <text x="8" y="98" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1.2" fill="#db0020">ONE VIEW SNEAKS IN</text>
+        <g fill="#fff" stroke="#db0020" stroke-width="1.2"><rect x="8" y="106" width="60" height="30" rx="5"/><rect x="76" y="106" width="60" height="30" rx="5"/><rect x="144" y="106" width="60" height="30" rx="5" stroke-dasharray="3 3"/></g>
+        <text x="150" y="126" font-family="JetBrains Mono,monospace" font-size="7.5" fill="#db0020">VIEW</text>
+        <path d="M212 121 H300" stroke="#db0020" stroke-width="1.6" marker-end="url(#arrR)"/><rect x="304" y="100" width="220" height="42" rx="8" fill="#fff1f3" stroke="#db0020" stroke-width="1.3"/><text x="414" y="126" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600" fill="#db0020">whole model → DirectQuery</text>
+        <defs><marker id="arrG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#18823e"/></marker><marker id="arrR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#db0020"/></marker></defs>
+      </svg>
+    </div>
+    <div class="tip gotcha"><b>The Direct Lake trap</b>Views can't be framed by Direct Lake &mdash; add one and the <b>entire model</b> falls back to DirectQuery, not just that table. Reports get slower and nobody can see why. Fix: materialise the view as a Delta table.</div>
 
     <p class="gh">Do this &mdash; 6 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d5-1"><span>Sketch your org's current reporting flow on one page and label each step bronze, silver or gold. Note which layer is missing &mdash; there's almost always one.</span></label></li>
-      <li><label><input type="checkbox" data-k="d5-2"><span>Take the Delta table you built. Which layer is it? Be honest &mdash; most first tables are bronze wearing a gold badge.</span></label></li>
-      <li><label><input type="checkbox" data-k="d5-3"><span>Create a Direct Lake semantic model over a lakehouse table and open it in Power BI. Note there's no refresh to schedule.</span></label></li>
-      <li><label><input type="checkbox" data-k="d5-4"><span>Check an existing semantic model in your org for views feeding a Direct Lake model &mdash; the trap above.</span></label></li>
-      <li><label><input type="checkbox" data-k="d5-5"><span>Read the <b>materialized lake views</b> docs page. Ten minutes of reading, permanently useful vocabulary.</span></label></li>
-      <li><label><input type="checkbox" data-k="d5-6"><span>Write down one fact table and three dimensions for your main subject area. That's a gold-layer design.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-1"><span>Sketch your org's reporting flow, label each step bronze/silver/gold. Which layer's missing?</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-2"><span>Which layer is the table you built? Most first tables are bronze wearing a gold badge.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-3"><span>Create a Direct Lake model over a lakehouse table, open it in Power BI &mdash; no refresh to schedule.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-4"><span>Check an existing semantic model for views feeding a Direct Lake model.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-5"><span>Skim the <b>materialized lake views</b> docs &mdash; ten minutes, permanent vocabulary.</span></label></li>
+      <li><label><input type="checkbox" data-k="d5-6"><span>Write down one fact table and three dimensions for your main subject area.</span></label></li>
     </ul>
 
-    <div class="tip org"><b>For your org</b>The bronze layer is the argument you'll have to win. It looks like pointless duplication until the day a source system changes and you can rebuild history without re-extracting. Have that argument ready before you need it.</div>
+    <div class="tip org"><b>For your org</b>Bronze is the argument you'll have to win &mdash; looks like duplication until a source system changes and you can rebuild history without re-extracting.</div>
   </div>
 </div>
 
@@ -549,35 +617,48 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">You've connected a workspace to GitHub, which is further than most Fabric users ever get. Here's the shape of the full lifecycle, and specifically what Git <em>doesn't</em> solve.</p>
+    <p class="blurb">You've connected a workspace to Git &mdash; further than most Fabric users get. Here's the rest of the lifecycle, and what Git <em>doesn't</em> solve.</p>
 
     <p class="gh">The three pieces</p>
     <ul class="plain">
-      <li><b>Git integration</b> &mdash; source of truth for item <em>definitions</em>. Notebooks, pipelines, semantic models, reports serialise to files you can branch, review and revert. Use <b>branch out to a new workspace</b> to get an isolated dev sandbox per feature instead of everyone editing one workspace.</li>
-      <li><b>Deployment pipelines</b> &mdash; promoting items between dev, test and prod workspaces, with <b>deployment rules</b> to swap connections and parameters per stage.</li>
-      <li><b>Variable libraries</b> &mdash; the newer piece, and the one that makes the other two usable. A workspace item holding values per stage: connection strings, item references, lakehouse IDs. Pipelines, notebooks and shortcuts read from it, so nothing is hardcoded and deployment stops rewriting IDs by hand. Recent releases added <b>connection</b> and <b>item reference</b> types, so a pipeline can bind dynamically to a lakehouse or connection per environment.</li>
+      <li><b>Git integration</b> &mdash; source of truth for item <em>definitions</em> (notebooks, pipelines, models, reports). <b>Branch out to a new workspace</b> gives each feature its own sandbox.</li>
+      <li><b>Deployment pipelines</b> &mdash; promote items dev&rarr;test&rarr;prod, with <b>deployment rules</b> swapping connections/parameters per stage.</li>
+      <li><b>Variable libraries</b> &mdash; per-stage values (connections, item references, lakehouse IDs) that pipelines and notebooks read, so nothing's hardcoded. Recently added <b>connection</b> and <b>item reference</b> types.</li>
     </ul>
 
-    <p class="gh">What Git does not capture &mdash; the part people learn painfully</p>
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 150" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="6" fill="none" stroke="#0075ad" stroke-width="1.6"/><circle cx="30" cy="60" r="6" fill="none" stroke="#0075ad" stroke-width="1.6"/><path d="M30 36 V54" stroke="#0075ad" stroke-width="1.6"/><path d="M36 30 H70" stroke="#0075ad" stroke-width="1.6" stroke-dasharray="3 3" marker-end="url(#arrD)"/><text x="6" y="80" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#0075ad">branch out</text>
+        <rect x="74" y="14" width="180" height="60" rx="10" fill="#eaf6fc" stroke="#0678ab" stroke-width="1.4"/><text x="90" y="40" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#0075ad">Dev</text><text x="90" y="58" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#5c6069">per-feature workspace</text>
+        <path d="M258 44 H320" stroke="#8b9098" stroke-width="1.6" marker-end="url(#arrD2)"/><text x="264" y="34" font-family="JetBrains Mono,monospace" font-size="8" fill="#8b9098">promote</text>
+        <rect x="324" y="14" width="180" height="60" rx="10" fill="#f2f3f2" stroke="#8b9098" stroke-width="1.4"/><text x="340" y="40" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#5c6069">Test</text><text x="340" y="58" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#5c6069">deployment rules apply</text>
+        <path d="M508 44 H570" stroke="#8b9098" stroke-width="1.6" marker-end="url(#arrD2)"/><text x="514" y="34" font-family="JetBrains Mono,monospace" font-size="8" fill="#8b9098">promote</text>
+        <rect x="574" y="14" width="238" height="60" rx="10" fill="#eef8f6" stroke="#1e7e75" stroke-width="1.4"/><text x="590" y="40" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#057e6b">Prod</text><text x="590" y="58" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#5c6069">live workspace</text>
+        <rect x="74" y="98" width="738" height="34" rx="8" fill="#fff" stroke="#0678ab" stroke-width="1.1" stroke-dasharray="3 3"/><text x="90" y="120" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#0075ad">Variable library swaps connection strings &amp; IDs per stage — nothing hardcoded</text>
+        <defs><marker id="arrD" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0075ad"/></marker><marker id="arrD2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8b9098"/></marker></defs>
+      </svg>
+    </div>
+
+    <p class="gh">What Git does not capture</p>
     <ul class="plain">
-      <li><b>Data.</b> Obviously, but worth saying: Git versions definitions, not table contents.</li>
-      <li><b>Shortcuts.</b> Not carried by deployment pipelines &mdash; recreate per workspace or automate them.</li>
-      <li><b>Bindings to specific items.</b> A notebook's default lakehouse or a pipeline's connection points at a specific ID that differs per environment &mdash; exactly what variable libraries exist to solve.</li>
-      <li><b>Capacity and workspace settings.</b> Assignment, permissions and capacity settings live outside the repo.</li>
+      <li><b>Data</b> &mdash; Git versions definitions, not table contents.</li>
+      <li><b>Shortcuts</b> &mdash; not carried by deployment pipelines; recreate or automate them.</li>
+      <li><b>Item bindings</b> &mdash; a notebook's default lakehouse, a pipeline's connection &mdash; exactly what variable libraries solve.</li>
+      <li><b>Capacity &amp; workspace settings</b> &mdash; live outside the repo.</li>
     </ul>
-    <p class="blurb">For automation beyond the UI there's the <b>Fabric REST API</b>, the <b>Fabric CLI</b>, and the <code>fabric-cicd</code> Python library for deploying items from a repo in a build pipeline. You don't need these on day one, but knowing they exist is what separates "we click Deploy" from "we have a release process."</p>
+    <p class="blurb">For automation beyond the UI: the <b>Fabric REST API</b>, the <b>Fabric CLI</b>, and the <code>fabric-cicd</code> Python library. Knowing they exist is the difference between "we click Deploy" and "we have a release process."</p>
 
     <p class="gh">Do this &mdash; 6 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d6-1"><span>In your Git-connected workspace, use <b>branch out to a new workspace</b> and watch a full isolated dev environment appear from a branch.</span></label></li>
-      <li><label><input type="checkbox" data-k="d6-2"><span>Open the repo and look at how a notebook and a pipeline are actually serialised. That's what you'll be reviewing in PRs.</span></label></li>
-      <li><label><input type="checkbox" data-k="d6-3"><span>Create a <b>variable library</b> with one variable &mdash; a lakehouse name or a connection &mdash; and reference it from a pipeline.</span></label></li>
-      <li><label><input type="checkbox" data-k="d6-4"><span>Create a <b>deployment pipeline</b> with dev and test stages, even with one item, so you've seen the promotion flow.</span></label></li>
-      <li><label><input type="checkbox" data-k="d6-5"><span>List everything in your workspace that would break on promotion because it names a specific environment. That list is your CI/CD backlog.</span></label></li>
-      <li><label><input type="checkbox" data-k="d6-6"><span>Skim the <b>Fabric CLI</b> docs for five minutes. Enough to say "we could automate this" credibly.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-1"><span>Use <b>branch out to a new workspace</b> &mdash; watch a full dev environment appear from a branch.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-2"><span>Look at how a notebook and a pipeline are serialised in the repo &mdash; what you'll review in PRs.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-3"><span>Create a <b>variable library</b> with one variable, reference it from a pipeline.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-4"><span>Create a <b>deployment pipeline</b> with dev/test stages, even with one item.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-5"><span>List what in your workspace would break on promotion by naming an environment. That's your CI/CD backlog.</span></label></li>
+      <li><label><input type="checkbox" data-k="d6-6"><span>Skim the <b>Fabric CLI</b> docs &mdash; enough to say "we could automate this" credibly.</span></label></li>
     </ul>
 
-    <div class="tip"><b>Where this makes you valuable</b>Almost every organisation adopting Fabric has a lifecycle problem, not a technology problem: everything is built in one workspace by one person and nobody can promote anything safely. Being the person who introduces branch-per-feature, variable libraries and a promotion path is a bigger contribution than any single pipeline you'll write.</div>
+    <div class="tip"><b>Where this makes you valuable</b>Most orgs adopting Fabric have a lifecycle problem, not a technology problem: one workspace, one person, nothing promotable safely. Introducing branch-per-feature, variable libraries and a promotion path outweighs any single pipeline you'll write.</div>
   </div>
 </div>
 
@@ -593,34 +674,49 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
     <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div class="sec-body">
-    <p class="blurb">A pipeline nobody consumes is a cost centre. Fabric has five distinct ways to serve what you've built, and knowing all five means you can answer "how would people use this?" before someone asks.</p>
+    <p class="blurb">A pipeline nobody consumes is a cost centre. Fabric has five distinct ways to serve what you've built.</p>
     <ul class="plain">
       <li><b>Semantic model + report</b> &mdash; the default. Direct Lake over your gold layer.</li>
-      <li><b>SQL analytics endpoint</b> &mdash; anyone with SQL or Excel can query it directly. Wildly underused; often the fastest way to make analysts happy.</li>
-      <li><b>Data agents</b> &mdash; a natural-language agent grounded in <em>your</em> data. Buildable over lakehouses, warehouses, semantic models, eventhouses, SQL and mirrored databases; publishing and sharing is generally available, and they now support Git integration and deployment pipelines like any other item. The quality depends almost entirely on how well-modelled and well-named your gold layer is &mdash; which makes your modelling work suddenly very visible.</li>
-      <li><b>Activator</b> &mdash; rules on streams or report visuals that fire a Teams message, email or Power Automate flow when a condition holds. This is how data becomes an action instead of a dashboard nobody opens.</li>
-      <li><b>Fabric Apps</b> &mdash; new in 2026, a first-class item for building real web applications on Fabric data with Entra auth built in. Covered on its own page.</li>
+      <li><b>SQL endpoint</b> &mdash; anyone with SQL or Excel queries it directly. Underused; often the fastest way to make analysts happy.</li>
+      <li><b>Data agents</b> &mdash; an NL agent grounded in your data (lakehouse, warehouse, model, eventhouse, DB). GA, now with Git and deployment-pipeline support. Quality depends entirely on how well your gold layer is modelled and named.</li>
+      <li><b>Activator</b> &mdash; rules on streams or visuals that fire Teams, email or Power Automate on a condition. Turns data into action, not a dashboard nobody opens.</li>
+      <li><b>Fabric Apps</b> &mdash; new in 2026, real web apps on Fabric data with Entra auth built in.</li>
     </ul>
 
-    <p class="gh">Governance, briefly, because it's what makes any of it trustworthy</p>
+    <div class="diag" aria-hidden="true">
+      <svg viewBox="0 0 820 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="84" width="150" height="48" rx="10" fill="#eef8f6" stroke="#1e7e75" stroke-width="1.4"/><text x="83" y="113" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#057e6b">Gold layer</text>
+        <g stroke="#057e6b" stroke-width="1.3" fill="none"><path d="M158 108 L340 36" marker-end="url(#arrF)"/><path d="M158 108 L340 80" marker-end="url(#arrF)"/><path d="M158 108 L340 124" marker-end="url(#arrF)"/><path d="M158 108 L340 168" marker-end="url(#arrF)"/><path d="M158 108 L340 212" marker-end="url(#arrF)"/></g>
+        <g font-family="Space Grotesk,sans-serif" font-size="11.5" font-weight="600" fill="#121316">
+          <rect x="340" y="20" width="200" height="32" rx="8" fill="#fff" stroke="#8b9098" stroke-width="1.1"/><text x="356" y="41">Report</text>
+          <rect x="340" y="64" width="200" height="32" rx="8" fill="#fff" stroke="#8b9098" stroke-width="1.1"/><text x="356" y="85">SQL / Excel</text>
+          <rect x="340" y="108" width="200" height="32" rx="8" fill="#fff" stroke="#8b9098" stroke-width="1.1"/><text x="356" y="129">Data agent</text>
+          <rect x="340" y="152" width="200" height="32" rx="8" fill="#fff" stroke="#8b9098" stroke-width="1.1"/><text x="356" y="173">Activator</text>
+          <rect x="340" y="196" width="200" height="32" rx="8" fill="#fff" stroke="#8b9098" stroke-width="1.1"/><text x="356" y="217">Fabric App</text>
+        </g>
+        <defs><marker id="arrF" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#057e6b"/></marker></defs>
+      </svg>
+    </div>
+
+    <p class="gh">Governance, briefly &mdash; what makes any of it trustworthy</p>
     <ul class="plain">
-      <li><b>Domains</b> group workspaces by business area, with their own admins &mdash; how you avoid one flat list of 400 workspaces.</li>
-      <li><b>OneLake catalog</b> is where people find data, and <b>endorsement</b> (Promoted / Certified) is how they know which copy to trust.</li>
-      <li><b>Purview</b> integration brings sensitivity labels and lineage across the estate.</li>
-      <li><b>Workspace roles</b> (Admin/Member/Contributor/Viewer) plus OneLake security decide who sees what &mdash; and mirrored data can now carry security that follows it through shortcuts downstream.</li>
+      <li><b>Domains</b> group workspaces by business area, with their own admins &mdash; avoids one flat list of 400 workspaces.</li>
+      <li><b>OneLake catalog</b> is how people find data; <b>endorsement</b> (Promoted / Certified) says which copy to trust.</li>
+      <li><b>Purview</b> brings sensitivity labels and lineage across the estate.</li>
+      <li><b>Workspace roles</b> plus OneLake security decide who sees what &mdash; mirrored data now carries security through shortcuts downstream.</li>
     </ul>
 
     <p class="gh">Do this &mdash; 6 minutes</p>
     <ul class="checks">
-      <li><label><input type="checkbox" data-k="d7-1"><span>Connect <b>Excel</b> to your lakehouse's SQL endpoint. Watch a finance colleague's face when you show them.</span></label></li>
-      <li><label><input type="checkbox" data-k="d7-2"><span>Create a <b>data agent</b> over your table and ask it a question in English. Note where it gets confused &mdash; that's a modelling or naming problem, not an AI problem.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-1"><span>Connect <b>Excel</b> to your lakehouse's SQL endpoint.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-2"><span>Create a <b>data agent</b> over your table, ask it something in English &mdash; confusion means a naming problem, not an AI one.</span></label></li>
       <li><label><input type="checkbox" data-k="d7-3"><span>Set an <b>Activator</b> alert on a report visual so a threshold breach messages you in Teams.</span></label></li>
-      <li><label><input type="checkbox" data-k="d7-4"><span>Open the <b>OneLake catalog</b> and see what's discoverable in your tenant. Usually revealing.</span></label></li>
-      <li><label><input type="checkbox" data-k="d7-5"><span>Check whether your org uses <b>domains</b> and <b>endorsement</b>. If not, that's a concrete, low-risk proposal you can own.</span></label></li>
-      <li><label><input type="checkbox" data-k="d7-6"><span>Pick which of the five serving routes fits your org's biggest current pain, and write one sentence on why.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-4"><span>Open the <b>OneLake catalog</b>, see what's discoverable in your tenant.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-5"><span>Check whether your org uses <b>domains</b> and <b>endorsement</b>. If not, that's a low-risk proposal to own.</span></label></li>
+      <li><label><input type="checkbox" data-k="d7-6"><span>Pick which of the five serving routes fits your org's biggest pain &mdash; one sentence why.</span></label></li>
     </ul>
 
-    <div class="tip org"><b>For your org</b>The fastest credibility win in Fabric is rarely a new pipeline. It's taking something people already wait for &mdash; a manual extract, a spreadsheet someone emails &mdash; and making it a governed table plus an alert. Small surface, visible result, easy to explain in a meeting.</div>
+    <div class="tip org"><b>For your org</b>The fastest credibility win is rarely a new pipeline &mdash; it's taking something people already wait for (a manual extract, an emailed spreadsheet) and making it a governed table plus an alert.</div>
   </div>
 </div>
 
@@ -630,7 +726,7 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
 <div class="sheet" id="cheat">
   <div class="sheet-head">
     <h2>The one-page answer sheet</h2>
-    <p>Everything above, compressed to what you'd actually say out loud in a design review. Screenshot this one.</p>
+    <p>Everything above, compressed to what you'd say out loud in a design review. Screenshot this one.</p>
   </div>
 
   <p class="chgh">"Where should this data live?"</p>
@@ -686,17 +782,17 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">Pick any real dataset your team cares about &mdash; small is fine. Build it properly, once. Doing this end to end teaches more than another twenty hours of reading, and it gives you something to show.</p>
+      <p class="blurb">Pick any real dataset your team cares about &mdash; small is fine. Build it properly, once. It teaches more than another twenty hours of reading, and gives you something to show.</p>
       <ul class="checks">
-        <li><label><input type="checkbox" data-k="cap-1"><span>Land it raw into a <b>bronze</b> lakehouse table, keeping load timestamp and source system.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap-2"><span>Build <b>silver</b> with a parameterised notebook that uses <code>MERGE</code>, not overwrite.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-1"><span>Land it raw into a <b>bronze</b> lakehouse table with load timestamp and source.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-2"><span>Build <b>silver</b> with a parameterised notebook using <code>MERGE</code>, not overwrite.</span></label></li>
         <li><label><input type="checkbox" data-k="cap-3"><span>Build <b>gold</b> as a proper star schema &mdash; one fact, two or three dimensions.</span></label></li>
         <li><label><input type="checkbox" data-k="cap-4"><span>Orchestrate the lot with a <b>pipeline</b> on a schedule, with a failure alert.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap-5"><span>Put a <b>Direct Lake</b> semantic model on gold &mdash; and confirm no views are feeding it.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap-6"><span>Commit the whole workspace to <b>Git</b> and promote it through a <b>deployment pipeline</b> with a variable library.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-5"><span>Put a <b>Direct Lake</b> model on gold &mdash; confirm no views feed it.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap-6"><span>Commit the workspace to <b>Git</b>, promote it through a <b>deployment pipeline</b> with a variable library.</span></label></li>
         <li><label><input type="checkbox" data-k="cap-7"><span>Add one <b>Activator</b> alert or <b>data agent</b> so a human gets value without opening Fabric.</span></label></li>
       </ul>
-      <div class="tip"><b>Then write it up</b>One page: the architecture, the choices you made, and what you'd do differently. That document is what gets you treated as the Fabric person &mdash; more reliably than the build itself.</div>
+      <div class="tip"><b>Then write it up</b>One page: the architecture, the choices you made, what you'd do differently. That document is what gets you treated as the Fabric person.</div>
     </div>
   </div>
 
@@ -708,16 +804,15 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="sec-body">
-      <p class="blurb">You don't want to pay for a certification &mdash; fine. The genuinely valuable part of <b>DP-700 (Fabric Data Engineer Associate)</b> is free anyway: the <b>skills-measured outline</b> in the study guide is a published syllabus of everything Microsoft thinks a Fabric data engineer should know, and every linked Learn module is free. Read the outline, tick off what you can already do, and let the gaps set your next month.</p>
-      <p class="blurb">DP-700 covers three roughly equal areas: implementing and managing an analytics solution (workspaces, security, lifecycle), ingesting and transforming data (batch and streaming, SQL/PySpark/KQL), and monitoring and optimising. If Power BI modelling is more your angle, <b>DP-600</b> covers the analytics-engineer side &mdash; semantic models, DAX, Direct Lake &mdash; and the same trick applies.</p>
+      <p class="blurb">Don't want to pay for a certification? Fine &mdash; the valuable part of <b>DP-700</b> is free: the <b>skills-measured outline</b> is Microsoft's own syllabus, and every linked Learn module is free. Tick what you already know; let the gaps set your next month. It covers implementing/managing, ingesting/transforming, and monitoring/optimising in roughly equal thirds. More into Power BI modelling? <b>DP-600</b> is the analytics-engineer version &mdash; same trick applies.</p>
       <ul class="checks">
-        <li><label><input type="checkbox" data-k="cap2-1"><span>Open the DP-700 study guide and copy the skills-measured list into a doc. Mark each line confident / shaky / never heard of it.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap2-2"><span>Work the "never heard of it" lines first &mdash; those are the ones that make you look unprepared in a design review.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap2-3"><span>Subscribe to the <b>monthly Fabric feature summary</b> on the Fabric blog. Fifteen minutes a month keeps you permanently current &mdash; this is the single highest-leverage habit here.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap2-4"><span>Re-read the KQL and real-time sections specifically. Streaming is where most Power BI people are weakest, so it's where the differentiation is.</span></label></li>
-        <li><label><input type="checkbox" data-k="cap2-5"><span>Teach one of these seven days to a colleague. Nothing exposes a shaky mental model faster.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-1"><span>Copy the DP-700 skills-measured list into a doc. Mark each: confident / shaky / never heard of it.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-2"><span>Work the "never heard of it" lines first &mdash; those are what expose you in a design review.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-3"><span>Subscribe to the <b>monthly Fabric feature summary</b>. Fifteen minutes a month, the highest-leverage habit here.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-4"><span>Re-read the KQL / real-time sections &mdash; where most Power BI people are weakest.</span></label></li>
+        <li><label><input type="checkbox" data-k="cap2-5"><span>Teach one of these seven days to a colleague &mdash; fastest way to expose a shaky mental model.</span></label></li>
       </ul>
-      <div class="tip org"><b>Becoming the expert in your group</b>Expertise reads as three things: you know what exists, you know what <em>not</em> to use, and you know the failure modes. Days 2, 3 and 5 gave you all three &mdash; the shortcut-vs-copy ladder, the read-only endpoint, the Direct Lake fallback. Deploy them in conversation and people conclude you've been doing this for years.</div>
+      <div class="tip org"><b>Becoming the expert in your group</b>Expertise reads as three things: what exists, what <em>not</em> to use, and the failure modes. Days 2, 3 and 5 gave you all three &mdash; deploy them in conversation.</div>
     </div>
   </div>
 </div>
@@ -730,10 +825,8 @@ target = DeltaTable.forName(spark, <span class="s">"silver_customer"</span>)
     Worth bookmarking &mdash;
     <a href="https://learn.microsoft.com/en-us/fabric/data-engineering/lakehouse-overview">Lakehouse overview (Microsoft Learn)</a> &middot;
     <a href="https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-overview">Direct Lake overview</a> &middot;
-    <a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-storage-tiers">OneLake storage tiers</a> &middot;
     <a href="https://learn.microsoft.com/en-us/fabric/data-factory/variable-library-integration-with-data-pipelines">Variable libraries in pipelines</a> &middot;
-    <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700">DP-700 study guide (free syllabus)</a> &middot;
-    <a href="https://blog.fabric.microsoft.com/">Monthly Fabric feature summaries</a>
+    <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700">DP-700 study guide (free syllabus)</a>
   </div>
   <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#1e7e75">◆</span> Fabric &middot; 7-day course</p>
 </footer>
