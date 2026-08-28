@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fabric Plan, Step by Step — The Dumbed-Down Version</title>
+<meta name="description" content="A plain-English, click-by-click walkthrough of Plan in Microsoft Fabric: what it is, why each step exists, and what to do when it breaks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfbfa;
+  --panel:#ffffff;
+  --panel2:#f6f7f6;
+  --line:rgba(0,0,0,.1);
+  --ink:#121316;
+  --mut:#5c6069;
+  --dim:#8b9098;
+  --fuch:#a21caf;
+  --fuch-hi:#86198f;
+  --fuch-soft:rgba(217,70,239,.12);
+  --teal:#0f766e;
+  --teal-hi:#0d9488;
+  --teal-soft:rgba(45,212,191,.14);
+  --blue:#1d4ed8;
+  --blue-hi:#2563eb;
+  --blue-soft:rgba(59,130,246,.12);
+  --amber:#a16207;
+  --amber-hi:#b45309;
+  --amber-soft:rgba(251,191,36,.15);
+  --rose:#be123c;
+  --rose-soft:rgba(244,63,94,.11);
+  --ok:#18823e;
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.64;min-height:100vh}
+a{color:inherit}
+::selection{background:rgba(217,70,239,.28)}
+
+/* section accents */
+.a-fuch{--acc:var(--fuch);--acc-hi:var(--fuch-hi);--soft:var(--fuch-soft)}
+.a-teal{--acc:var(--teal);--acc-hi:var(--teal-hi);--soft:var(--teal-soft)}
+.a-blue{--acc:var(--blue);--acc-hi:var(--blue-hi);--soft:var(--blue-soft)}
+.a-amber{--acc:var(--amber);--acc-hi:var(--amber-hi);--soft:var(--amber-soft)}
+
+/* ---------- sticky bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(251,251,250,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--fuch)}
+.obar{flex:1;min-width:110px;height:8px;border-radius:99px;background:#eef0ee;border:1px solid var(--line);overflow:hidden}
+.obar>div{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--fuch),var(--blue-hi));transition:width .35s ease}
+.opct{font-family:var(--mono);font-size:.77rem;color:var(--mut);min-width:8.5ch;text-align:right}
+.dchip{font-family:var(--mono);font-size:.71rem;padding:3px 8px;border-radius:6px;border:1px solid var(--line);
+  color:var(--mut);text-decoration:none;background:var(--panel);white-space:nowrap}
+.dchip:hover{border-color:var(--fuch);color:var(--ink)}
+.dchip.done{border-color:var(--ok);color:var(--ok)}
+.dchip.ref{border-color:var(--blue);color:var(--blue)}
+.tbtn{font-family:var(--mono);font-size:.7rem;background:var(--panel);border:1px solid var(--line);color:var(--mut);
+  padding:3px 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.tbtn:hover{color:var(--ink);border-color:var(--dim)}
+
+/* ---------- layout ---------- */
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+
+/* ---------- hero ---------- */
+.hero{padding:44px 0 16px}
+.hero .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.85rem,5.1vw,2.85rem);line-height:1.12;letter-spacing:-.018em}
+.hero h1 .f{color:var(--fuch)}
+.hero h1 .b{color:var(--blue)}
+.hero .sub{color:var(--mut);max-width:64ch;margin-top:13px;font-size:1.04rem}
+
+/* the one-sentence panel */
+.onesent{margin:24px 0 4px;background:linear-gradient(180deg,var(--fuch-soft),var(--panel) 78%);
+  border:1px solid var(--line);border-left:4px solid var(--fuch);border-radius:13px;padding:17px 24px}
+.onesent h2{font-family:var(--mono);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--fuch-hi);margin-bottom:8px}
+.onesent p{font-family:var(--disp);font-size:1.16rem;font-weight:600;line-height:1.45;letter-spacing:-.01em}
+.onesent p .u{background:var(--fuch-soft);border-radius:5px;padding:0 5px}
+.onesent .after{font-family:var(--body);font-size:.95rem;font-weight:400;color:var(--mut);margin-top:9px;line-height:1.6}
+
+/* start-here box */
+.startbox{margin:16px 0 5px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--blue);
+  border-radius:12px;padding:15px 22px}
+.startbox h2{font-family:var(--disp);font-size:.86rem;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:7px}
+.startbox p{color:var(--mut);font-size:.95rem;margin-bottom:6px}
+.startbox p:last-child{margin-bottom:0}
+.startbox b{color:var(--ink);font-weight:600}
+#persistNote{font-family:var(--mono);font-size:.77rem;color:var(--dim)}
+
+/* diagrams */
+.stack{margin:22px 0 5px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 22px 11px;
+  box-shadow:0 2px 16px rgba(0,0,0,.06)}
+.stack svg{display:block;width:100%;height:auto}
+.stack-cap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-top:8px}
+.stack-cap .g{color:var(--fuch-hi)}
+.diag{margin:14px 0 6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px 16px 10px}
+.diag svg{display:block;width:100%;height:auto}
+.diag-cap{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-top:7px;text-align:center}
+
+/* ---------- section cards ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+.sec.done{border-color:var(--acc)}
+.sec-head{width:100%;display:flex;align-items:center;gap:14px;padding:12px 18px;background:none;border:none;color:inherit;
+  font-family:inherit;text-align:left;cursor:pointer}
+.sec-head:hover{background:var(--panel2)}
+.sec-head:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+.snum{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--acc);border:1.5px solid var(--acc);background:var(--soft);
+  border-radius:9px;padding:6px 8px;min-width:58px;text-align:center;flex-shrink:0;line-height:1.15}
+.snum b{display:block;font-size:.95rem}
+.stitle{flex:1;min-width:0}
+.stitle h3{font-family:var(--disp);font-weight:600;font-size:1.06rem;line-height:1.28}
+.stitle .ssub{color:var(--dim);font-size:.83rem;margin-top:2px}
+.mins{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;
+  border:1px solid var(--line);color:var(--mut);flex-shrink:0;background:var(--panel2)}
+.cnt{font-family:var(--mono);font-size:.74rem;color:var(--dim);flex-shrink:0;min-width:4ch;text-align:right}
+.cnt.full{color:var(--ok)}
+.chev{flex-shrink:0;transition:transform .25s ease;color:var(--dim)}
+.sec[data-open="true"] .chev{transform:rotate(180deg)}
+.sec-body{display:none;padding:4px 20px 17px;border-top:1px solid var(--line)}
+.sec[data-open="true"] .sec-body{display:block}
+
+.blurb{color:var(--mut);font-size:.96rem;margin:12px 0 3px;max-width:72ch}
+.blurb b{color:var(--ink);font-weight:600}
+.blurb em{color:var(--acc-hi);font-style:normal;font-weight:500}
+
+/* plain-english callout */
+.pe{margin-top:12px;background:var(--panel2);border:1px dashed var(--line);border-radius:11px;padding:11px 16px}
+.pe b{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--acc-hi);
+  display:block;margin-bottom:4px;font-weight:600}
+.pe p{color:var(--mut);font-size:.95rem}
+.pe p + p{margin-top:6px}
+.pe strong{color:var(--ink);font-weight:600}
+
+.gh{font-family:var(--mono);font-size:.69rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);font-weight:600;margin:16px 0 7px;
+  display:flex;align-items:center;gap:9px}
+.gh::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* click path */
+.path{font-family:var(--mono);font-size:.82rem;background:var(--soft);border:1px solid var(--acc);color:var(--acc-hi);
+  border-radius:8px;padding:8px 13px;margin-top:9px;display:block;overflow-x:auto;white-space:nowrap;font-weight:600}
+
+ul.checks{list-style:none;margin-top:4px}
+ul.checks li{margin-bottom:2px}
+ul.checks label{display:flex;gap:12px;align-items:flex-start;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.94rem}
+ul.checks label:hover{background:var(--panel2)}
+ul.checks input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex-shrink:0;margin-top:3px;border-radius:5px;
+  border:1.5px solid var(--dim);background:var(--panel2);cursor:pointer;position:relative}
+ul.checks input:checked{background:var(--acc);border-color:var(--acc)}
+ul.checks input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.checks input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+ul.checks input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(18,19,22,.26)}
+ul.checks b{color:var(--ink);font-weight:600}
+
+ul.plain{list-style:none;margin-top:8px}
+ul.plain li{position:relative;padding-left:20px;margin-bottom:5px;color:var(--mut);font-size:.94rem}
+ul.plain li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;border-radius:2px;background:var(--acc)}
+ul.plain li b{color:var(--ink);font-weight:600}
+
+.tip{margin-top:12px;border-left:3px solid var(--acc);background:var(--soft);border-radius:0 10px 10px 0;padding:10px 16px;font-size:.92rem;color:var(--mut)}
+.tip b{color:var(--acc-hi);font-weight:600;font-family:var(--mono);font-size:.71rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+.tip strong{color:var(--ink);font-weight:600}
+.tip.gotcha{border-left-color:var(--rose);background:var(--rose-soft)}
+.tip.gotcha b{color:var(--rose)}
+.tip.win{border-left-color:var(--ok);background:rgba(24,130,62,.09)}
+.tip.win b{color:var(--ok)}
+
+table{width:100%;border-collapse:collapse;margin-top:11px;font-size:.89rem}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+td b{color:var(--ink);font-weight:600}
+.tscroll{overflow-x:auto}
+
+p code,li code,td code{background:var(--fuch-soft);color:var(--fuch-hi);border-radius:5px;padding:1px 6px;font-size:.85em;white-space:normal;font-family:var(--mono)}
+
+/* reference blocks */
+.sheet{margin-top:40px;background:linear-gradient(180deg,var(--blue-soft),var(--panel) 70%);border:1px solid var(--line);
+  border-radius:14px;padding:21px 24px 19px}
+.sheet-head h2{font-family:var(--disp);font-weight:700;font-size:1.4rem;margin-bottom:5px}
+.sheet-head p{color:var(--mut);font-size:.95rem;max-width:68ch}
+.sheet .chgh{font-family:var(--mono);font-size:.71rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);
+  font-weight:600;margin:22px 0 2px}
+.sheet table{margin-top:9px}
+
+.close{margin-top:40px;background:linear-gradient(180deg,var(--fuch-soft),var(--panel) 76%);border:1px solid var(--line);
+  border-radius:14px;padding:21px 24px}
+.close h2{font-family:var(--disp);font-weight:700;font-size:1.42rem;margin-bottom:6px}
+.close .cdesc{color:var(--mut);font-size:.96rem;max-width:68ch}
+
+footer{margin:45px 0 30px;padding-top:17px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
+.srcs{margin-top:10px;font-size:.82rem;line-height:1.9}
+.backlink{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--mut);margin-top:20px;text-decoration:none}
+.backlink:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .topbar{gap:8px;padding:9px 14px}
+  .opct{display:none}
+  .hero{padding:32px 0 14px}
+  .onesent{padding:14px 17px}
+  .onesent p{font-size:1.04rem}
+  .sec-head{padding:11px 13px;gap:10px}
+  .stitle .ssub{display:none}
+  .sec-body{padding:4px 14px 15px}
+  .stack{padding:12px 14px 9px}
+  .diag{padding:10px 12px 8px}
+  .sheet,.close{padding:17px 16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff;color:#111}
+  .topbar,.chev,.tbtn{display:none}
+  .sec-body{display:block!important}
+  .sec,.stack,.startbox,.close,.diag,.sheet,.onesent{border-color:#bbb;background:#fff;box-shadow:none}
+  a{color:#111}
+}
+
+/* back to index — self-contained, inherits topbar colour */
+.homebtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;
+  border:1px solid currentColor;border-radius:9px;color:inherit;opacity:.42;text-decoration:none;
+  transition:opacity .18s ease,transform .18s ease}
+.homebtn:hover{opacity:1;transform:translateX(-2px)}
+.homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
+.homebtn svg{width:14px;height:14px;display:block}
+@media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
+</style>
+</head>
+<body>
+
+<!-- ============ STICKY PROGRESS ============ -->
+<div class="topbar">
+  <a class="homebtn" href="../index.html" aria-label="Back to the tool belt" title="Back to the tool belt"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  <span class="brand"><span class="fl">&#9670;</span> Fabric Plan &middot; step by step</span>
+  <div class="obar"><div id="obarFill"></div></div>
+  <span class="opct" id="opct">0% done</span>
+  <a class="dchip" href="#what">What</a>
+  <a class="dchip" href="#parts">Parts</a>
+  <a class="dchip" href="#setup" data-for="setup">Setup</a>
+  <a class="dchip" href="#s1" data-for="s1">1</a>
+  <a class="dchip" href="#s2" data-for="s2">2</a>
+  <a class="dchip" href="#s3" data-for="s3">3</a>
+  <a class="dchip" href="#s4" data-for="s4">4</a>
+  <a class="dchip" href="#s5" data-for="s5">5</a>
+  <a class="dchip" href="#s6" data-for="s6">6</a>
+  <a class="dchip" href="#s7" data-for="s7">7</a>
+  <a class="dchip" href="#s8" data-for="s8">8</a>
+  <a class="dchip ref" href="#jargon">Jargon</a>
+  <a class="dchip ref" href="#fixes">Fixes</a>
+  <button class="tbtn" id="toggleAll" type="button">Collapse all</button>
+  <button class="tbtn" id="resetBtn" type="button">Reset</button>
+</div>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; Microsoft Fabric &middot; Plan (Fabric IQ)</p>
+  <h1>Fabric <span class="f">Plan</span>, explained<br>like nobody explained it <span class="b">to you</span>.</h1>
+  <p class="sub">Every step, in order, in plain English &mdash; what you click, what it actually does, and why it exists. No assumed knowledge. If you've felt scattered every time you opened Plan, that's because the docs describe forty features and never tell you the four that come first. This does.</p>
+
+  <div class="onesent">
+    <h2>The whole product, in one sentence</h2>
+    <p>Plan is a <span class="u">spreadsheet that's plugged in at both ends</span> &mdash; it reads real numbers out of your Power BI model, lets people type new numbers on top, and saves those into a real database.</p>
+    <p class="after">That's it. Everything else on this page is detail hanging off that sentence. When you get lost later, come back and re-read it &mdash; nine times out of ten your confusion is "which end am I on right now, the reading end or the writing end?"</p>
+  </div>
+
+  <div class="stack">
+    <svg viewBox="0 0 880 232" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: a Power BI semantic model feeds actuals into a planning sheet, where people type budget numbers, which write back to a Fabric SQL database, which flows back into reports">
+      <!-- READ end -->
+      <rect x="8" y="46" width="228" height="92" rx="12" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.6"/>
+      <text x="26" y="74" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1d4ed8">Semantic model</text>
+      <text x="26" y="95" font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">your existing Power BI model</text>
+      <text x="26" y="113" font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">actuals, dimensions, measures</text>
+      <text x="26" y="131" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#1d4ed8">Plan only READS this</text>
+
+      <path d="M240,92 H286" stroke="#8b9098" stroke-width="1.6"/><path d="M292,92 l-10,-5.5 v11 z" fill="#8b9098"/>
+      <text x="248" y="82" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="0.6" fill="#8b9098">READ</text>
+
+      <!-- the sheet -->
+      <rect x="298" y="30" width="284" height="124" rx="13" fill="#fdf2fd" stroke="#a21caf" stroke-width="2"/>
+      <text x="318" y="58" font-family="Space Grotesk,sans-serif" font-size="15" font-weight="700" fill="#a21caf">Planning sheet</text>
+      <text x="318" y="79" font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">the grid people actually use</text>
+      <rect x="318" y="90" width="244" height="20" rx="4" fill="#ffffff" stroke="#e9c8ee"/>
+      <text x="326" y="104" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#86198f">rows = what &middot; columns = when</text>
+      <rect x="318" y="114" width="244" height="20" rx="4" fill="#ffffff" stroke="#e9c8ee"/>
+      <text x="326" y="128" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#86198f">humans type numbers in here</text>
+
+      <path d="M586,92 H632" stroke="#8b9098" stroke-width="1.6"/><path d="M638,92 l-10,-5.5 v11 z" fill="#8b9098"/>
+      <text x="592" y="82" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="0.6" fill="#8b9098">WRITE</text>
+
+      <!-- WRITE end -->
+      <rect x="644" y="46" width="228" height="92" rx="12" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.6"/>
+      <text x="662" y="74" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#0f766e">Fabric SQL database</text>
+      <text x="662" y="95" font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">a real table, in your workspace</text>
+      <text x="662" y="113" font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">budgets, forecasts, scenarios</text>
+      <text x="662" y="131" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#0f766e">this is called WRITEBACK</text>
+
+      <!-- return loop -->
+      <path d="M758,142 V184 H122 V144" stroke="#a16207" stroke-width="1.5" stroke-dasharray="5 4" fill="none"/>
+      <path d="M122,138 l-5.5,10 h11 z" fill="#a16207"/>
+      <rect x="336" y="170" width="208" height="27" rx="7" fill="#fffbeb" stroke="#a16207" stroke-width="1.3"/>
+      <text x="440" y="188" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#a16207">plan vs actual, in one report</text>
+
+      <text x="440" y="219" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#8b9098">the loop closes &mdash; your budget becomes data, next to the actuals it will be judged against</text>
+    </svg>
+    <div class="stack-cap"><span>reading end</span><span class="g">the bit you build</span><span>writing end</span></div>
+  </div>
+
+  <div class="startbox">
+    <h2>How to use this page</h2>
+    <p>Read it top to bottom, once, without touching Fabric. Then go again with Fabric open in another window and do each step for real. Every step has the <b>same four parts</b>: <b>in plain English</b> (what this thing is), <b>do this</b> (the literal clicks), <b>how you know it worked</b>, and <b>when it goes wrong</b>.</p>
+    <p>Tick boxes as you go &mdash; <span id="persistNote">progress saves in this browser, on this device.</span> Sections 1&ndash;8 are in strict order and each one genuinely needs the one before it. Skipping is the thing that makes Plan feel chaotic.</p>
+  </div>
+</header>
+
+<!-- ==================================================================== -->
+<!-- ============================ WHAT ================================== -->
+<!-- ==================================================================== -->
+<div class="sec a-fuch" data-open="true" id="what">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">READ<b>1st</b></span>
+    <span class="stitle"><h3>What Plan actually is &mdash; and what it replaces</h3><span class="ssub">the 90 seconds that makes the rest make sense</span></span>
+    <span class="mins">3 min</span>
+    <span class="cnt">0/3</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Somewhere in your organisation there is a budget spreadsheet. Someone exports actuals from Power BI into it, a dozen people type next year's numbers into it, it gets emailed around, versions multiply, and eventually a hero re-keys the final numbers into something official. <b>Plan is Microsoft deleting that spreadsheet</b> and putting the same job inside Fabric, where the actuals already live.</p>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>Microsoft calls Plan an <strong>"EPM &amp; CPM solution"</strong>. Ignore the acronyms. Enterprise / Corporate Performance Management just means <strong>budgeting, forecasting and target-setting</strong> &mdash; the numbers about the future, as opposed to reporting, which is numbers about the past.</p>
+      <p>Power BI has always been a <strong>read-only</strong> tool. You could look at last quarter, but you could not type next quarter into it. Plan is the write-enabled half that was always missing.</p>
+    </div>
+
+    <p class="gh">Why this is a bigger deal than it sounds</p>
+    <div class="tscroll"><table>
+      <tr><th>The old way</th><th>What went wrong</th><th>What Plan does instead</th></tr>
+      <tr><td>Export actuals to Excel, budget in Excel</td><td>The moment you export, your numbers stop matching the report. Nobody can tell which file is current.</td><td>The sheet reads the model <b>live</b>. Same measures, same definitions, no export.</td></tr>
+      <tr><td>A separate planning tool (Anaplan, Pigment, TM1&hellip;)</td><td>Second platform, second licence, second security model, and a data pipeline between them that breaks.</td><td>Same workspace, same permissions, same capacity as the rest of Fabric.</td></tr>
+      <tr><td>Power Apps + Dataverse for write-back</td><td>You're now a software team. Someone has to own an app forever.</td><td>No-code grid. A finance person builds it themselves.</td></tr>
+    </table></div>
+
+    <div class="tip"><b>The sentence to say out loud at work</b>"We can budget on top of the actuals, in the same place the actuals live, and the budget comes back out as data." That's the entire business case, and it lands with both finance and IT.</div>
+
+    <p class="gh">Where Plan sits in Fabric</p>
+    <p class="blurb">Plan is an item in the <b>Fabric IQ</b> workload &mdash; Microsoft's grouping for the "shared business meaning" layer, alongside semantic models, ontology, graph and data agents. You don't need to understand Fabric IQ to use Plan. All you need from that sentence is: <em>Plan is designed to sit on top of a semantic model, not on top of raw tables.</em> That single fact explains almost every prerequisite in the next section.</p>
+
+    <div class="tip gotcha"><b>Say this back to yourself</b>If you cannot answer "which semantic model is this plan reading from?" you are not ready to create anything yet. That model is the foundation, and Plan gives you no way to plan without one.</div>
+
+    <p class="gh">Tick when true</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="w1"><span>I can say the one-sentence version out loud: <b>a spreadsheet plugged in at both ends</b> &mdash; reads a semantic model, writes to a SQL database.</span></label></li>
+      <li><label><input type="checkbox" data-k="w2"><span>I understand Plan is about <b>the future</b> (budgets, forecasts, targets), and Power BI reporting is about the past.</span></label></li>
+      <li><label><input type="checkbox" data-k="w3"><span>I have named the <b>specific semantic model</b> my first plan will read from. Not "we'll figure it out" &mdash; an actual name.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ PARTS ================================= -->
+<!-- ==================================================================== -->
+<div class="sec a-blue" data-open="true" id="parts">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">READ<b>2nd</b></span>
+    <span class="stitle"><h3>Plan has four parts. You need exactly one of them.</h3><span class="ssub">this is the single biggest reason people feel "all over the place"</span></span>
+    <span class="mins">3 min</span>
+    <span class="cnt">0/3</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Open the Plan docs and you're immediately hit with <b>Planning sheets</b>, <b>PowerTable</b>, <b>Intelligence</b> and <b>Infobridge</b>, all presented as equals. They are not equals. One of them is the product; the other three are things you'll want in month three. Here is the honest ranking.</p>
+
+    <div class="tscroll"><table>
+      <tr><th>Part</th><th>What it really is</th><th>Do you need it now?</th></tr>
+      <tr><td><b>Planning sheet</b></td><td>The budgeting grid. Rows and columns of numbers, some read from your model, some typed by humans, some calculated. <b>This is Plan.</b></td><td><b>Yes.</b> This whole page is about this one.</td></tr>
+      <tr><td><b>PowerTable sheet</b></td><td>A data-entry table over a database table &mdash; more like a managed list or a form than a budget. For maintaining reference data at scale.</td><td>No. Later, when you need to <em>maintain</em> data rather than plan it.</td></tr>
+      <tr><td><b>Intelligence sheet</b></td><td>Reporting and variance analysis <em>inside</em> Plan &mdash; plan vs actual, charts, financial-report layouts.</td><td>No. You can just use a Power BI report at first.</td></tr>
+      <tr><td><b>Infobridge</b></td><td>The data-plumbing layer: pull from several sources, merge, append, pivot, group, and map data between sheets.</td><td>No. Only when one semantic model stops being enough.</td></tr>
+    </table></div>
+
+    <div class="pe">
+      <b>Why this matters so much</b>
+      <p>Every one of those four has its own toolbar, its own menus and its own docs section. If you wander between them while learning, <strong>nothing accumulates</strong> &mdash; you learn a quarter of four tools instead of all of one.</p>
+      <p>So here is the rule for the next two weeks: <strong>if the docs page you're reading doesn't say "planning sheet", close it.</strong></p>
+    </div>
+
+    <div class="tip win"><b>Your scope, written down</b>One Plan item. One planning sheet. One semantic model. One budget you actually care about. Everything on the rest of this page fits inside that sentence, and you can finish it in an afternoon once setup is done.</div>
+
+    <p class="gh">Tick when true</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="p1"><span>I know the difference between a <b>planning sheet</b> (budget grid) and a <b>PowerTable sheet</b> (data-entry table) &mdash; and I'm only doing the first one.</span></label></li>
+      <li><label><input type="checkbox" data-k="p2"><span>I've accepted I do <b>not</b> need Intelligence sheets or Infobridge yet.</span></label></li>
+      <li><label><input type="checkbox" data-k="p3"><span>I've written down my one-line scope: the one budget, for the one thing, I'm going to build first.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ SETUP ================================= -->
+<!-- ==================================================================== -->
+<div class="sec a-amber" data-open="true" id="setup">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>0</b></span>
+    <span class="stitle"><h3>The boring checklist that saves you a week</h3><span class="ssub">every one of these has a matching "why is nothing working" symptom</span></span>
+    <span class="mins">10 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Do not skip this to "just have a look". Plan fails <em>quietly</em> &mdash; empty dropdowns, greyed-out buttons, a sheet that loads with no data &mdash; and every one of those symptoms traces back to something in this list. Ten minutes here saves days of confusion.</p>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>Plan doesn't read your semantic model the polite way a report does. It talks to it through the <strong>XMLA endpoint</strong> &mdash; the "back door" into a model that external tools use &mdash; and it renders itself using <strong>embed tokens</strong>, the same machinery that puts a Power BI report inside someone else's website.</p>
+      <p>Both of those are switched off in a lot of tenants and both need real capacity. That's why the requirements look heavier than "it's just a spreadsheet".</p>
+    </div>
+
+    <p class="gh">A. Tenant settings &mdash; someone with Fabric admin has to do these</p>
+    <p class="blurb">Admin portal &rarr; <b>Tenant settings</b>. Three switches:</p>
+    <ul class="plain">
+      <li>Under <b>Integration settings</b>: turn on <b>Allow XMLA endpoints and Analyze in Excel with on-premises semantic models</b>. <em>Without this, Plan cannot read your model at all.</em></li>
+      <li>Under <b>Developer settings</b>: turn on <b>Embed content in apps</b>. <em>Without this, the sheet itself won't render.</em></li>
+      <li>Under <b>Developer settings</b>, only if you'll use a service principal later: <b>Service principals can call Fabric public APIs</b>. Skip for now if you're signing in as yourself.</li>
+    </ul>
+
+    <p class="gh">B. Capacity &mdash; what you're running on</p>
+    <ul class="plain">
+      <li>The semantic model must live on an <b>F SKU (Fabric capacity)</b> or a <b>Power BI Premium P1&ndash;P5</b>.</li>
+      <li><b>Power BI Pro and PPU do not work</b> for the XMLA + embed-token scenarios Plan needs. This is a hard stop, not a slow-down. If you're on Pro, you cannot do this at your desk today.</li>
+      <li>In the admin portal under <b>Capacity settings</b>, the <b>XMLA Endpoint</b> must be set to <b>Read Only</b> or <b>Read Write</b>. If it says "Off", nothing works.</li>
+      <li>Very small SKUs can still trip over XMLA and memory limits even when everything is switched on.</li>
+    </ul>
+
+    <p class="gh">C. Permissions &mdash; the one people get wrong</p>
+    <ul class="plain">
+      <li>You need <b>Admin</b> or <b>Build</b> permission on the semantic model itself.</li>
+      <li>Whoever creates the connection in Step 1 must be a workspace <b>Member</b> or <b>Admin</b>.</li>
+      <li><b>Contributor is not enough.</b> A Contributor can't create or share cloud connections, and can't create Plan items that need an embed token. If you're a Contributor you will hit a wall and the error won't tell you this.</li>
+    </ul>
+
+    <div class="tip gotcha"><b>Four hard stops, checked now, not later</b><strong>1.</strong> A model in <strong>My workspace</strong> is not supported &mdash; move it to a real workspace. <strong>2.</strong> Tenants or workspaces using <strong>private links</strong> can't have Plan items at all. <strong>3.</strong> <strong>Entra B2B guest accounts</strong> are not supported &mdash; if you're a guest in this tenant, stop here. <strong>4.</strong> Only <strong>OAuth</strong> and <strong>service principal</strong> authentication are supported for the connection.</div>
+
+    <div class="tip"><b>Two things you must never do later</b>Don't <strong>rename the semantic model</strong> once a plan is connected to it &mdash; it breaks the connection. Don't <strong>rename the workspace</strong> that holds a Plan item &mdash; the item stops opening entirely. Decide your names before you build, because these aren't recoverable by renaming back cleanly.</div>
+
+    <p class="gh">Do this now</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="c1"><span><b>XMLA endpoints</b> tenant setting is on (Integration settings).</span></label></li>
+      <li><label><input type="checkbox" data-k="c2"><span><b>Embed content in apps</b> tenant setting is on (Developer settings).</span></label></li>
+      <li><label><input type="checkbox" data-k="c3"><span>My workspace is on an <b>F SKU or P1&ndash;P5</b>, and <b>XMLA Endpoint</b> is Read Only or Read Write.</span></label></li>
+      <li><label><input type="checkbox" data-k="c4"><span>I have <b>Admin or Build</b> on the semantic model, and I'm <b>Member or Admin</b> on the workspace &mdash; not Contributor.</span></label></li>
+      <li><label><input type="checkbox" data-k="c5"><span>The semantic model is <b>not</b> in My workspace, and I'm <b>not</b> a guest (B2B) account here.</span></label></li>
+      <li><label><input type="checkbox" data-k="c6"><span>I've settled the <b>names</b> of my workspace and semantic model, because renaming them later breaks things.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 1 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-blue" data-open="true" id="s1">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>1</b></span>
+    <span class="stitle"><h3>Build the connection &mdash; before you create anything else</h3><span class="ssub">the step everyone skips, then wonders why the dropdown is empty</span></span>
+    <span class="mins">8 min</span>
+    <span class="cnt">0/5</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Almost everyone's first attempt goes: create the Plan, create the sheet, click <b>Add</b> to attach data&hellip; and the dropdown is <em>empty</em>. Nothing is broken. The connection simply doesn't exist yet, because <b>you have to build it somewhere else first</b>, before you create a plan at all.</p>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>A <strong>connection</strong> is a saved, named, reusable "here is how to reach that model, and here is who to sign in as". It lives at the tenant level in <strong>Manage connections and gateways</strong> &mdash; the same place gateways and data source credentials live &mdash; not inside your plan.</p>
+      <p>Why separate? Because a budget gets used by twenty people who don't individually have back-door access to the model. You create one connection, you <strong>share</strong> it, and everyone borrows it. That's also why you must be a workspace Member or Admin to make one: you're handing out access.</p>
+    </div>
+
+    <p class="gh">Do this &mdash; create the connection</p>
+    <code class="path">Fabric toolbar &rarr; Settings (gear) &rarr; Manage connections and gateways &rarr; New</code>
+    <ul class="plain">
+      <li>Choose <b>Cloud</b> (not on-premises).</li>
+      <li>Give it a <b>connection name</b> you'll recognise in a list of forty. Something like <code>Plan &mdash; FY27 Sales Model</code>.</li>
+      <li><b>Connection type</b> must be <b>Power BI Semantic Model</b>. This is the one that matters &mdash; the plan's dropdown filters to this type and nothing else.</li>
+      <li><b>Authentication method</b>: choose <b>OAuth 2.0</b>, select <b>Edit credentials</b>, and sign in as yourself. (<b>Service principal</b> is the grown-up option for CI/CD &mdash; ignore it for your first build.)</li>
+      <li>Select <b>Create</b>.</li>
+    </ul>
+
+    <p class="gh">Do this &mdash; share it with the humans who'll use the plan</p>
+    <code class="path">next to the connection name &rarr; &hellip; &rarr; Manage users &rarr; search person &rarr; set access &rarr; Share</code>
+    <p class="blurb">Access levels are <b>User</b>, <b>User with resharing</b>, and <b>Owner</b>. For a colleague who just needs to type budget numbers, <b>User</b> is right. You can do this later, but doing it now saves a confused Teams message on launch day.</p>
+
+    <div class="tip win"><b>How you know it worked</b>The connection appears in the Manage connections and gateways list with type <strong>Power BI Semantic Model</strong>. That's the whole test. In Step 3 it will show up in the plan's dropdown &mdash; if it doesn't, it's this step that's wrong, not that one.</div>
+
+    <div class="tip gotcha"><b>Direct Lake models need extra work</b><strong>Import</strong> models just work. <strong>Direct Lake</strong> and <strong>DirectQuery</strong> are supported <em>with limitations</em>: they need <strong>fixed credentials</strong>, and <strong>single sign-on is not supported</strong>. For a Direct Lake model you must also go to the model itself &mdash; <code>&hellip; &rarr; Settings &rarr; Gateway and cloud connections</code> &mdash; and swap it off the default SSO connection onto a new one you create there, then <strong>Apply</strong>. If your first-ever plan can sit on an Import model, do that and save yourself the detour.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s1a"><span>I created a <b>Cloud</b> connection with connection type <b>Power BI Semantic Model</b>.</span></label></li>
+      <li><label><input type="checkbox" data-k="s1b"><span>I used <b>OAuth 2.0</b> and successfully signed in under <b>Edit credentials</b>.</span></label></li>
+      <li><label><input type="checkbox" data-k="s1c"><span>I gave it a name I'll still recognise in six months.</span></label></li>
+      <li><label><input type="checkbox" data-k="s1d"><span>I shared it (<b>Manage users</b>) with at least one other person, or noted that I'll need to.</span></label></li>
+      <li><label><input type="checkbox" data-k="s1e"><span>If my model is <b>Direct Lake</b>, I did the extra <b>Gateway and cloud connections</b> step on the model itself.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 2 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-fuch" data-open="true" id="s2">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>2</b></span>
+    <span class="stitle"><h3>Create the Plan item &mdash; and the database that appears from nowhere</h3><span class="ssub">two minutes of clicking, one surprise you should expect</span></span>
+    <span class="mins">3 min</span>
+    <span class="cnt">0/3</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">This is the easy one. Two clicks and a name.</p>
+
+    <code class="path">your workspace &rarr; New item &rarr; Plan &rarr; type a name &rarr; Create</code>
+
+    <div class="pe">
+      <b>The surprise, explained before it surprises you</b>
+      <p>A moment after you create the Plan, <strong>a Fabric SQL database appears in your workspace that you did not ask for</strong>. Do not delete it. Do not rename it. Do not "tidy it up".</p>
+      <p>That database stores your plan's <strong>metadata</strong> &mdash; the definition of your sheets, rows, formulas and layout. It is part of the Plan item, in the same way a semantic model quietly sits behind a report.</p>
+      <p>Note what it is <em>not</em>: it is <strong>not</strong> where your budget numbers get written. That's a different database you'll choose yourself in Step 8. Two databases, two jobs. Mixing these up is a classic week-two confusion.</p>
+    </div>
+
+    <div class="tip"><b>Think of the Plan item as a workbook</b>An Excel workbook holds many sheets; a Plan item holds many sheets too &mdash; up to <strong>25</strong>, and up to <strong>50 visuals</strong>. So the unit you create here is "the whole budgeting workbook for this topic", not "one budget grid". Name it accordingly: <code>FY27 Sales Plan</code>, not <code>Sheet1</code>.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s2a"><span>Plan item created via <b>New item &rarr; Plan</b>, with a workbook-level name.</span></label></li>
+      <li><label><input type="checkbox" data-k="s2b"><span>I've spotted the auto-created <b>SQL database</b> in the workspace and I know to leave it alone.</span></label></li>
+      <li><label><input type="checkbox" data-k="s2c"><span>I understand that database holds <b>metadata</b>, not my budget numbers.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 3 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-fuch" data-open="true" id="s3">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>3</b></span>
+    <span class="stitle"><h3>Your first planning sheet, connected to real data</h3><span class="ssub">where the connection from Step 1 finally pays off</span></span>
+    <span class="mins">5 min</span>
+    <span class="cnt">0/4</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Open the new Plan item. It offers to get data from a semantic model or from Excel, and to build a sheet from it &mdash; or to start with an empty sheet and connect it afterwards. <b>Take the empty sheet.</b> Doing the two things separately makes it much clearer which half is which, and that clarity is the whole point right now.</p>
+
+    <code class="path">in the Plan item &rarr; Planning &rarr; name the sheet &rarr; Create</code>
+    <code class="path">then, in the new sheet &rarr; Add &rarr; Select a Connection &rarr; pick your connection &rarr; choose the semantic model &rarr; Add</code>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>You just did two separate things that feel like one. First you made an <strong>empty grid</strong>. Then you told that grid <strong>where its numbers come from</strong>.</p>
+      <p>The grid is yours &mdash; your layout, your rows, your formulas. The model is not yours; it's shared, governed, and read-only from here. <strong>Plan never writes back into your semantic model.</strong> Keeping that boundary clear in your head is most of the battle.</p>
+    </div>
+
+    <div class="tip gotcha"><b>"The dropdown is empty"</b>Only connections of type <strong>Power BI Semantic Model</strong> that <em>you personally have access to</em> appear here. An empty list means one of exactly three things: you never made the connection (Step 1), you made it with the wrong connection type, or somebody else made it and never shared it with you. It is never a bug. Go back to Step 1.</div>
+
+    <div class="tip win"><b>How you know it worked</b>You can add fields from the semantic model into the sheet and <strong>real numbers appear</strong>. If fields appear but the cells are blank, that's usually the XMLA endpoint or capacity from Step 0, not this step.</div>
+
+    <div class="tip"><b>Optional but do it early: the collaboration database</b>If more than one person will use this sheet, add a <strong>database connection</strong> for the Plan item so it has somewhere to store comments and collaboration details. It's optional and easy to add later &mdash; but "later" usually means "the day people start asking why their comments vanished".</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s3a"><span>I created a sheet of type <b>Planning</b> (not PowerTable, not Intelligence).</span></label></li>
+      <li><label><input type="checkbox" data-k="s3b"><span>I attached my semantic model with <b>Add &rarr; Select a Connection</b>.</span></label></li>
+      <li><label><input type="checkbox" data-k="s3c"><span><b>Real numbers</b> from the model are visible in the sheet.</span></label></li>
+      <li><label><input type="checkbox" data-k="s3d"><span>I can state plainly: the model is <b>read-only</b> to Plan; nothing I type goes back into it.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 4 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-teal" data-open="true" id="s4">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>4</b></span>
+    <span class="stitle"><h3>Rows and columns &mdash; the shape of every plan ever built</h3><span class="ssub">"what am I planning" down the side, "when" across the top</span></span>
+    <span class="mins">6 min</span>
+    <span class="cnt">0/4</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Now you shape the grid. This is the part that decides whether your plan is pleasant or painful for the next six months, and it takes about five minutes to get right.</p>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>A planning sheet is a <strong>pivot table you're allowed to type into</strong>. Exactly like a pivot table, it has two jobs to fill:</p>
+      <p><strong>Row dimensions</strong> &mdash; <em>what</em> you're planning. Product, department, cost centre, account, region. These stack into a hierarchy you can expand and collapse: Category &rarr; Sub-category &rarr; Product.</p>
+      <p><strong>Column dimensions</strong> &mdash; almost always <em>when</em>. Months, quarters, years. Sometimes also <em>which version</em>: Actual, Budget, Forecast.</p>
+    </div>
+
+    <div class="diag">
+      <svg viewBox="0 0 860 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Anatomy of a planning sheet: row dimensions down the left, column dimensions across the top, with a model row, a data input row and a formula row">
+        <!-- column headers -->
+        <rect x="228" y="14" width="620" height="30" rx="6" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.3"/>
+        <text x="538" y="34" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="600" fill="#1d4ed8">COLUMN DIMENSIONS &mdash; usually time</text>
+        <g font-family="JetBrains Mono,monospace" font-size="10" fill="#5c6069">
+          <text x="272" y="62" text-anchor="middle">Jan</text><text x="382" y="62" text-anchor="middle">Feb</text>
+          <text x="492" y="62" text-anchor="middle">Mar</text><text x="602" y="62" text-anchor="middle">Q1</text>
+          <text x="742" y="62" text-anchor="middle">FY total</text>
+        </g>
+
+        <!-- row dim label -->
+        <rect x="12" y="14" width="204" height="192" rx="6" fill="#fdf2fd" stroke="#a21caf" stroke-width="1.3"/>
+        <text x="114" y="34" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="600" fill="#a21caf">ROW DIMENSIONS</text>
+        <text x="114" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b9098">what you're planning</text>
+        <g font-family="Inter,sans-serif" font-size="11" fill="#121316">
+          <text x="30" y="82" font-weight="600">Beverages</text>
+          <text x="44" y="106">Water</text>
+          <text x="44" y="130">Juices</text>
+          <text x="44" y="154" fill="#a21caf" font-weight="600">Mocktails</text>
+          <text x="30" y="184" font-weight="600">Gross margin</text>
+        </g>
+
+        <!-- row bands -->
+        <rect x="228" y="70" width="620" height="24" rx="5" fill="#ffffff" stroke="#dfe2e0"/>
+        <rect x="228" y="96" width="620" height="24" rx="5" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.2"/>
+        <rect x="228" y="122" width="620" height="24" rx="5" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.2"/>
+        <rect x="228" y="148" width="620" height="24" rx="5" fill="#fdf2fd" stroke="#a21caf" stroke-width="1.2"/>
+        <rect x="228" y="174" width="620" height="24" rx="5" fill="#fffbeb" stroke="#a16207" stroke-width="1.2"/>
+
+        <g font-family="JetBrains Mono,monospace" font-size="9.5" fill="#5c6069">
+          <text x="240" y="86">read from the model &mdash; you cannot type here</text>
+          <text x="240" y="112" fill="#0f766e" font-weight="600">DATA INPUT ROW &mdash; a human types the budget here</text>
+          <text x="240" y="138" fill="#0f766e" font-weight="600">DATA INPUT ROW</text>
+          <text x="240" y="164" fill="#a21caf" font-weight="600">DATA INPUT ROW &mdash; added by you, not in the model</text>
+          <text x="240" y="190" fill="#a16207" font-weight="600">FORMULA ROW &mdash; = Revenue - Cost</text>
+        </g>
+
+        <text x="430" y="224" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#8b9098">every planning sheet is these three row types, arranged over a time axis</text>
+      </svg>
+      <p class="diag-cap">the anatomy of every planning sheet you will ever build</p>
+    </div>
+
+    <div class="tip"><b>Start smaller than feels sensible</b>Three or four row levels and twelve months. Not every product, not every cost centre. You are learning a tool, not shipping the corporate budget &mdash; and a small sheet makes every later step (formulas, scenarios, writeback) fast to test instead of a two-minute wait each time.</div>
+
+    <div class="tip gotcha"><b>You need at least one dimension</b>Writeback in Step 8 flatly requires the sheet to have <strong>at least one row or column dimension</strong>. A sheet with numbers but no dimensions has nothing to key the saved rows on, so it can't be written anywhere.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s4a"><span>I've added <b>row dimensions</b> &mdash; the "what" &mdash; and I can expand and collapse the hierarchy.</span></label></li>
+      <li><label><input type="checkbox" data-k="s4b"><span>I've added <b>column dimensions</b> &mdash; the "when".</span></label></li>
+      <li><label><input type="checkbox" data-k="s4c"><span>I deliberately kept it <b>small</b> for this first build.</span></label></li>
+      <li><label><input type="checkbox" data-k="s4d"><span>I can point at any cell and say whether it came <b>from the model</b> or will be <b>typed by a human</b>.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 5 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-teal" data-open="true" id="s5">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>5</b></span>
+    <span class="stitle"><h3>Type a number &mdash; data input rows</h3><span class="ssub">this is the moment Plan does something Power BI never could</span></span>
+    <span class="mins">8 min</span>
+    <span class="cnt">0/5</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Everything so far has been reading. Now you add a row that <b>isn't in the semantic model at all</b> and type into it. This is the point of the entire product, and it's worth pausing on when it works.</p>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>A <strong>data input row</strong> is an empty row you bolt onto the grid so a human can type. Nothing feeds it. It exists because the model doesn't have the thing you need.</p>
+      <p>Two examples that make it click: your P&amp;L model has revenue and expenses but no <strong>shares outstanding</strong>, so you can't compute EPS. Or you launched a product last week that has <strong>no history</strong>, so it appears nowhere in the model &mdash; but it definitely needs a budget.</p>
+      <p>The model can't answer those. A person can. That's a data input row.</p>
+    </div>
+
+    <p class="gh">Do this &mdash; two ways, same result</p>
+    <code class="path">select a row &rarr; Planning &rarr; Insert Row &rarr; Data Input &rarr; Number</code>
+    <code class="path">or: hover a row &rarr; row gripper &rarr; Insert &rarr; Data Input</code>
+    <p class="blurb">The <b>row gripper</b> is the little handle that appears when you hover over a row &mdash; the same idea as the drag handle on an Excel row. Using the gripper opens a <b>side pane of row properties</b>, which is where the useful settings live. <em>Insert Row is greyed out if no row is selected</em> &mdash; that's the most common "the button doesn't work" moment, and it isn't a bug.</p>
+
+    <p class="gh">The properties that actually matter</p>
+    <div class="tscroll"><table>
+      <tr><th>Setting</th><th>What it means, plainly</th><th>What to pick first time</th></tr>
+      <tr><td><b>Row type</b></td><td>Number (a human types) or Formula (it calculates). You can switch a row between the two whenever you like.</td><td><b>Number</b>.</td></tr>
+      <tr><td><b>Insert As</b></td><td><b>Single Row</b> adds one row here. <b>Templated</b> adds the same row at <em>every</em> level of the hierarchy &mdash; add "New product line" once, get it under every region.</td><td>Single Row. Templated is the power move once you trust it.</td></tr>
+      <tr><td><b>Scaling factor</b></td><td>Whether typing "5" means 5, 5 thousand, or 5 million. Defaults to Auto.</td><td>Set it explicitly if people will type in thousands. Ambiguity here causes real errors.</td></tr>
+      <tr><td><b>Include in total</b></td><td>Does this row roll up into its parent? On by default.</td><td>Leave on &mdash; unless it's a memo line like headcount that shouldn't be added to money.</td></tr>
+      <tr><td><b>Distribute parent value to children</b></td><td>Type a number at the parent level and it spreads down to the children automatically.</td><td>Brilliant for top-down budgeting. Try it once and you'll see why.</td></tr>
+      <tr><td><b>Default value</b></td><td>What the row starts as: a <b>Static</b> number, or copied from another <b>Row</b> (e.g. "start at last year's actuals").</td><td>Sourcing from last year's row is the single biggest time-saver here.</td></tr>
+      <tr><td><b>Allow Input</b></td><td><b>Edit mode</b> = only editors can type. <b>Read mode</b> = viewers can type too.</td><td>Read mode is what you want when twenty people submit budgets without editing the sheet's design.</td></tr>
+    </table></div>
+
+    <div class="tip gotcha"><b>Bind for cross filter/RLS &mdash; the security one</b>If your row references another row, turn this on. Without it, row-level security leaks: a manager who should only see <em>Canada</em> can see a manually inserted row that quietly references <em>US</em> data. RLS on the semantic model does <strong>not</strong> automatically cover rows you invented inside the sheet. This is the setting that stops a genuinely embarrassing incident.</div>
+
+    <div class="tip"><b>Adding a lot of rows at once</b>Use <strong>Insert Row(s)</strong> from the same menu: it pre-fills the parent levels, lets you add <strong>1, 5 or 10</strong> at a time, and can define a whole new hierarchy branch by overwriting the pre-filled parents. If you're pasting a list of new cost centres, this is the door. Bulk data input caps at <strong>1 million rows</strong> from an Excel or CSV upload.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s5a"><span>I inserted a <b>data input row</b> and typed a number into it. It stuck.</span></label></li>
+      <li><label><input type="checkbox" data-k="s5b"><span>I found the <b>row gripper</b> and opened the row properties side pane.</span></label></li>
+      <li><label><input type="checkbox" data-k="s5c"><span>I've set <b>Scaling factor</b> deliberately, so nobody types 5 and means 5,000.</span></label></li>
+      <li><label><input type="checkbox" data-k="s5d"><span>I tried <b>Distribute parent value to children</b> at least once to see what top-down budgeting feels like.</span></label></li>
+      <li><label><input type="checkbox" data-k="s5e"><span>I understand <b>Bind for cross filter/RLS</b> and why leaving it off can leak data across regions.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 6 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-amber" data-open="true" id="s6">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>6</b></span>
+    <span class="stitle"><h3>Do maths &mdash; formula rows</h3><span class="ssub">Excel formulas, except the references are rows, not cells</span></span>
+    <span class="mins">6 min</span>
+    <span class="cnt">0/4</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">You have actuals from the model and budget numbers typed by humans. Now you want <b>Gross margin</b>, <b>Variance</b>, <b>Growth %</b> &mdash; rows that are computed from other rows. That's a formula row.</p>
+
+    <div class="pe">
+      <b>In plain English &mdash; and the one mental shift</b>
+      <p>The formula engine is <strong>Excel-like</strong>: logical and mathematical functions, autocomplete, syntax help, multi-line editing. If you can write an Excel formula you can write these.</p>
+      <p>The shift: in Excel you reference <strong>cells</strong> (<code>=B4-B7</code>). Here you reference <strong>rows</strong> (<code>= Revenue - Cost of sales</code>), and the formula applies across <em>every column</em> automatically. You write it once and it computes for all twelve months. Once that lands, formula rows stop feeling strange.</p>
+    </div>
+
+    <p class="gh">Do this</p>
+    <code class="path">select the row below where you want it &rarr; Planning &rarr; Insert Row &rarr; Formula</code>
+    <ul class="plain">
+      <li>The new row is inserted <b>above</b> the row you selected. (Data input rows go <em>below</em>. Yes, that's inconsistent. Now you know.)</li>
+      <li>In the <b>Calculated Row</b> pane, give it a title and write the formula.</li>
+      <li>To reference a row: <b>click it directly in the report</b> while your cursor is in the formula box, or use the <b>References</b> tab to search the hierarchy. Typing row names by hand is the slow, typo-prone way.</li>
+      <li><b>Create</b> only lights up once the formula is valid. A greyed-out Create button means your formula is wrong, not that the app is stuck.</li>
+    </ul>
+
+    <div class="tip"><b>Tools that make this painless</b>Turn on the <strong>Suggestions</strong> toggle for IntelliSense-style autocomplete. Use the <strong>Functions</strong> tab to browse what exists rather than guessing. And when a formula misbehaves, hit <strong>expand</strong> for the <strong>Maximized Formula View</strong> &mdash; line numbers and proper error messages instead of squinting at a one-line box.</div>
+
+    <div class="tip gotcha"><b>Evaluated Formula For &mdash; the setting that explains weird totals</b>When a formula <em>row</em> crosses a formula <em>column</em>, something has to win. That's what this controls: <strong>All Data Source and Input Columns</strong>, <strong>All Columns</strong>, or <strong>Custom</strong> (include/exclude specific columns). If one column in your margin row shows a number that makes no sense, this setting is almost always why. It's not a rendering glitch.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s6a"><span>I created a formula row that computes from other rows (e.g. <code>Revenue - Cost</code>).</span></label></li>
+      <li><label><input type="checkbox" data-k="s6b"><span>I inserted a row reference by <b>clicking the row in the report</b>, not typing its name.</span></label></li>
+      <li><label><input type="checkbox" data-k="s6c"><span>I've seen that one formula fills <b>every column</b> at once.</span></label></li>
+      <li><label><input type="checkbox" data-k="s6d"><span>I know <b>Evaluated Formula For</b> exists and is the first thing to check when a column looks wrong.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 7 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-blue" data-open="true" id="s7">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>7</b></span>
+    <span class="stitle"><h3>Scenarios &mdash; "what if sales drop 10%?"</h3><span class="ssub">safe sandboxes stacked on top of your real plan</span></span>
+    <span class="mins">10 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">In Excel, "what if?" means <b>Save As &mdash; Budget v4 PESSIMISTIC FINAL.xlsx</b>, and then nobody can tell which file is real. Scenarios are the fix: alternative versions that live <em>inside</em> the sheet and cannot damage the plan underneath.</p>
+
+    <div class="pe">
+      <b>The mental model &mdash; get this and scenarios are easy</b>
+      <p><strong>Base</strong> is your committed plan. It's the reference point everything is measured against.</p>
+      <p>A scenario is a <strong>transparent sheet laid over Base</strong>. You scribble on the overlay; Base is untouched underneath. Delete the overlay and nothing is lost.</p>
+      <p>Two rules people get wrong: every scenario sits on <strong>Base</strong>, never on another scenario &mdash; "Best case" and "Cost cuts" are siblings, not a stack. And simulations <strong>never alter Base or the source data</strong>, so you genuinely cannot break anything in here.</p>
+    </div>
+
+    <div class="diag">
+      <svg viewBox="0 0 840 216" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram: two scenario layers each sit independently on top of the base plan, and Copy to base pushes chosen values down into base">
+        <rect x="150" y="150" width="540" height="46" rx="9" fill="#f6f7f6" stroke="#5c6069" stroke-width="1.8"/>
+        <text x="176" y="171" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#121316">Base</text>
+        <text x="176" y="188" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#5c6069">the committed plan &mdash; the thing everything is compared against</text>
+
+        <rect x="90" y="76" width="300" height="46" rx="9" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5"/>
+        <text x="112" y="97" font-family="Space Grotesk,sans-serif" font-size="12.5" font-weight="600" fill="#1d4ed8">Scenario: Best case</text>
+        <text x="112" y="113" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">sales +10% &mdash; an overlay, not an edit</text>
+
+        <rect x="440" y="76" width="300" height="46" rx="9" fill="#fdf2fd" stroke="#a21caf" stroke-width="1.5"/>
+        <text x="462" y="97" font-family="Space Grotesk,sans-serif" font-size="12.5" font-weight="600" fill="#a21caf">Scenario: Cost cuts</text>
+        <text x="462" y="113" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6069">opex &minus;8% &mdash; independent of the other one</text>
+
+        <path d="M240,126 V146" stroke="#1d4ed8" stroke-width="1.4" stroke-dasharray="4 3"/>
+        <path d="M590,126 V146" stroke="#a21caf" stroke-width="1.4" stroke-dasharray="4 3"/>
+        <text x="416" y="140" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b9098">both sit on Base</text>
+
+        <path d="M300,60 H530" stroke="#dfe2e0" stroke-width="1.2" stroke-dasharray="3 4"/>
+        <text x="415" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#be123c">never stacked on each other</text>
+
+        <path d="M700,99 H784 V173 H700" stroke="#0f766e" stroke-width="1.5" fill="none"/>
+        <path d="M706,173 l10,-5.5 v11 z" fill="#0f766e"/>
+        <text x="790" y="130" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" fill="#0f766e">Copy</text>
+        <text x="790" y="143" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" fill="#0f766e">to base</text>
+
+        <text x="420" y="26" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#8b9098">scenarios are overlays &mdash; scribble freely, Base is safe underneath</text>
+      </svg>
+      <p class="diag-cap">why you cannot break anything with a scenario</p>
+    </div>
+
+    <p class="gh">Do this</p>
+    <code class="path">Model &rarr; Scenario &rarr; name it &rarr; select the series to simulate &rarr; Create</code>
+    <p class="blurb">"Series" just means <b>which measures this scenario is allowed to move</b>. Pick Sales, and the scenario can flex sales; everything else stays put. Then drag the <b>slider</b> on a cell, or type a value directly. Dependent measures recalculate live &mdash; change a leaf value and every parent total and calculated measure above it updates instantly. Hit <b>Save</b>. Add more scenarios with the <b>+</b> at the bottom.</p>
+
+    <p class="gh">The four buttons worth knowing on day one</p>
+    <div class="tscroll"><table>
+      <tr><th>Button</th><th>What it does</th><th>Why you'll want it</th></tr>
+      <tr><td><b>Compare Scenario</b></td><td>Side-by-side of two scenarios with a <b>&Delta;</b> column showing the difference.</td><td>This is what you actually present. Pick <b>Compare</b>, <b>With</b>, and which measures.</td></tr>
+      <tr><td><b>Show variance</b></td><td>Shows the gap between scenario and Base inline. <b>Slider settings</b> controls the colours &mdash; <b>Increase is good</b> is on by default (up = green).</td><td>Turn <b>Increase is good</b> <em>off</em> for cost rows, or your savings will glow red.</td></tr>
+      <tr><td><b>Distribution</b></td><td>Spread one value across many cells: copy to all rows, copy until the last column, or copy <b>with trend</b> so it follows the existing shape.</td><td>Beats typing twelve months by hand. <b>Reset value</b> undoes it.</td></tr>
+      <tr><td><b>Bulk Edit</b></td><td>Pick a measure, pick row and column dimensions, set a value or a percentage, <b>Apply</b>.</td><td>"Cut all European marketing by 8%" in one action.</td></tr>
+    </table></div>
+
+    <div class="tip win"><b>Copy to base &mdash; the moment a scenario becomes the plan</b>When leadership picks a scenario, <strong>Copy to base</strong> pushes those values down into Base. Review the columns, select <strong>Proceed</strong>. Note carefully: <strong>only simulated values are copied</strong> &mdash; native measures are not. Your scenario becomes the plan; it doesn't overwrite what came from the model.</div>
+
+    <div class="tip gotcha"><b>"Why can't I simulate this measure?"</b>You can't directly simulate a <strong>calculated measure that references native measures</strong>, because it holds no value of its own &mdash; it's derived. Simulate the underlying native measures instead, and watch the calculated one move on its own. This is the most common scenario-related "is it broken?" and the answer is no.</div>
+
+    <div class="tip"><b>Two more you'll reach for</b><strong>Lock Scenario</strong> (Scenario &rarr; Settings) freezes it so nobody edits the version that went to the board. <strong>Security &rarr; Scenario</strong> controls who can even see each one &mdash; useful when "Restructuring case" shouldn't be visible to everyone.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s7a"><span>I created a scenario via <b>Model &rarr; Scenario</b> and moved a value with the slider.</span></label></li>
+      <li><label><input type="checkbox" data-k="s7b"><span>I can explain <b>Base</b> vs a scenario overlay, and that scenarios never stack on each other.</span></label></li>
+      <li><label><input type="checkbox" data-k="s7c"><span>I built a <b>second</b> scenario and used <b>Compare Scenario</b> to see the &Delta;.</span></label></li>
+      <li><label><input type="checkbox" data-k="s7d"><span>I tried <b>Distribution</b> or <b>Bulk Edit</b> instead of typing every cell.</span></label></li>
+      <li><label><input type="checkbox" data-k="s7e"><span>I know <b>Copy to base</b> promotes a scenario &mdash; and that it copies only simulated values.</span></label></li>
+      <li><label><input type="checkbox" data-k="s7f"><span>I understand why a calculated measure can't be simulated directly.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- ============================ STEP 8 ================================ -->
+<!-- ==================================================================== -->
+<div class="sec a-teal" data-open="true" id="s8">
+  <button class="sec-head" type="button" aria-expanded="true">
+    <span class="snum">STEP<b>8</b></span>
+    <span class="stitle"><h3>Writeback &mdash; where your numbers actually go</h3><span class="ssub">the step that turns a nice grid into a real system</span></span>
+    <span class="mins">10 min</span>
+    <span class="cnt">0/6</span>
+    <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec-body">
+    <p class="blurb">Until now your budget lives inside the Plan item. Useful, but sealed off. <b>Writeback</b> copies those numbers into a real <b>Fabric SQL database table</b> &mdash; where a pipeline can read them, a semantic model can model them, and a Power BI report can put budget next to actuals.</p>
+
+    <div class="pe">
+      <b>In plain English</b>
+      <p>Writeback is <strong>Save As, into a database table</strong>. You choose the database and the table name, and Plan creates and fills the table for you. No DBA, no schema designed in advance &mdash; it builds the structure at runtime from your sheet.</p>
+      <p>Remember Step 2: this is a <strong>different database</strong> from the one Fabric auto-created for the Plan's metadata. That one holds the <em>definition</em> of your sheet. This one holds your <em>numbers</em>.</p>
+    </div>
+
+    <p class="gh">Do this &mdash; create the destination</p>
+    <code class="path">Writeback &rarr; Add Destination</code>
+    <ul class="plain">
+      <li>Pick a <b>database connection</b>.</li>
+      <li>Pick the <b>target database</b> &mdash; you browse and select it from the <b>OneLake catalog</b>.</li>
+      <li>Type a <b>Table Name</b>. This table doesn't have to exist; Plan creates it.</li>
+      <li><b>Decimal Precision</b> &mdash; digits after the decimal point for number columns.</li>
+      <li><b>Text Length</b> &mdash; max length for text columns (e.g. 512 for all of them), or <b>Custom</b>.</li>
+      <li><b>Add</b>.</li>
+    </ul>
+
+    <p class="gh">Choose the shape: Long vs Wide</p>
+    <code class="path">Writeback &rarr; Settings &rarr; Writeback Type</code>
+    <div class="tscroll"><table>
+      <tr><th>Type</th><th>What the table looks like</th><th>Pick this when</th></tr>
+      <tr><td><b>Long</b></td><td>One row per measure per combination &mdash; key-value pairs. Tall and narrow. Columns like <code>Measure</code>, <code>Value</code>.</td><td>Default choice. Add a new measure later and the table shape doesn't change &mdash; it just gets more rows.</td></tr>
+      <tr><td><b>Wide</b></td><td>One column per measure. Short and fat. Looks like the sheet.</td><td>You want to eyeball it in SQL, or a downstream tool expects fixed columns.</td></tr>
+      <tr><td><b>Long with Changes</b></td><td>Long, but only the values that <em>changed</em>.</td><td>Big sheets, frequent saves, or you want an audit trail of edits.</td></tr>
+      <tr><td><b>Wide with Changes</b></td><td>Wide, only changed values.</td><td>Same reason, wide shape.</td></tr>
+    </table></div>
+    <p class="blurb">The other <b>Settings</b> tabs: <b>Data</b> (which measures and dimensions take part), <b>Destinations</b> (where it goes), <b>Advanced</b> (system-level behaviour), <b>General</b> (the core options).</p>
+
+    <p class="gh">Do it, then check it</p>
+    <code class="path">Writeback &rarr; Writeback &rarr; wait for the confirmation &rarr; open the database and look at the table</code>
+    <p class="blurb">Actually open the destination database and look at the rows. Don't trust the toast message &mdash; look at the data. <b>Writeback &rarr; Logs</b> shows every run with milestones, payload size and duration; click a writeback ID for the detail. When someone asks "did the budget save?", that log is your answer.</p>
+
+    <div class="tip gotcha"><b>The gotcha that will bite you, guaranteed</b>Once you've written back, <strong>adding or removing row/column dimensions changes the table's required structure</strong>. Plan won't silently reshape a table that already exists &mdash; you get a structure-mismatch error. The fix: <strong>drop and re-create the destination table</strong> before the next writeback. So get your dimensions settled <em>before</em> you point anything downstream at that table.</div>
+
+    <div class="tip"><b>The ceiling</b>Writeback handles up to <strong>1.2 million cells per operation</strong>. Past that it isn't supported and will fail. If you're near it, split across sheets &mdash; the same 1.2M ceiling applies to each Infobridge query, and five sheets gets you to roughly 5 million cells in one workbook.</div>
+
+    <div class="tip win"><b>Scenarios write back too</b>From the <strong>Scenario</strong> tab: <strong>Writeback</strong> saves the selected scenario, <strong>Writeback All</strong> saves all of them. This is how "best case vs worst case" ends up as data in a report rather than a screenshot in a deck. The Writeback option only lights up <strong>after</strong> a destination exists.</div>
+
+    <p class="gh">Tick as you go</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-k="s8a"><span>I created a <b>writeback destination</b> pointing at a Fabric SQL database and table.</span></label></li>
+      <li><label><input type="checkbox" data-k="s8b"><span>I chose a <b>writeback type</b> and can say why (Long vs Wide).</span></label></li>
+      <li><label><input type="checkbox" data-k="s8c"><span>I ran a writeback and <b>opened the table</b> to see my own numbers sitting in it.</span></label></li>
+      <li><label><input type="checkbox" data-k="s8d"><span>I found <b>Writeback &rarr; Logs</b> and know it's where "did it save?" gets answered.</span></label></li>
+      <li><label><input type="checkbox" data-k="s8e"><span>I know that changing dimensions later means <b>dropping and re-creating</b> the destination table.</span></label></li>
+      <li><label><input type="checkbox" data-k="s8f"><span>I know this database is <b>not</b> the auto-created metadata one from Step 2.</span></label></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- =========================== JARGON ================================= -->
+<!-- ==================================================================== -->
+<section class="sheet" id="jargon">
+  <div class="sheet-head">
+    <h2>Jargon decoder</h2>
+    <p>Every word that made a docs page feel harder than it is, translated into something you'd actually say to a colleague. Bookmark this bit &mdash; it's the part you'll come back to.</p>
+  </div>
+
+  <p class="chgh">The words in the product</p>
+  <div class="tscroll"><table>
+    <tr><th>They say</th><th>They mean</th></tr>
+    <tr><td><b>Plan (the item)</b></td><td>The workbook. Holds up to 25 sheets.</td></tr>
+    <tr><td><b>Planning sheet</b></td><td>One budget grid. A pivot table you can type into.</td></tr>
+    <tr><td><b>Row dimension</b></td><td>What you're planning, down the left. Product, department, account.</td></tr>
+    <tr><td><b>Column dimension</b></td><td>Nearly always time, across the top. Months, quarters, years.</td></tr>
+    <tr><td><b>Series</b></td><td>A measure that a scenario is allowed to move.</td></tr>
+    <tr><td><b>Native measure</b></td><td>A number that comes from the semantic model. Real, stored, simulatable.</td></tr>
+    <tr><td><b>Calculated measure</b></td><td>A number derived from other numbers. Holds no value of its own, so it can't be simulated directly.</td></tr>
+    <tr><td><b>Data input row</b></td><td>An empty row a human types into. The whole point of Plan.</td></tr>
+    <tr><td><b>Formula row</b></td><td>A row that calculates from other rows. Excel formulas, row references.</td></tr>
+    <tr><td><b>Templated row</b></td><td>The same row repeated at every level of the hierarchy.</td></tr>
+    <tr><td><b>Row gripper</b></td><td>The little handle on hover. Right-click equivalent for rows.</td></tr>
+    <tr><td><b>Base</b></td><td>The committed plan. The reference point.</td></tr>
+    <tr><td><b>Scenario</b></td><td>A what-if overlay on Base. Can't damage Base.</td></tr>
+    <tr><td><b>Copy to base</b></td><td>Promote a scenario's simulated values into the real plan.</td></tr>
+    <tr><td><b>Writeback</b></td><td>Save the numbers into a real SQL table.</td></tr>
+    <tr><td><b>Long / Wide</b></td><td>Tall key-value table / one column per measure.</td></tr>
+    <tr><td><b>Infobridge</b></td><td>The plumbing: merge, append, pivot, group across sources. Ignore at first.</td></tr>
+    <tr><td><b>PowerTable</b></td><td>Data-entry table over a database table. Not a budget grid.</td></tr>
+    <tr><td><b>Intelligence sheet</b></td><td>Reporting and variance analysis inside Plan.</td></tr>
+  </table></div>
+
+  <p class="chgh">The words around the product</p>
+  <div class="tscroll"><table>
+    <tr><th>They say</th><th>They mean</th></tr>
+    <tr><td><b>EPM / CPM</b></td><td>Budgeting and forecasting. Numbers about the future.</td></tr>
+    <tr><td><b>Fabric IQ</b></td><td>Microsoft's grouping for the "shared business meaning" layer &mdash; semantic models, ontology, graph, agents, and Plan.</td></tr>
+    <tr><td><b>XMLA endpoint</b></td><td>The back door into a semantic model that external tools use. Plan needs it open.</td></tr>
+    <tr><td><b>Embed token</b></td><td>The mechanism that renders Power BI content inside another app. Plan renders itself this way.</td></tr>
+    <tr><td><b>Semantic model</b></td><td>Your Power BI model &mdash; tables, relationships, measures. Plan reads it and never writes to it.</td></tr>
+    <tr><td><b>Shareable cloud connection</b></td><td>A saved "how to reach that model and who to sign in as", created once and shared.</td></tr>
+    <tr><td><b>DMTS connection</b></td><td>The internal name for that connection. You'll only meet it in an error message.</td></tr>
+    <tr><td><b>RLS</b></td><td>Row-level security &mdash; who is allowed to see which rows.</td></tr>
+    <tr><td><b>Direct Lake</b></td><td>A semantic model reading Delta files straight from OneLake. Works with Plan, but needs extra connection setup.</td></tr>
+  </table></div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ============================ FIXES ================================= -->
+<!-- ==================================================================== -->
+<section class="sheet" id="fixes">
+  <div class="sheet-head">
+    <h2>When it breaks &mdash; symptom to cause</h2>
+    <p>Plan's failures are quiet: empty lists, greyed buttons, blank cells. Almost none of them are bugs. Find your symptom on the left.</p>
+  </div>
+
+  <div class="tscroll"><table>
+    <tr><th>What you see</th><th>What's actually wrong</th><th>Fix</th></tr>
+    <tr><td>Connection dropdown is empty when adding data</td><td>No connection of type <b>Power BI Semantic Model</b> exists, or it wasn't shared with you</td><td>Step 1. Check the connection type is exactly right, and that it's shared to your account.</td></tr>
+    <tr><td>Sheet loads but every cell is blank</td><td>XMLA endpoint off, or capacity doesn't support it</td><td>Step 0 &mdash; tenant setting <b>and</b> capacity XMLA setting must both be on.</td></tr>
+    <tr><td>Can't create the Plan item at all</td><td>You're a <b>Contributor</b>; embed-token items need Member or Admin</td><td>Get your workspace role raised. Contributor also can't create or share connections.</td></tr>
+    <tr><td>Everything is greyed out and you're on Power BI Pro</td><td>Pro and PPU aren't supported for XMLA + embed-token scenarios</td><td>You need an F SKU or P1&ndash;P5. No workaround.</td></tr>
+    <tr><td><b>Insert Row</b> is greyed out</td><td>No row is selected</td><td>Click a row first. That's genuinely all it is.</td></tr>
+    <tr><td><b>Create</b> stays greyed in the formula pane</td><td>The formula isn't valid yet</td><td>Open the Maximized Formula View for the real error message.</td></tr>
+    <tr><td>A plan that worked yesterday won't open</td><td>Someone renamed the <b>workspace</b></td><td>Don't rename workspaces containing Plan items. Ever.</td></tr>
+    <tr><td>Plan lost its data source</td><td>Someone renamed the <b>semantic model</b></td><td>Same rule. Renaming breaks the connection.</td></tr>
+    <tr><td>Writeback fails with a structure mismatch</td><td>You changed dimensions after the table was created</td><td>Drop and re-create the destination table, then write back again.</td></tr>
+    <tr><td>Writeback fails on a big sheet</td><td>Over <b>1.2 million cells</b> in one operation</td><td>Split across sheets. The cap is per operation.</td></tr>
+    <tr><td>"DMTS connection is deleted or not found" on a PowerTable sheet</td><td>The connection was deleted; the recovery screen doesn't appear</td><td>Create a new PowerTable sheet using <b>Existing Table</b> and configure the same table again.</td></tr>
+    <tr><td>Users see rows they shouldn't</td><td>RLS gaps: PowerTable queries run as the <b>connection's</b> identity, not the user's; Blend (From Sheets) doesn't apply RLS at all</td><td>Don't rely on database-level RLS through these paths. And set <b>Bind for cross filter/RLS</b> on inserted rows.</td></tr>
+    <tr><td>Can't insert a data input column</td><td>The semantic model contains unsupported Unicode characters</td><td>Clean the offending names in the model.</td></tr>
+    <tr><td>Nothing works and you're a guest in this tenant</td><td>Entra <b>B2B</b> accounts aren't supported</td><td>Use an account native to the tenant.</td></tr>
+    <tr><td>Plan items unavailable across the whole tenant</td><td>The tenant or workspace uses <b>private links</b></td><td>Not supported. This one is architectural, not a setting.</td></tr>
+  </table></div>
+
+  <p class="chgh">Ceilings worth memorising</p>
+  <div class="tscroll"><table>
+    <tr><th>Limit</th><th>Number</th></tr>
+    <tr><td>Sheets per Plan item</td><td><b>25</b></td></tr>
+    <tr><td>Visuals per Plan item</td><td><b>50</b></td></tr>
+    <tr><td>Cells per writeback operation</td><td><b>1.2 million</b></td></tr>
+    <tr><td>Cells per Infobridge query</td><td><b>1.2 million</b> (~5 million across five sheets)</td></tr>
+    <tr><td>Rows per bulk data input from Excel/CSV</td><td><b>1 million</b></td></tr>
+  </table></div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- =========================== CAPSTONE =============================== -->
+<!-- ==================================================================== -->
+<section class="close" id="capstone">
+  <h2>Now build the small one</h2>
+  <p class="cdesc">Reading this page teaches you the vocabulary. Building one tiny plan end to end is what makes it stick &mdash; and the small version takes an afternoon, not a quarter. Pick something you genuinely care about but nobody depends on yet: next year's travel budget, headcount for one team, revenue for one product line.</p>
+
+  <p class="gh">The afternoon project</p>
+  <ul class="checks">
+    <li><label><input type="checkbox" data-k="cap1"><span><b>One semantic model</b>, Import mode, in a real workspace on an F SKU. Connection created and shared.</span></label></li>
+    <li><label><input type="checkbox" data-k="cap2"><span><b>One planning sheet</b>: two or three row levels, twelve months across the top, actuals visible from the model.</span></label></li>
+    <li><label><input type="checkbox" data-k="cap3"><span><b>One data input row</b> for something the model doesn't have, defaulting to last year's actuals.</span></label></li>
+    <li><label><input type="checkbox" data-k="cap4"><span><b>One formula row</b> &mdash; variance, or growth %, computed from the rows above.</span></label></li>
+    <li><label><input type="checkbox" data-k="cap5"><span><b>Two scenarios</b> on Base, compared side by side with the &Delta; column.</span></label></li>
+    <li><label><input type="checkbox" data-k="cap6"><span><b>One writeback</b> to a SQL table &mdash; and you've opened the table and seen your numbers in it.</span></label></li>
+    <li><label><input type="checkbox" data-k="cap7"><span><b>One Power BI report</b> over that table showing budget next to actuals. The loop is closed.</span></label></li>
+  </ul>
+
+  <div class="tip win"><b>When you've done all seven</b>You've used every concept that matters in Plan. Everything left &mdash; approval workflows, Intelligence sheets, Infobridge, PowerTable, allocation rules &mdash; is an addition to this skeleton, not a new thing to learn from scratch. That's the point at which Plan stops feeling like forty features and starts feeling like one tool.</div>
+</section>
+
+<a class="backlink" href="../index.html">&larr; back to the tool belt</a>
+
+<footer>
+  <p>Written August 2026, against Microsoft's published Plan documentation. Plan sits in the Fabric IQ workload &mdash; Microsoft states it's available worldwide as part of the Microsoft Fabric SKU with billing meters in place, while parts of the IQ workload still carry preview labels and individual features move month to month. Check the docs before you build anything month-end depends on. Progress on this page is stored locally in your browser.</p>
+  <div class="srcs">
+    Worth bookmarking &mdash;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/overview">What is Plan?</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/overview-prerequisites">Prerequisites for Plan</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/planning-how-to-get-started">Get started with planning sheets</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/planning-how-to-create-semantic-model-connection">Create a semantic model connection</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/planning-how-to-set-up-scenarios">Set up a scenario</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/planning-writeback/planning-how-to-persist-data">Set up writeback</a> &middot;
+    <a href="https://learn.microsoft.com/en-us/fabric/iq/plan/overview-limitations">Known limitations</a>
+  </div>
+  <p class="fp">timmyjfly.pages.dev &middot; <span style="color:#a21caf">&#9670;</span> Fabric Plan &middot; step by step</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  var KEY = 'fabric_plan_stepbystep_v1';
+  var mem = {};
+  var canStore = true;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ mem = JSON.parse(raw) || {}; }
+    }catch(e){
+      canStore = false; mem = {};
+      var n = document.getElementById('persistNote');
+      if(n){ n.textContent = 'saving is unavailable in this view — open the file in your browser and progress will stick.'; }
+    }
+  }
+  function save(){
+    if(!canStore) return;
+    try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){ canStore = false; }
+  }
+
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-k]'));
+
+  function refresh(){
+    var total = boxes.length, done = 0;
+    boxes.forEach(function(b){ if(b.checked) done++; });
+
+    document.querySelectorAll('.sec').forEach(function(sec){
+      var sb = sec.querySelectorAll('input[type=checkbox][data-k]');
+      if(!sb.length) return;
+      var sd = 0;
+      sb.forEach(function(b){ if(b.checked) sd++; });
+      var cnt = sec.querySelector('.cnt');
+      if(cnt){
+        cnt.textContent = sd + '/' + sb.length;
+        cnt.classList.toggle('full', sd === sb.length);
+      }
+      sec.classList.toggle('done', sd === sb.length);
+      var chip = document.querySelector('.dchip[data-for="' + sec.id + '"]');
+      if(chip){ chip.classList.toggle('done', sd === sb.length); }
+    });
+
+    var opct = total ? Math.round(done / total * 100) : 0;
+    var ob = document.getElementById('obarFill');
+    var ot = document.getElementById('opct');
+    if(ob){ ob.style.width = opct + '%'; }
+    if(ot){ ot.textContent = opct + '% done'; }
+  }
+
+  load();
+  boxes.forEach(function(b){
+    var k = b.getAttribute('data-k');
+    if(mem[k]){ b.checked = true; }
+    b.addEventListener('change', function(){
+      if(b.checked){ mem[k] = 1; } else { delete mem[k]; }
+      save(); refresh();
+    });
+  });
+
+  document.querySelectorAll('.sec').forEach(function(sec){
+    if(sec.id && mem['open:' + sec.id] === 0){
+      sec.setAttribute('data-open', 'false');
+      var hh = sec.querySelector('.sec-head');
+      if(hh){ hh.setAttribute('aria-expanded', 'false'); }
+    }
+  });
+
+  document.querySelectorAll('.sec-head').forEach(function(h){
+    h.addEventListener('click', function(){
+      var sec = h.closest('.sec');
+      var open = sec.getAttribute('data-open') === 'true';
+      sec.setAttribute('data-open', open ? 'false' : 'true');
+      h.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if(sec.id){
+        if(open){ mem['open:' + sec.id] = 0; } else { delete mem['open:' + sec.id]; }
+        save();
+      }
+    });
+  });
+
+  var tAll = document.getElementById('toggleAll');
+  var allOpen = true;
+  if(tAll){
+    tAll.addEventListener('click', function(){
+      allOpen = !allOpen;
+      document.querySelectorAll('.sec').forEach(function(sec){
+        sec.setAttribute('data-open', allOpen ? 'true' : 'false');
+        var h = sec.querySelector('.sec-head');
+        if(h){ h.setAttribute('aria-expanded', allOpen ? 'true' : 'false'); }
+        if(sec.id){
+          if(allOpen){ delete mem['open:' + sec.id]; } else { mem['open:' + sec.id] = 0; }
+        }
+      });
+      save();
+      tAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  var rBtn = document.getElementById('resetBtn');
+  if(rBtn){
+    rBtn.addEventListener('click', function(){
+      if(!confirm('Clear all progress on this page?')) return;
+      mem = {};
+      boxes.forEach(function(b){ b.checked = false; });
+      save(); refresh();
+    });
+  }
+
+  refresh();
+})();
+</script>
+</body>
+</html>
