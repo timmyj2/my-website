@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copilot Without Babysitting</title>
+<meta name="description" content="How people actually run GitHub Copilot unattended — the autonomy dial, sub-agent fleets, a self-updating memory file, and what breaks on Power BI work. Field notes, not docs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfbfd;
+  --panel:#ffffff;
+  --panel2:#f3f4f8;
+  --line:rgba(30,27,75,.11);
+  --line2:rgba(30,27,75,.055);
+  --ink:#131426;
+  --mut:#565b6e;
+  --dim:#878ca0;
+
+  --ind:#4f46e5;
+  --ind-hi:#4338ca;
+  --ind-soft:rgba(79,70,229,.10);
+
+  --good:#0f766e;
+  --good-soft:rgba(15,118,110,.10);
+  --bad:#be123c;
+  --bad-soft:rgba(190,18,60,.085);
+  --warn:#b45309;
+  --warn-soft:rgba(180,83,9,.11);
+
+  --disp:'Space Grotesk',system-ui,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Code',Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:78px;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;min-height:100vh}
+a{color:inherit}
+h1,h2,h3,h4{text-wrap:balance}
+::selection{background:rgba(79,70,229,.22)}
+:focus-visible{outline:2px solid var(--ind);outline-offset:2px;border-radius:4px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(251,251,253,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:9px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar .brand{font-family:var(--disp);font-weight:700;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.brand .fl{color:var(--ind)}
+.navlinks{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font-family:var(--mono);font-size:.7rem;color:var(--mut);text-decoration:none;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{color:var(--ink);background:var(--panel2)}
+.homebtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;
+  border:1px solid currentColor;border-radius:9px;color:inherit;opacity:.42;text-decoration:none;
+  transition:opacity .18s ease,transform .18s ease}
+.homebtn:hover{opacity:1;transform:translateX(-2px)}
+.homebtn svg{width:14px;height:14px;display:block}
+
+/* ---------- layout ---------- */
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+
+/* ---------- hero ---------- */
+.hero{padding:38px 0 2px}
+.eyebrow{font-family:var(--mono);font-size:.73rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5vw,2.8rem);line-height:1.09;letter-spacing:-.02em}
+.hero h1 .r{color:var(--ind)}
+.hero .sub{color:var(--mut);max-width:62ch;margin-top:12px;font-size:1.04rem}
+
+.rules{margin:22px 0 2px;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+.rules h2{font-family:var(--mono);font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ind-hi);
+  background:var(--ind-soft);padding:9px 18px;border-bottom:1px solid var(--line)}
+.rules ol{list-style:none;counter-reset:r;display:grid;grid-template-columns:1fr 1fr}
+.rules li{counter-increment:r;position:relative;padding:11px 18px 11px 44px;border-bottom:1px solid var(--line2);font-size:.95rem}
+.rules li:nth-child(odd){border-right:1px solid var(--line2)}
+.rules li:nth-last-child(-n+2){border-bottom:none}
+.rules li::before{content:counter(r);position:absolute;left:16px;top:12px;font-family:var(--mono);font-size:.74rem;
+  font-weight:600;color:var(--ind);opacity:.75}
+.rules b{font-weight:600}
+@media (max-width:700px){
+  .rules ol{grid-template-columns:1fr}
+  .rules li:nth-child(odd){border-right:none}
+  .rules li:nth-last-child(2){border-bottom:1px solid var(--line2)}
+}
+
+/* ---------- sections ---------- */
+section{margin-top:40px}
+.shead{display:flex;align-items:baseline;gap:12px;margin-bottom:7px;flex-wrap:wrap}
+.stag{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ind-hi);border:1px solid rgba(79,70,229,.35);background:var(--ind-soft);border-radius:99px;padding:3px 10px;flex:none}
+.shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.3rem,3.3vw,1.68rem);line-height:1.18}
+.slede{color:var(--mut);font-size:1rem;max-width:70ch}
+
+/* ---------- daily loop ---------- */
+.loop{margin-top:16px;display:grid;gap:8px}
+.loop .beat{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:start;background:var(--panel);
+  border:1px solid var(--line);border-left:3px solid var(--ind);border-radius:0 11px 11px 0;padding:11px 16px}
+.loop .when{font-family:var(--mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ind-hi);padding-top:2px}
+.loop h4{font-family:var(--disp);font-weight:600;font-size:1rem;margin-bottom:2px}
+.loop p{color:var(--mut);font-size:.92rem}
+.loop .beat.quiet{border-left-color:var(--dim)}
+.loop .beat.quiet .when{color:var(--dim)}
+@media (max-width:620px){
+  .loop .beat{grid-template-columns:1fr;gap:3px}
+}
+
+/* ---------- autonomy ladder ---------- */
+.ladder{margin-top:16px;display:grid;gap:7px}
+.rung{display:grid;grid-template-columns:38px 1fr;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.rung .lv{display:grid;place-items:center;font-family:var(--mono);font-size:.9rem;font-weight:600;color:#fff}
+.rung .bd{padding:11px 15px 12px}
+.rung h4{font-family:var(--disp);font-weight:600;font-size:1.02rem;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.rung h4 span{font-family:var(--mono);font-size:.68rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.rung p{color:var(--mut);font-size:.92rem;margin-top:3px}
+.rung code{font-family:var(--mono);font-size:.82em;background:var(--panel2);border:1px solid var(--line2);border-radius:5px;padding:1px 6px}
+.rung .risk{margin-top:7px;font-family:var(--mono);font-size:.7rem;letter-spacing:.03em;color:var(--dim);display:flex;gap:16px;flex-wrap:wrap}
+.rung .risk b{color:var(--ink);font-weight:600}
+.lv0 .lv{background:#9aa0b4}.lv1 .lv{background:#7c83e0}.lv2 .lv{background:#6366f1}
+.lv3 .lv{background:var(--ind)}.lv4 .lv{background:#3730a3}
+
+/* ---------- field notes ---------- */
+.field{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col h3{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:7px}
+.col h3::before{content:"";width:8px;height:8px;border-radius:2px}
+.col.up h3{color:var(--good)}.col.up h3::before{background:var(--good)}
+.col.dn h3{color:var(--bad)}.col.dn h3::before{background:var(--bad)}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 15px;margin-bottom:8px}
+.note p{font-size:.93rem;color:var(--ink)}
+.q{font-style:italic;color:var(--mut)}
+.note .who{margin-top:7px;font-family:var(--mono);font-size:.69rem;letter-spacing:.02em;color:var(--dim)}
+.note .who a{color:var(--ind-hi);text-decoration:none;border-bottom:1px solid rgba(79,70,229,.3)}
+.note .who a:hover{border-bottom-color:var(--ind)}
+.col.up .note{border-left:3px solid var(--good)}
+.col.dn .note{border-left:3px solid var(--bad)}
+@media (max-width:760px){.field{grid-template-columns:1fr}}
+
+/* ---------- conditions / checklist ---------- */
+ul.cond{list-style:none;margin-top:14px;display:grid;gap:7px}
+ul.cond li{position:relative;padding:10px 16px 11px 42px;background:var(--panel);border:1px solid var(--line);border-radius:11px;font-size:.95rem}
+ul.cond li::before{content:"";position:absolute;left:16px;top:16px;width:9px;height:9px;border-radius:50%;
+  border:2px solid var(--ind);background:var(--ind-soft)}
+ul.cond b{font-weight:600}
+ul.cond em{font-style:normal;color:var(--mut);display:block;font-size:.89rem;margin-top:2px}
+
+/* ---------- cycle diagram ---------- */
+.cycle{margin-top:16px;display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:0;align-items:stretch}
+.cycle .node{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--ind);border-radius:11px;padding:12px 14px}
+.cycle .node .n{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.cycle .node .t{font-family:var(--disp);font-weight:600;font-size:.97rem;line-height:1.25}
+.cycle .node .d{color:var(--mut);font-size:.85rem;margin-top:4px}
+.cycle .ar{display:grid;place-items:center;color:var(--ind);font-family:var(--mono);font-size:1.05rem;padding:0 8px}
+.cycle .node.last{border-top-color:var(--good)}
+@media (max-width:820px){
+  .cycle{grid-template-columns:1fr;gap:6px}
+  .cycle .ar{padding:0;transform:rotate(90deg);height:16px}
+}
+
+/* ---------- tables ---------- */
+.tblwrap{margin-top:14px;overflow-x:auto;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.91rem;min-width:520px}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+th{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+  background:var(--panel2);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td b{font-weight:600}
+td.yes{color:var(--good);font-weight:600;white-space:nowrap}
+td.no{color:var(--bad);font-weight:600;white-space:nowrap}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- prompt / code cards ---------- */
+.prompt{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:11px;overflow:hidden}
+.prompt .ph{display:flex;align-items:center;gap:10px;padding:9px 15px;background:var(--panel2);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.prompt .ph .pn{font-family:var(--mono);font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ind-hi);
+  border:1px solid rgba(79,70,229,.35);background:var(--ind-soft);border-radius:99px;padding:2px 9px}
+.prompt .ph h4{font-family:var(--disp);font-weight:600;font-size:.97rem}
+.copy{margin-left:auto;font-family:var(--mono);font-size:.67rem;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:7px;padding:5px 11px;cursor:pointer;
+  transition:color .16s ease,border-color .16s ease,background .16s ease}
+.copy:hover{color:var(--ind-hi);border-color:var(--ind);background:var(--ind-soft)}
+.copy.done{color:var(--good);border-color:var(--good);background:var(--good-soft)}
+.prompt pre{font-family:var(--mono);font-size:.815rem;line-height:1.62;padding:13px 16px;overflow-x:auto;
+  white-space:pre;color:var(--ink);margin:0}
+.prompt.wrapped pre{white-space:pre-wrap}
+
+/* ---------- tips ---------- */
+.tip{margin-top:14px;border-left:3px solid var(--ind);background:var(--ind-soft);border-radius:0 10px 10px 0;
+  padding:11px 16px;font-size:.93rem;color:var(--mut)}
+.tip b{color:var(--ink);font-weight:600}
+.tip > b:first-child{color:var(--ind-hi);font-weight:600;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:4px}
+.tip.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.tip.warn > b:first-child{color:var(--warn)}
+.tip.go{border-left-color:var(--good);background:var(--good-soft)}
+.tip.go > b:first-child{color:var(--good)}
+.tip a{color:var(--ind-hi)}
+
+p code,li code,td code,.tip code{font-family:var(--mono);background:var(--ind-soft);color:var(--ind-hi);border-radius:5px;padding:1px 6px;font-size:.85em}
+
+/* ---------- practice ladder ---------- */
+.track{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+.track .th{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel2);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.track .th h3{font-family:var(--disp);font-weight:600;font-size:.97rem}
+.track .th .score{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--ind-hi);font-variant-numeric:tabular-nums}
+.track label{display:flex;gap:12px;align-items:flex-start;padding:9px 16px;border-bottom:1px solid var(--line2);cursor:pointer;font-size:.94rem}
+.track label:last-child{border-bottom:none}
+.track label:hover{background:var(--ind-soft)}
+.track input{appearance:none;-webkit-appearance:none;width:17px;height:17px;flex:none;margin-top:2px;border:1.5px solid var(--dim);
+  border-radius:5px;background:var(--panel);cursor:pointer;transition:background .15s ease,border-color .15s ease}
+.track input:checked{background:var(--ind);border-color:var(--ind)}
+.track input:checked::after{content:"✓";display:block;color:#fff;font-size:.72rem;line-height:14px;text-align:center}
+.track input:checked + span{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(79,70,229,.4)}
+.track span em{font-style:normal;color:var(--dim);font-family:var(--mono);font-size:.72rem;display:block;margin-top:1px}
+
+footer{margin:48px 0 34px;padding-top:17px;border-top:1px solid var(--line);color:var(--dim);font-size:.85rem}
+footer a{color:var(--ind-hi);text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:10px}
+.srcs{margin-top:11px;font-size:.8rem;line-height:1.95}
+.srcs h4{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:9px}
+
+@media (max-width:640px){
+  body{font-size:16px}
+  .topbar{gap:8px;padding:8px 14px}
+  .navlinks{margin-left:0}
+  .hero{padding:26px 0 2px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff}
+  .topbar,.copy{display:none}
+  .prompt,.rung,.note,.track{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="homebtn" href="../index.html" aria-label="Back to the tool belt" title="Back to the tool belt"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  <span class="brand"><span class="fl">&#9670;</span> Copilot Without Babysitting</span>
+  <nav class="navlinks">
+    <a href="#loop">Loop</a>
+    <a href="#dial">Dial</a>
+    <a href="#field">Field notes</a>
+    <a href="#alone">Run alone</a>
+    <a href="#fleet">Fleet</a>
+    <a href="#memory">Memory</a>
+    <a href="#pbi">Power BI</a>
+    <a href="#kit">Kit</a>
+    <a href="#cost">Cost</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Tool-belt series &middot; GitHub Copilot &middot; Autonomy &amp; memory</p>
+  <h1>Stop sitting next to it.<br>Give it a <span class="r">stop condition</span> instead.</h1>
+  <p class="sub">Everything below is what practitioners actually report &mdash; the wins, the burns, the exact flags &mdash; pulled from field write-ups rather than product pages. Written to be read in slices of thirty seconds, at the moment you need the slice.</p>
+
+  <div class="rules">
+    <h2>The whole page, if you only read one box</h2>
+    <ol>
+      <li><b>Autonomy is a dial, not a switch.</b> Plan first, autopilot second. Never the reverse.</li>
+      <li><b>A run without a verify command is a run you have to babysit.</b> Tests are the stop condition.</li>
+      <li><b>Corrections belong in a file, not in a chat.</b> If you said it twice, it should have been written down once.</li>
+      <li><b>Fan out only where work is genuinely independent.</b> Parallel dependent tasks just fail four times.</li>
+      <li><b>The repo is the source of truth; the workspace is the runtime.</b> True for code, doubly true for Power BI.</li>
+      <li><b>Agents draft, humans post.</b> Nothing an agent writes reaches a system of record unreviewed.</li>
+    </ol>
+  </div>
+</header>
+
+<!-- ============ DAILY LOOP ============ -->
+<section id="loop">
+  <div class="shead"><span class="stag">Loop</span><h2>The daily rhythm that makes it a daily driver</h2></div>
+  <p class="slede">The mistake is treating the app like a chat window you visit. It is an inbox and a dispatch desk. Four beats, and only one of them is you typing.</p>
+
+  <div class="loop">
+    <div class="beat">
+      <div class="when">First 10 min</div>
+      <div>
+        <h4>Read what ran overnight, before you start anything new</h4>
+        <p>Scheduled automations and cloud sessions have already produced pull requests, triage comments and briefs. <b>My Work</b> is the single pane: active sessions, issues, PRs, automations. Triage before you create.</p>
+      </div>
+    </div>
+    <div class="beat">
+      <div class="when">Dispatch</div>
+      <div>
+        <h4>Delegate three to five, not one</h4>
+        <p>Each session gets its own git worktree &mdash; a real isolated copy of the branch, created and cleaned up for you. That is the whole point of the app: parallel work without branch juggling. One agent at a time wastes the architecture.</p>
+      </div>
+    </div>
+    <div class="beat">
+      <div class="when">Steer</div>
+      <div>
+        <h4>Review the plan, not the keystrokes</h4>
+        <p>Plans and diffs land on canvases &mdash; work surfaces you edit, reorder and approve on, instead of scrolling a chat log. Kill a bad plan at step two; a bad plan at step twenty costs you the whole session.</p>
+      </div>
+    </div>
+    <div class="beat quiet">
+      <div class="when">Last 5 min</div>
+      <div>
+        <h4>Harvest the corrections</h4>
+        <p>Whatever you had to say twice today goes into the memory file tonight, not "sometime". This is the beat everyone skips, and it is the one that compounds. <a href="#memory">The loop is below.</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip"><b>Why this order</b>Delegation is cheap and review is expensive, so the constraint on your day is <b>review capacity</b>, not agent capacity. Start by clearing the review queue and you will always know how many new sessions you can afford to start.</div>
+</section>
+
+<!-- ============ AUTONOMY DIAL ============ -->
+<section id="dial">
+  <div class="shead"><span class="stag">Dial</span><h2>The autonomy dial</h2></div>
+  <p class="slede">Five settings, genuinely ordered by how much can go wrong before you find out. Pick the lowest one that finishes the job. The rungs are real product modes, not a metaphor.</p>
+
+  <div class="ladder">
+    <div class="rung lv0">
+      <div class="lv">0</div>
+      <div class="bd">
+        <h4>Ask <span>read-only</span></h4>
+        <p>Questions about the codebase or model. No edits. Use it to find out whether the thing you're about to ask for is even possible here.</p>
+        <div class="risk"><span>Approval: <b>n/a</b></span><span>Blast radius: <b>none</b></span></div>
+      </div>
+    </div>
+    <div class="rung lv1">
+      <div class="lv">1</div>
+      <div class="bd">
+        <h4>Plan <span>writes a plan, not code</span></h4>
+        <p>Produces the step list and the files it intends to touch. GitHub's own recommended path is plan first, then <b>"Accept plan and build on autopilot"</b>. Reading a plan takes ninety seconds and saves an hour of unwinding.</p>
+        <div class="risk"><span>Approval: <b>you approve the plan</b></span><span>Blast radius: <b>none</b></span></div>
+      </div>
+    </div>
+    <div class="rung lv2">
+      <div class="lv">2</div>
+      <div class="bd">
+        <h4>Interactive <span>per-tool approvals</span></h4>
+        <p>The default. It asks before each meaningful action. Correct setting for unfamiliar repos, live models, anything with a rename cascade.</p>
+        <div class="risk"><span>Approval: <b>every tool</b></span><span>Blast radius: <b>one keystroke</b></span></div>
+      </div>
+    </div>
+    <div class="rung lv3">
+      <div class="lv">3</div>
+      <div class="bd">
+        <h4>Autopilot <span>local, sandboxed, capped</span></h4>
+        <p>Runs multi-step to completion without stopping between steps. <code>Shift+Tab</code> cycles into it interactively; programmatically it is<br><code>copilot --autopilot --yolo --max-autopilot-continues 10 -p "…"</code>. The cap is the important flag &mdash; it is your infinite-loop insurance. Autopilot is sticky between tasks unless you set <code>"stayInAutopilot": false</code> in <code>~/.copilot/settings.json</code>.</p>
+        <div class="risk"><span>Approval: <b>up front, once</b></span><span>Blast radius: <b>the worktree</b></span><span>Cost: <b>it spends credits on its own</b></span></div>
+      </div>
+    </div>
+    <div class="rung lv4">
+      <div class="lv">4</div>
+      <div class="bd">
+        <h4>Cloud automation <span>runs when your laptop is shut</span></h4>
+        <p>A saved prompt on a trigger: hourly, daily, weekly, CRON (local automations only), or on issue-created / PR-opened / PR-synchronised. Scoped to one repo, with an explicit tool list. Output lands as a PR, a label, an issue comment &mdash; things you review in the morning.</p>
+        <div class="risk"><span>Approval: <b>the pull request</b></span><span>Blast radius: <b>one repo, chosen tools</b></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip warn"><b>The one flag people regret</b><code>--yolo</code> / <code>--allow-all</code> grants every tool, path and URL. GitHub's own advice is to prefer <code>--allow-tool</code> and <code>--allow-url</code> with only what the task needs, and to keep the blanket version for sandboxes. Also worth setting explicitly for unattended runs: <code>--no-ask-user</code> (it can't ask you anything at 3am anyway), <code>--model</code> (so a silent model swap doesn't change your results), and <code>-s</code> for clean capturable output.</div>
+</section>
+
+<!-- ============ FIELD NOTES ============ -->
+<section id="field">
+  <div class="shead"><span class="stag">Field notes</span><h2>What people actually report</h2></div>
+  <p class="slede">Not marketing, not docs. Practitioners writing up what happened, including the parts that went badly. Every note links to the source.</p>
+
+  <div class="field">
+    <div class="col up">
+      <h3>Holds up</h3>
+
+      <div class="note">
+        <p><b>~60% of bug tickets closed with no steering.</b> A developer pointed Copilot at his Sentry queue from outside the IDE entirely and called it <span class="q">"simpler and more magical than my local IDE experience"</span>. Most of the rest needed only light correction.</p>
+        <p class="who">Harrison Milbradt &middot; <a href="https://harrisonmilbradt.com/blog/2025-11-10-an-honest-review-of-copilot-agents-hq">An honest review of Copilot &amp; Agents HQ</a></p>
+      </div>
+
+      <div class="note">
+        <p><b>Specs pay when they are acceptance criteria.</b> One practitioner reports 2&ndash;3 hours writing a spec built around acceptance tests, then a working tested version, claiming roughly <b>20&times;</b> return on the end-to-end tests written into it. Mercari's internal write-up claims <b>150%</b> over their traditional baseline and <b>80%</b> over freeform prompting after six months.</p>
+        <p class="who">Field study of practitioner reports &middot; <a href="https://github.com/ianhxu/agentic-engineering-field-study/blob/main/04-spec-driven-development.md">Spec-driven development</a></p>
+      </div>
+
+      <div class="note">
+        <p><b>Real model refactor, 54 measures, 30&ndash;40 minutes.</b> Against 30&ndash;90 minutes by hand &mdash; and the agent planned eight steps with checkpoints before touching anything. Verdict: <span class="q">"Agentic AI works best when the task is specific, the tools are clear, and the checkpoints are real."</span></p>
+        <p class="who">BI Insight &middot; <a href="https://biinsight.com/agentic-ai-in-action-with-github-copilot-and-power-bi-modeling-mcp/">Copilot + Power BI Modeling MCP in action</a></p>
+      </div>
+
+      <div class="note">
+        <p><b>Search and summarise beats generate.</b> For semantic models, agents reading metadata are <span class="q">"the quickest and most efficient way for AI to search or summarize"</span> &mdash; strongest on a model you didn't build.</p>
+        <p class="who">Kurt Buhler &middot; <a href="https://tabulareditor.com/blog/ai-agents-that-work-with-tmdl-files">AI agents that work with TMDL files</a></p>
+      </div>
+    </div>
+
+    <div class="col dn">
+      <h3>Burns people</h3>
+
+      <div class="note">
+        <p><b>Confidently wrong, plausibly shaped.</b> The same reviewer watched it force single-threaded test runs to make a failure disappear rather than fix the environment, and flatly notes <span class="q">"Copilot sucks at handling merge conflicts"</span> &mdash; a real problem when you're running parallel branches.</p>
+        <p class="who">Harrison Milbradt &middot; <a href="https://harrisonmilbradt.com/blog/2025-11-10-an-honest-review-of-copilot-agents-hq">Honest review</a></p>
+      </div>
+
+      <div class="note">
+        <p><b>Rate limits are the number one complaint of 2026.</b> Paying users reported multi-day lockouts &mdash; one 44-hour weekly limit, others claiming far worse &mdash; after GitHub fixed a token-counting bug that had been undercounting the newest models. Plan unattended runs around this; don't assume unlimited throughput.</p>
+        <p class="who">The Register, April 2026 &middot; <a href="https://www.theregister.com/software/2026/04/15/customers-revolt-as-github-copilot_fixes_rate_limits/5225088">Customers revolt as Copilot "fixes" rate limits</a></p>
+      </div>
+
+      <div class="note">
+        <p><b>Elaborate specs get partially ignored.</b> Drift is called <span class="q">"the #1 practical problem"</span>: <span class="q">"it just keeps drifting and drifting until you have duplication and contradictions."</span> One framework generated <b>1,300 lines of markdown for a date-display feature</b>. The sting: <span class="q">"agents ignore parts of the elaborate spec &mdash; control is partly illusory."</span></p>
+        <p class="who">Field study &middot; <a href="https://github.com/ianhxu/agentic-engineering-field-study/blob/main/04-spec-driven-development.md">Spec-driven development</a></p>
+      </div>
+
+      <div class="note">
+        <p><b>MCP servers eat your context before work starts.</b> Measured: <span class="q">"29% of the context is taken up by the Power BI modelling MCP server, alone."</span> Advice from the same write-up &mdash; <span class="q">"only enable them when you need them."</span></p>
+        <p class="who">Kurt Buhler &middot; <a href="https://tabulareditor.com/blog/ai-agents-that-work-with-power-bi-semantic-model-mcp-servers">Agents + Power BI MCP servers</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip"><b>The pattern under all of it</b>The failures are not intelligence failures. They are <b>verification</b> failures &mdash; nothing in the loop could tell the agent it was wrong. Every fix on this page is really the same fix: give the run something that can say no.</div>
+</section>
+
+<!-- ============ RUN ALONE ============ -->
+<section id="alone">
+  <div class="shead"><span class="stag">Run alone</span><h2>Five conditions before you walk away</h2></div>
+  <p class="slede">If a task fails all five, it needs you in the chair. If it passes all five, it can run overnight and you can review the pull request with coffee. This is the checklist, and it is short on purpose.</p>
+
+  <ul class="cond">
+    <li><b>A falsifiable goal.</b><em>"Make the close pack better" cannot fail. "Every measure in <code>Finance.tmdl</code> has a non-empty description, and BPA reports zero errors" can. Autopilot is documented as poor at vague or open-ended objectives &mdash; that isn't a bug, it's the definition.</em></li>
+    <li><b>A command that proves it.</b><em>Tests, a linter, a Best Practice Analyzer run, a script that exits non-zero. Without one, "done" is just the agent's opinion. Practitioners are blunt about this: keep good tests and the agent will imitate them.</em></li>
+    <li><b>An environment that's already ready.</b><em><code>.github/workflows/copilot-setup-steps.yml</code> runs before the agent starts &mdash; one <code>copilot-setup-steps</code> job that installs your tooling, your Python, your MCP dependencies. An agent that spends its first twenty minutes fighting a missing package has burned the run.</em></li>
+    <li><b>A blast radius you can throw away.</b><em>Feature branch, worktree, sandbox &mdash; never <code>main</code>, never a live model you can't restore. The universal rule from people who do this daily: the agent opens a pull request, it does not merge one.</em></li>
+    <li><b>A stop condition.</b><em><code>--max-autopilot-continues</code>, a max-iterations cap, a time box. The classic loop failure is an agent grinding at an impossible task until your credits are gone. Cap it at a number you'd be willing to pay for twice.</em></li>
+  </ul>
+
+  <div class="tip go"><b>The unattended-run recipe, compressed</b>Plan mode &rarr; read the plan &rarr; accept into autopilot with a continuation cap &rarr; it pushes a branch and opens a PR &rarr; <b>Agent Merge</b> watches CI, addresses failing checks and waits on required reviewers &rarr; you review a green PR in the morning. Nowhere in that chain did you sit and watch a spinner.</div>
+</section>
+
+<!-- ============ FLEET ============ -->
+<section id="fleet">
+  <div class="shead"><span class="stag">Fleet</span><h2>Sub-agents: when fanning out actually helps</h2></div>
+  <p class="slede">A sub-agent is a temporary worker the main agent launches with its own clean context. The value is context isolation first, speed second &mdash; and it costs you a coordination layer, so spend it deliberately.</p>
+
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th>Pattern</th><th>Shape</th><th>Use it when</th></tr></thead>
+      <tbody>
+        <tr><td><b>Research, then act</b></td><td>One agent gathers facts, a second implements from them</td><td>Default for anything in an unfamiliar model or repo. <code>/research</code> does this for you.</td></tr>
+        <tr><td><b>Coordinator &amp; workers</b></td><td>Planner &rarr; implementer &rarr; reviewer, orchestrator holds the thread</td><td>Multi-file work with real dependencies. Keep the orchestrator thin &mdash; it coordinates, it doesn't code.</td></tr>
+        <tr><td><b>Multi-perspective review</b></td><td>Parallel reviewers: correctness, security, performance, conventions</td><td>Before a PR you can't easily unwind. Different models per lens is a feature, not a gimmick.</td></tr>
+        <tr><td><b>Fleet</b></td><td><code>/fleet</code> decomposes, launches background sub-agents, respects dependencies, synthesises</td><td>Genuinely independent tracks. Headless: <code>copilot -p "/fleet …" --no-ask-user</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip warn"><b>Two settings to know before you scale this</b>Recursive delegation (sub-agents spawning sub-agents) is <b>off by default</b> in VS Code &mdash; <code>chat.subagents.allowInvocationsFromSubagents</code>. And recent CLI builds let you cap parallelism and depth from <code>/settings</code>, explicitly to prevent runaway recursive trees. Turn recursion on only when you've watched a flat fleet behave.</div>
+
+  <div class="tip"><b>Where the files live</b>Agents are markdown with frontmatter in <code>.github/agents/*.agent.md</code>. The useful frontmatter keys are <code>tools</code> (what it may touch), <code>agents</code> (an allowlist of who it may delegate to), <code>user-invocable: false</code> (hide a worker from the picker), and <code>disable-model-invocation: true</code> (stop it being auto-recruited). Because it's a file, it reviews and versions like anything else in the repo.</div>
+</section>
+
+<!-- ============ MEMORY ============ -->
+<section id="memory">
+  <div class="shead"><span class="stag">Memory</span><h2>The Hermes loop, ported to Copilot</h2></div>
+  <p class="slede">Nous Research's Hermes agent keeps a small curated memory as plain markdown &mdash; <code>MEMORY.md</code> for environment facts and lessons, <code>USER.md</code> for how you like to work &mdash; in <code>~/.hermes/memories/</code>. After each turn a background review quietly decides whether anything is worth keeping. That is the mechanism you want. You can build it on Copilot today.</p>
+
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th>Hermes does this</th><th>Detail worth stealing</th><th>Your Copilot equivalent</th></tr></thead>
+      <tbody>
+        <tr><td>Two memory files</td><td><b class="num">2,200</b> chars for lessons, <b class="num">1,375</b> for the user profile &mdash; hard caps, roughly 800 and 500 tokens</td><td><code>AGENTS.md</code> (norms + code map) and a short <code>learnings.md</code></td></tr>
+        <tr><td>Frozen snapshot at session start</td><td>Mid-session writes persist to disk but don't change the running prompt</td><td>Same reality: instruction files are read at session start. Today's lesson lands tomorrow.</td></tr>
+        <tr><td>Background self-improvement review</td><td>Runs after each turn, and can run on a cheaper auxiliary model</td><td>A <code>sessionEnd</code> hook that distils corrections &mdash; on Sonnet, not Opus</td></tr>
+        <tr><td><code>write_approval</code> gate</td><td>Staged writes reviewed with <code>/memory pending</code> before they touch your profile</td><td>The memory file is in git. The pull request <i>is</i> the approval gate.</td></tr>
+        <tr><td>Skills that self-improve</td><td>Completed workflows get written up as reusable procedure docs</td><td><code>.github/skills/&lt;name&gt;/SKILL.md</code> &mdash; read by the CLI, the app, the cloud agent and code review</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cycle">
+    <div class="node">
+      <div class="n">Step 1</div>
+      <div class="t">It gets it wrong</div>
+      <div class="d">Wrong folder convention, wrong measure naming, wrong refresh order.</div>
+    </div>
+    <div class="ar">&rarr;</div>
+    <div class="node">
+      <div class="n">Step 2</div>
+      <div class="t">You correct it once</div>
+      <div class="d">And add four words: <b>"write that down"</b>.</div>
+    </div>
+    <div class="ar">&rarr;</div>
+    <div class="node">
+      <div class="n">Step 3</div>
+      <div class="t">It appends one line</div>
+      <div class="d">Imperative, specific, dated. To Local norms &mdash; not a paragraph of reflection.</div>
+    </div>
+    <div class="ar">&rarr;</div>
+    <div class="node last">
+      <div class="n">Step 4</div>
+      <div class="t">Tomorrow it starts there</div>
+      <div class="d">Same mistake doesn't get made twice. That is the entire product.</div>
+    </div>
+  </div>
+
+  <div class="tip"><b>The insight that makes this work</b>As one practitioner puts it: <span class="q">"If the model weights are not changing mid-week, improvement has to come from the environment you wrap around the agent."</span> You are not training anything. You are maintaining a very short document that a very capable reader consults before every job.</div>
+
+  <div class="tip warn"><b>The failure mode is bloat, not forgetting</b>Instruction files past roughly a thousand words get skimmed; GitHub's own guidance caps custom instructions at about two pages. So borrow Hermes' hard limit: cap the learnings file, and run a weekly <b>compaction</b> pass &mdash; merge duplicates, delete anything about code that no longer exists, promote anything that's now a permanent rule up into <code>AGENTS.md</code>. A memory file nobody prunes becomes a memory file nobody reads.</div>
+</section>
+
+<!-- ============ POWER BI ============ -->
+<section id="pbi">
+  <div class="shead"><span class="stag">Power BI</span><h2>Analytics work: what to hand it, what to keep</h2></div>
+  <p class="slede">Semantic models are the hardest thing on this page to automate safely, because the file format punishes small errors and the failure is silent &mdash; a number that is wrong but renders fine. The community consensus is unusually clear.</p>
+
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th>Task</th><th>Hand it over?</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Summarise / search an unfamiliar model</td><td class="yes">Yes</td><td>Fastest reliable win. Reading metadata is what agents are best at here.</td></tr>
+        <tr><td>Backfill descriptions on tables, columns, measures</td><td class="yes">Yes</td><td>Bulk, low-risk, tedious, and it improves every future agent run on the model.</td></tr>
+        <tr><td>Refactor / move existing measures, display folders</td><td class="yes">Yes</td><td>Proven in the field &mdash; with checkpoints and a repo you can revert.</td></tr>
+        <tr><td>Formatting and labels across PBIR report JSON</td><td class="yes">Yes</td><td>Scale work no human enjoys. Reopen in Desktop afterwards, always.</td></tr>
+        <tr><td>Generate whole new TMDL files from scratch</td><td class="no">No</td><td>High error rate. TMDL and PBIR are sparse in training data; agents mix TMDL, DAX, M and SQL syntax.</td></tr>
+        <tr><td>Rename a table or measure with dependents</td><td class="no">No</td><td>Renames don't propagate through dependent expressions &mdash; agents routinely miss the downstream break.</td></tr>
+        <tr><td>Anything pointed at a <code>.pbix</code></td><td class="no">No</td><td>Opaque binary, no useful diff. Convert to PBIP first or don't start.</td></tr>
+        <tr><td>Writing to a system of record</td><td class="no">No</td><td>Finance rule, not a technical one: agents draft, reconcile, flag and explain. Humans review, approve and post.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip warn"><b>Four gotchas that cost a whole afternoon</b><b>Indentation in TMDL is structural</b> &mdash; one bad indent breaks the parse, and agents mangle multi-line DAX continuations. <b>Fabric Git sync is not automatic on push</b>: someone has to update from the Source control pane. <b>PBIR JSON can capture slicer values, filter conditions and example data</b> &mdash; check before that repo goes anywhere shared. And <b>credits go fast</b>: one practitioner's single measure-reorganisation run consumed about 35% of a month's free-tier credits.</div>
+
+  <div class="tip go"><b>The setup that makes all of this safe</b>PBIP + TMDL + PBIR committed to git, with the <b>repo as the source of truth and the Fabric workspace as the runtime</b>. Best Practice Analyzer wired into CI so the agent's mistakes fail a check rather than reach a report. Tabular Editor open to validate after a session. MCP servers switched on only for the bulk job that needs them, then off. That's it &mdash; four things, and they turn silent failure into a red build.</div>
+
+  <div class="tip"><b>Automations worth scheduling in a finance shop</b><b>Daily:</b> refresh-failure triage &rarr; an issue naming the failing table and the last good run. <b>On PR:</b> BPA + a plain-English note on what a measure change does to reported figures. <b>Weekly:</b> description backfill on anything added since Monday, plus the memory-file compaction pass. <b>Monthly close:</b> variance commentary drafted <i>from numbers a script pulled</i> &mdash; never numbers the model produced from memory &mdash; landing as a draft for you to edit, sign and send.</div>
+</section>
+
+<!-- ============ KIT ============ -->
+<section id="kit">
+  <div class="shead"><span class="stag">Kit</span><h2>Copy-paste kit</h2></div>
+  <p class="slede">Six blocks. Paste, adjust the names, commit. The first two are the highest-leverage files you will write this quarter.</p>
+
+  <div class="prompt wrapped">
+    <div class="ph"><span class="pn">File</span><h4>AGENTS.md &mdash; the skeleton that survives contact</h4><button class="copy" type="button">Copy</button></div>
+<pre># AGENTS.md
+
+## Commands
+- Validate model:   pwsh ./scripts/validate-model.ps1
+- Run BPA:          pwsh ./scripts/run-bpa.ps1 -Path ./Sales.SemanticModel
+- Tests:            pytest -q
+- Format check:     ruff check .
+(Run the validate + BPA pair before claiming any model change is done.)
+
+## Stack
+Power BI Project (PBIP). Semantic model as TMDL, report as PBIR.
+Python 3.11 + semantic-link-labs for notebook-side automation.
+Fabric workspace is the runtime. This repo is the source of truth.
+
+## Code map
+- Sales.SemanticModel/definition/tables/*.tmdl   measures + columns
+- Sales.Report/definition/pages/*                report layout
+- scripts/                                       validation + deploy
+If this map is wrong or stale, fix it in this file as part of your change.
+
+## Local norms
+- Measure names: Title Case With Spaces. No abbreviations except FX, YTD, QTD.
+- Every new measure gets a description and a display folder. No exceptions.
+- Never edit a .pbix. If one appears, stop and tell me.
+- Do not modify tests to make them pass.
+- Currency measures format "#,##0;(#,##0)" — parentheses for negatives, finance house style.
+
+## Boundaries
+- Never commit secrets, connection strings, or workspace IDs.
+- Never touch main directly. Branch, then open a pull request.
+- Never rename a table, column or measure that has dependents without listing
+  every dependent expression first and showing me the list.
+
+## Self-update rule
+When I correct how work is done in this repo, append the correction to
+"Local norms" as one imperative line before you continue. Keep this file
+under two pages: merge duplicates, delete rules about code that no longer
+exists. If you are unsure whether a correction is durable, put it in
+docs/learnings.md instead and leave this file alone.</pre>
+  </div>
+
+  <div class="prompt wrapped">
+    <div class="ph"><span class="pn">Prompt</span><h4>The end-of-day harvest &mdash; run it in the last five minutes</h4><button class="copy" type="button">Copy</button></div>
+<pre>Review this session's conversation only. Find every place I corrected you —
+naming, ordering, tools, conventions, things you assumed that were wrong.
+
+For each one, decide:
+  DURABLE  → true next week too. Append one imperative line to
+             "Local norms" in AGENTS.md.
+  LOCAL    → true only for this task. Append to docs/learnings.md
+             under today's date.
+  NOISE    → a one-off. Drop it.
+
+Rules for what you write:
+- One line each. Imperative. No hedging, no "consider", no explanation.
+- No duplicates: if a rule already covers it, sharpen the existing line
+  instead of adding a new one.
+- If AGENTS.md is over two pages after your edit, compact it in the same
+  commit — merge overlapping rules, delete anything about code that no
+  longer exists.
+
+Then show me the diff and stop. Do not commit.</pre>
+  </div>
+
+  <div class="prompt">
+    <div class="ph"><span class="pn">File</span><h4>.github/hooks/hooks.json &mdash; make the harvest automatic</h4><button class="copy" type="button">Copy</button></div>
+<pre>{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "cat docs/learnings.md 2>/dev/null | tail -40",
+        "powershell": "Get-Content docs/learnings.md -Tail 40 -EA SilentlyContinue",
+        "timeoutSec": 5
+      }
+    ],
+    "sessionEnd": [
+      {
+        "type": "command",
+        "bash": "./scripts/harvest-learnings.sh",
+        "powershell": "./scripts/harvest-learnings.ps1",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}</pre>
+  </div>
+
+  <div class="tip"><b>What goes in that script</b>One line: a headless Copilot call with the harvest prompt above, on a cheap fast model, writing to <code>docs/learnings.md</code>. That is exactly Hermes' background review &mdash; a small model quietly deciding what was worth keeping. Keep hooks fast; they block the agent, and the guidance is to stay under about five seconds where you can, so do the heavy version as a scheduled weekly job instead.</div>
+
+  <div class="prompt">
+    <div class="ph"><span class="pn">Command</span><h4>The overnight run</h4><button class="copy" type="button">Copy</button></div>
+<pre># 1. plan first — read this before you go anywhere
+copilot -p "Plan only, no edits: add descriptions to every measure in
+Sales.SemanticModel missing one. List files touched and the validation
+command you'll run." --model claude-sonnet-5 -s
+
+# 2. then let it run, capped, with only the tools it needs
+copilot --autopilot \
+  --max-autopilot-continues 12 \
+  --allow-tool 'shell(pytest)' --allow-tool 'shell(pwsh ./scripts/run-bpa.ps1)' \
+  --allow-tool 'write' --allow-tool 'read' \
+  --no-ask-user --model claude-sonnet-5 -s \
+  -p "Execute the plan in plan.md. After each file, run the BPA script.
+      Stop and write BLOCKED.md if BPA fails twice on the same file.
+      When green, commit to branch feat/measure-descriptions and open a PR."</pre>
+  </div>
+
+  <div class="prompt">
+    <div class="ph"><span class="pn">File</span><h4>.github/agents/close-pack.agent.md &mdash; a coordinator worth having</h4><button class="copy" type="button">Copy</button></div>
+<pre>---
+name: 'Close Pack Coordinator'
+description: 'Runs the month-end reporting checks end to end and reports what needs a human.'
+tools: ['read', 'search', 'edit', 'runCommands', 'agent']
+agents: ['Model Validator', 'Variance Writer', 'Number Checker']
+user-invocable: true
+---
+
+You coordinate. You do not write DAX and you do not write commentary yourself.
+
+Sequence:
+1. Delegate to Model Validator: run BPA + the refresh check. If it fails,
+   stop everything and report. A broken model makes the rest meaningless.
+2. Delegate to Variance Writer: draft commentary for every variance over
+   the threshold in config/thresholds.json. Numbers come from
+   scripts/pull-actuals.py output ONLY. Never state a figure you did not
+   read from that file.
+3. Delegate to Number Checker: independently re-derive every figure quoted
+   in the draft against the same file. Flag every mismatch. Do not fix them.
+
+Output one markdown file: docs/close/YYYY-MM.md, with a "NEEDS A HUMAN"
+section at the top listing mismatches, missing data and anything you
+guessed at. If that section is empty, say so explicitly — do not omit it.
+
+Never post, send, email or write to any system of record. You produce a
+draft. A person signs it.</pre>
+  </div>
+
+  <div class="prompt wrapped">
+    <div class="ph"><span class="pn">Prompt</span><h4>The model-refactor prompt, with real checkpoints</h4><button class="copy" type="button">Copy</button></div>
+<pre>The semantic model at <path or localhost port> has measures spread across
+several tables. Move them into a dedicated measure table with display
+folders.
+
+Structure I want — be exact, do not improvise a hierarchy:
+  Averages & Aggregations/  → Cost, Internet, Reseller as SUBFOLDERS
+  Margins/                  → flat
+  Time Intelligence/        → YTD, QTD, PY as subfolders
+
+Before you change anything:
+1. Inventory every measure and its current home. Show me the list.
+2. Show me the target mapping. Wait for my yes.
+3. Then move in batches of ten, validating after each batch.
+
+Rules:
+- This runs against a live model, so checkpoint before each batch and
+  stop on the first validation failure.
+- Do not rename any measure. Moving only.
+- Do not create, delete or edit measure expressions.
+- If a measure's home is ambiguous, put it in a NEEDS DECISION folder and
+  keep going. Do not guess.
+
+Finish by listing every measure in NEEDS DECISION and what you'd suggest.</pre>
+  </div>
+</section>
+
+<!-- ============ COST ============ -->
+<section id="cost">
+  <div class="shead"><span class="stag">Cost</span><h2>Credits, models, and the throttle nobody plans for</h2></div>
+  <p class="slede">Copilot moved to usage-based AI credits on 1 June 2026 &mdash; one credit is one US cent, spent against each model's token rate. Which means unattended runs are now a budget decision, and model choice is the biggest lever you have.</p>
+
+  <div class="tblwrap">
+    <table>
+      <thead><tr><th>Job</th><th>Reach for</th><th>Reasoning</th></tr></thead>
+      <tbody>
+        <tr><td>The long loop: refactors, backfills, test writing, docs</td><td><b>Sonnet class</b></td><td>Sonnet 5 lands near the top of agentic coding benchmarks at a fraction of the flagship rate. This is where 90% of your unattended hours should go.</td></tr>
+        <tr><td>The hard hour: root-causing a failure nothing else cracked, gnarly modelling decisions, security review</td><td><b>Opus class</b></td><td>Worth it in an interactive session where you're watching. Putting the most expensive model inside an uncapped loop is how people wake up to an empty balance.</td></tr>
+        <tr><td>The janitor: harvesting learnings, summarising sessions, triaging refresh failures</td><td><b>Fast / cheap tier</b></td><td>Exactly what Hermes does with its background reviewer &mdash; small model, narrow job, runs constantly.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip warn"><b>Budget for the throttle, not just the credits</b>Rate limits bite hardest exactly when you're doing what this page describes &mdash; concentrated, parallel, long-running sessions. Three defences: put long jobs on <b>cloud sessions and scheduled automations</b> so they run on their own clock rather than competing with your interactive work; keep MCP servers off unless the current task needs them, since they tax every request; and always set <code>--model</code> explicitly, so a fallback to a weaker model shows up in your logs instead of silently in your output.</div>
+</section>
+
+<!-- ============ PRACTICE ============ -->
+<section id="practice">
+  <div class="shead"><span class="stag">Ladder</span><h2>Are you actually doing this?</h2></div>
+  <p class="slede">Ten things, roughly in the order they pay off. Saved in this browser &mdash; come back and tick as you go.</p>
+
+  <div class="track">
+    <div class="th">
+      <h3>Practice ladder</h3>
+      <span class="score" id="score">0 / 10</span>
+    </div>
+    <label><input type="checkbox" data-k="c1"><span>AGENTS.md exists at the repo root, with runnable commands in the first section<em>not a description of the project — the commands</em></span></label>
+    <label><input type="checkbox" data-k="c2"><span>It has a Boundaries block naming what must never be touched<em>secrets, main, .pbix, renames with dependents</em></span></label>
+    <label><input type="checkbox" data-k="c3"><span>A path-scoped instructions file for your riskiest file type<em>applyTo: "**/*.tmdl"</em></span></label>
+    <label><input type="checkbox" data-k="c4"><span>You added a Local norm this week because of a correction you made<em>the loop is alive, not decorative</em></span></label>
+    <label><input type="checkbox" data-k="c5"><span>A sessionEnd hook writes the day's corrections somewhere<em>.github/hooks/hooks.json</em></span></label>
+    <label><input type="checkbox" data-k="c6"><span>One custom agent exists in .github/agents/<em>a job you do repeatedly, written down once</em></span></label>
+    <label><input type="checkbox" data-k="c7"><span>copilot-setup-steps.yml installs your tooling before the agent starts<em>no more twenty minutes lost to a missing package</em></span></label>
+    <label><input type="checkbox" data-k="c8"><span>A validation command exists that can fail a change<em>BPA, tests, a script with an exit code</em></span></label>
+    <label><input type="checkbox" data-k="c9"><span>A scheduled automation produced something you actually read this week<em>if you don't read it, delete it</em></span></label>
+    <label><input type="checkbox" data-k="c10"><span>You merged a PR from an overnight autopilot run<em>the whole point</em></span></label>
+  </div>
+
+  <div class="tip go"><b>If you only build one thing this week</b>Number 8. Everything else on this page is leverage on top of a verification command; without one, more autonomy just means finding out later. With one, every rung of the dial gets safer at the same time.</div>
+</section>
+
+<footer>
+  <p>Researched September 2026, from practitioner write-ups first and product documentation second. Agent tooling moves monthly &mdash; flags and file paths are the things most likely to have shifted by the time you read this; the five conditions and the memory loop are not.</p>
+
+  <div class="srcs">
+    <h4>Field reports &amp; opinion</h4>
+    <a href="https://harrisonmilbradt.com/blog/2025-11-10-an-honest-review-of-copilot-agents-hq">An honest review of Copilot &amp; Agents HQ</a> &middot;
+    <a href="https://github.com/ianhxu/agentic-engineering-field-study/blob/main/04-spec-driven-development.md">Agentic engineering field study &mdash; spec-driven development</a> &middot;
+    <a href="https://www.theregister.com/software/2026/04/15/customers-revolt-as-github-copilot_fixes_rate_limits/5225088">The Register &mdash; customers revolt over rate limits</a> &middot;
+    <a href="https://addyosmani.com/blog/self-improving-agents/">Addy Osmani &mdash; self-improving coding agents</a> &middot;
+    <a href="https://ericmjl.github.io/blog/2026/1/17/how-to-build-self-improving-coding-agents-part-1/">Eric Ma &mdash; building self-improving coding agents</a>
+
+    <h4>Power BI &amp; analytics</h4>
+    <a href="https://tabulareditor.com/blog/ai-agents-that-work-with-tmdl-files">Kurt Buhler &mdash; agents that work with TMDL files</a> &middot;
+    <a href="https://tabulareditor.com/blog/ai-agents-that-work-with-power-bi-semantic-model-mcp-servers">Kurt Buhler &mdash; agents with Power BI MCP servers</a> &middot;
+    <a href="https://biinsight.com/agentic-ai-in-action-with-github-copilot-and-power-bi-modeling-mcp/">BI Insight &mdash; agentic AI in action</a> &middot;
+    <a href="https://github.com/xavierxmorris/powerbi-copilot-agent-guide">Practitioner's guide &mdash; Copilot agent mode with PBIP/TMDL/PBIR</a> &middot;
+    <a href="https://github.com/microsoft/powerbi-modeling-mcp">Power BI Modeling MCP server</a> &middot;
+    <a href="https://github.com/microsoft/semantic-link-labs">semantic-link-labs</a>
+
+    <h4>Memory &amp; self-improvement</h4>
+    <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory">Hermes Agent &mdash; persistent memory</a> &middot;
+    <a href="https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/">Lessons from 2,500+ agents.md files</a> &middot;
+    <a href="https://github.blog/ai-and-ml/github-copilot/5-tips-for-writing-better-custom-instructions-for-copilot/">Five tips for custom instructions</a>
+
+    <h4>Mechanics</h4>
+    <a href="https://docs.github.com/en/copilot/concepts/agents/copilot-cli/autopilot">Autopilot &amp; permissions</a> &middot;
+    <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/run-cli-programmatically">Running the CLI programmatically</a> &middot;
+    <a href="https://docs.github.com/en/copilot/how-tos/github-copilot-app/using-automations">Automations in the Copilot app</a> &middot;
+    <a href="https://docs.github.com/en/copilot/concepts/agents/hooks">Hooks</a> &middot;
+    <a href="https://awesome-copilot.github.com/learning-hub/agents-and-subagents/">Agents &amp; sub-agents</a> &middot;
+    <a href="https://docs.github.com/en/copilot/concepts/agents/about-agent-skills">Agent skills</a> &middot;
+    <a href="https://github.com/github/awesome-copilot">awesome-copilot &mdash; steal the examples</a>
+  </div>
+
+  <p class="fp">Tool-belt series &middot; timmyjfly.pages.dev</p>
+</footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.closest('.prompt').querySelector('pre').innerText;
+    try { await navigator.clipboard.writeText(text); }
+    catch { const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    btn.textContent = 'Copied'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+  });
+});
+
+(function(){
+  const KEY = 'copilot-babysitting-v1';
+  const boxes = Array.from(document.querySelectorAll('.track input[type=checkbox]'));
+  const score = document.getElementById('score');
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+
+  const paint = () => {
+    const done = boxes.filter(b => b.checked).length;
+    score.textContent = done + ' / ' + boxes.length;
+  };
+
+  boxes.forEach(b => {
+    b.checked = !!state[b.dataset.k];
+    b.addEventListener('change', () => {
+      state[b.dataset.k] = b.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+      paint();
+    });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
