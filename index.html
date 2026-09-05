@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tim's Learning Roadmaps</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="description" content="Self-built, interactive reference roadmaps for agentic analytics engineering.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -152,6 +153,21 @@ a.cell:hover .go svg{transform:translateX(5px)}
   .cell{min-height:0}
 }
 
+
+/* ── filter chips ───────────────────────── */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;
+  border:1px solid var(--line);background:transparent;color:var(--dim);
+  border-radius:999px;padding:6px 14px;cursor:pointer;
+  transition:color .16s ease,border-color .16s ease,background .16s ease;
+}
+.chip:hover{color:var(--text);border-color:var(--line-strong)}
+.chip[aria-pressed="true"]{color:var(--bg);background:var(--text);border-color:var(--text)}
+.cell.is-hidden{display:none}
+.shead.is-empty + .grid{display:none}
+.shead.is-empty{display:none}
+
 /* ── footer ──────────────────────────────── */
 footer{margin:clamp(48px,6.5vw,80px) 0 44px}
 .fline{display:flex;flex-wrap:wrap;gap:18px 34px;align-items:baseline;justify-content:space-between;
@@ -186,11 +202,21 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
     </div>
   </header>
 
+  <div class="filters" id="filters" role="toolbar" aria-label="Filter guides">
+    <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+    <button type="button" class="chip" data-filter="git" aria-pressed="false">Git</button>
+    <button type="button" class="chip" data-filter="copilot" aria-pressed="false">Copilot</button>
+    <button type="button" class="chip" data-filter="fabric" aria-pressed="false">Fabric</button>
+    <button type="button" class="chip" data-filter="powerbi" aria-pressed="false">Power BI</button>
+    <button type="button" class="chip" data-filter="play" aria-pressed="false">Play</button>
+  </div>
+
+
   <section id="roadmaps">
     <div class="shead"><h2>Roadmaps</h2><p>Reference &amp; practice</p></div>
     <div class="grid">
 
-      <a class="cell" href="roadmaps/git-vscode-gui.html" style="--glow:rgba(0,152,255,.13);">
+      <a class="cell" data-tags="git" href="roadmaps/git-vscode-gui.html" style="--glow:rgba(0,152,255,.13);">
         <div class="crow"><span class="cdot" style="--glow:#0098ff"></span><span class="kicker">Git · VS Code · GUI-first</span><span class="num">01</span></div>
         <h3>Git Without the Terminal</h3>
         <p>The whole workflow through VS Code's Source Control panel. The mental model in four ideas, the six-click daily loop, what a merge conflict actually is — and how to undo almost anything.</p>
@@ -198,7 +224,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Open guide <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="roadmaps/github-copilot-operating-manual.html" style="--glow:rgba(242,183,5,.13);">
+      <a class="cell" data-tags="copilot powerbi" href="roadmaps/github-copilot-operating-manual.html" style="--glow:rgba(242,183,5,.13);">
         <div class="crow"><span class="cdot" style="--glow:#F2B705"></span><span class="kicker">GitHub Copilot · Power BI · Agents</span><span class="num">02</span></div>
         <h3>GitHub Copilot — Operating Manual</h3>
         <p>Model pricing and which one to switch to, a starter agent crew for meeting prep and memory, and how to stop Power BI reports from looking like defaults.</p>
@@ -206,7 +232,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Open manual <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="roadmaps/fabric-plan-step-by-step.html" style="--glow:rgba(217,70,239,.13);">
+      <a class="cell" data-tags="fabric powerbi" href="roadmaps/fabric-plan-step-by-step.html" style="--glow:rgba(217,70,239,.13);">
         <div class="crow"><span class="cdot" style="--glow:#c026d3"></span><span class="kicker">Microsoft Fabric &middot; Planning</span><span class="num">03</span></div>
         <h3>Fabric Plan, Step by Step</h3>
         <p>Budgeting inside Fabric, explained like nobody explained it to you. Every click in order, why each step exists, the setup that silently blocks you, and a symptom-to-cause table for when it breaks.</p>
@@ -214,7 +240,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Start step 0 <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="roadmaps/build-your-own-agent-app.html" style="--glow:rgba(251,113,133,.13);">
+      <a class="cell" data-tags="copilot" href="roadmaps/build-your-own-agent-app.html" style="--glow:rgba(251,113,133,.13);">
         <div class="crow"><span class="cdot" style="--glow:#fb7185"></span><span class="kicker">GitHub Copilot &middot; Agents &middot; Build</span><span class="num">04</span></div>
         <h3>Build Your Own Agent App</h3>
         <p>BridgeMind-style AI teammates that start work on a schedule &mdash; running locally on the Copilot licence you already have. Caveman-simple: what, why, how, and four prompts that build it for you.</p>
@@ -222,7 +248,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Open the plan <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="roadmaps/copilot-without-babysitting.html" style="--glow:rgba(79,70,229,.13);">
+      <a class="cell" data-tags="copilot" href="roadmaps/copilot-without-babysitting.html" style="--glow:rgba(79,70,229,.13);">
         <div class="crow"><span class="cdot" style="--glow:#4f46e5"></span><span class="kicker">GitHub Copilot &middot; Autonomy &middot; Memory</span><span class="num">05</span></div>
         <h3>Copilot Without Babysitting</h3>
         <p>What practitioners actually report about running agents unattended &mdash; the autonomy dial, sub-agent fleets, a self-updating memory file, and the Power BI work you should never hand over.</p>
@@ -230,7 +256,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Open field notes <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="roadmaps/copilot-quick-reference.html" style="--glow:rgba(20,184,166,.13);">
+      <a class="cell" data-tags="copilot" href="roadmaps/copilot-quick-reference.html" style="--glow:rgba(20,184,166,.13);">
         <div class="crow"><span class="cdot" style="--glow:#14b8a6"></span><span class="kicker">GitHub Copilot &middot; Cheat sheet</span><span class="num">06</span></div>
         <h3>Copilot Quick Reference</h3>
         <p>The dial, the five conditions, the Power BI yes/no table and the whole copy-paste kit &mdash; condensed to what you actually need at your desk. Companion to the field-notes page.</p>
@@ -238,7 +264,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Open cheat sheet <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <div class="cell soon">
+      <div class="cell soon" data-tags="">
         <div class="crow"><span class="cdot"></span><span class="kicker">In progress</span><span class="num">07</span></div>
         <h3>Data modelling · Purview · more</h3>
         <p>Additional roadmaps from the tool-belt series land here as they're brought over.</p>
@@ -251,7 +277,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
     <div class="shead"><h2>Play</h2><p>Built for the fun of it</p></div>
     <div class="grid">
 
-      <a class="cell" href="games/brick-dash.html" style="--glow:rgba(245,184,27,.13);">
+      <a class="cell" data-tags="play" href="games/brick-dash.html" style="--glow:rgba(245,184,27,.13);">
         <div class="crow"><span class="cdot" style="--glow:#f5b81b"></span><span class="kicker">Endless runner · arcade</span><span class="num">01</span></div>
         <h3>Brick Dash</h3>
         <p>Sprint a brick minifigure through three lanes of toy city. Switch lanes, jump the barriers, slide under the gantries. Collect studs to charge a boost and see how far you get.</p>
@@ -259,7 +285,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Play now <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="games/compute-cluster-tycoon.html" style="--glow:rgba(192,132,252,.13);">
+      <a class="cell" data-tags="play" href="games/compute-cluster-tycoon.html" style="--glow:rgba(192,132,252,.13);">
         <div class="crow"><span class="cdot" style="--glow:#c084fc"></span><span class="kicker">Idle · incremental</span><span class="num">02</span></div>
         <h3>Compute Cluster Tycoon</h3>
         <p>Buy GPUs, juggle power and cooling, train models, and prestige into the next model generation for permanent multipliers. A five-minute break that still has room to master.</p>
@@ -267,7 +293,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
         <span class="go">Play now <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="cell" href="games/hockey-play-board.html" style="--glow:rgba(56,189,248,.13);">
+      <a class="cell" data-tags="play" href="games/hockey-play-board.html" style="--glow:rgba(56,189,248,.13);">
         <div class="crow"><span class="cdot" style="--glow:#38bdf8"></span><span class="kicker">Whiteboard · dry-erase rink</span><span class="num">03</span></div>
         <h3>Hockey Play Board</h3>
         <p>A rink drawn up like a real coach's whiteboard. Sketch routes and passes, drop player/opponent/puck stamps, pick your marker color, then save the play as a photo or print it to PDF.</p>
@@ -292,6 +318,33 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
   const onScroll = () => nav.classList.toggle('stuck', window.scrollY > 8);
   onScroll();
   addEventListener('scroll', onScroll, {passive:true});
+
+  (function(){
+    const chips = Array.from(document.querySelectorAll('#filters .chip'));
+    const cells = Array.from(document.querySelectorAll('.cell[data-tags]'));
+    const sections = Array.from(document.querySelectorAll('section'));
+
+    function apply(filter){
+      chips.forEach(c => c.setAttribute('aria-pressed', c.dataset.filter === filter ? 'true' : 'false'));
+      cells.forEach(cell => {
+        const tags = (cell.getAttribute('data-tags') || '').trim().split(/\s+/).filter(Boolean);
+        const show = filter === 'all' ? true : tags.includes(filter);
+        cell.classList.toggle('is-hidden', !show);
+      });
+      sections.forEach(sec => {
+        const grid = sec.querySelector('.grid');
+        const head = sec.querySelector('.shead');
+        if (!grid || !head) return;
+        const any = Array.from(grid.querySelectorAll('.cell')).some(c => !c.classList.contains('is-hidden'));
+        head.classList.toggle('is-empty', !any);
+        grid.style.display = any ? '' : 'none';
+      });
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => apply(chip.dataset.filter));
+    });
+  })();
 </script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GitHub Copilot — Operating Manual</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -185,6 +186,20 @@ footer ul{max-width:none;}
   .rail-in{overflow-x:auto;}
   .tab-btn{font-size:15px;padding:16px 8px 13px;}
 }
+
+/* related strip */
+.related{margin:36px 0 0;padding:18px 20px;border:1px solid #2C3D48;background:#1E2C36}
+.related .rk{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A8F9B;margin:0 0 12px}
+.related .rl{display:flex;flex-wrap:wrap;gap:10px 18px}
+.related a{font-size:14.5px;color:#BBD0D6;text-decoration:none;border-bottom:1px solid transparent}
+.related a:hover{color:#fff;border-bottom-color:var(--hazard)}
+.homebtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;
+  border-radius:9px;border:1px solid #3A4C58;color:#9FB2BC;opacity:.9;transition:opacity .16s ease,transform .16s ease,border-color .16s ease;text-decoration:none;margin-right:8px}
+.homebtn:hover{opacity:1;transform:translateX(-2px);border-color:var(--hazard);color:#fff}
+.homebtn:focus-visible{opacity:1;outline:2px solid var(--hazard);outline-offset:2px}
+.homebtn svg{width:14px;height:14px;display:block}
+.rail-back{display:inline-flex;align-items:center;gap:4px;margin-right:10px}
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
   .row-bar{transition:none;}
@@ -198,6 +213,7 @@ footer ul{max-width:none;}
 
 <nav class="rail">
   <div class="rail-in" role="tablist" aria-label="Sections">
+    <a class="homebtn" href="../index.html" aria-label="Back to the tool belt" title="Back to the tool belt"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H4M8 3L3 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <span class="rail-mark">Copilot / Ops</span>
     <a class="tab-btn" id="tab-manual" href="#part-manual">Manual</a>
     <a class="tab-btn" id="tab-models" href="#part-models">Model catalog</a>
@@ -1716,6 +1732,17 @@ candidates. Apply no retirements yourself — I approve those individually.</cod
 </main>
 </div>
 
+
+<aside class="related" aria-label="Related guides">
+  <p class="rk">Related</p>
+  <div class="rl">
+    <a href="../index.html">Tool-belt home</a>
+    <a href="copilot-without-babysitting.html">Copilot Without Babysitting</a>
+    <a href="copilot-quick-reference.html">Copilot Quick Reference</a>
+    <a href="build-your-own-agent-app.html">Build Your Own Agent App</a>
+  </div>
+</aside>
+
 <footer>
   <div class="wrap">
     <div class="panel-label">Copilot sources — GitHub Docs, retrieved 21 August 2026</div>
@@ -1725,6 +1752,7 @@ candidates. Apply no retirements yourself — I approve those individually.</cod
       <li><a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-automations" target="_blank" rel="noopener noreferrer">About Copilot automations</a> · <a href="https://docs.github.com/en/copilot/reference/custom-agents-configuration" target="_blank" rel="noopener noreferrer">Custom agents configuration</a></li>
     </ul>
     <p style="max-width:70ch">Model names, prices, and promotional rates change frequently, and the Power BI project formats are still moving toward general availability. Treat every number and every format claim here as a snapshot dated 21 August 2026.</p>
+    <p style="margin-top:18px"><a href="../index.html">&larr; back to the tool belt</a></p>
   </div>
 </footer>
 

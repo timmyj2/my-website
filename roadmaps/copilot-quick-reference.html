@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Copilot Quick Reference</title>
 <meta name="description" content="The condensed cheat sheet for running GitHub Copilot unattended — the autonomy dial, the five conditions before you walk away, the Power BI hand-off table, and the full copy-paste kit. No essay required.">
@@ -204,6 +205,14 @@ footer p+p{margin-top:8px}
   .navlinks{margin-left:0}
   .hero{padding:26px 0 2px}
 }
+
+/* related strip */
+.related{margin:28px 0 8px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel2,var(--panel))}
+.related .rk{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+.related .rl{display:flex;flex-wrap:wrap;gap:8px 14px}
+.related a{font-size:.88rem;color:var(--mut);text-decoration:none;border-bottom:1px solid transparent}
+.related a:hover{color:var(--ind-hi,var(--ink));border-bottom-color:currentColor}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 @media print{
   body{background:#fff}
@@ -651,6 +660,17 @@ Finish by listing every measure in NEEDS DECISION and what you'd suggest.</pre>
   <div class="tip warn"><b>Budget for the throttle, not just the credits</b>Put long jobs on <b>cloud sessions / scheduled automations</b> so they run on their own clock. Keep MCP servers off unless the current task needs them. Always set <code>--model</code> explicitly, so a fallback shows up in your logs instead of silently in your output.</div>
 </section>
 
+
+<aside class="related" aria-label="Related guides">
+  <p class="rk">Related</p>
+  <div class="rl">
+    <a href="../index.html">Tool-belt home</a>
+    <a href="copilot-without-babysitting.html">Without Babysitting</a>
+    <a href="github-copilot-operating-manual.html">Operating Manual</a>
+    <a href="build-your-own-agent-app.html">Build Your Own Agent App</a>
+  </div>
+</aside>
+
 <footer>
   <p>Condensed from the field-notes page, researched September 2026. Flags and file paths are the things most likely to have shifted by the time you read this &mdash; the dial, the five conditions and the memory loop are not.</p>
   <p><a href="copilot-without-babysitting.html">Read the full page, with every quote and source &rarr;</a></p>
@@ -660,13 +680,25 @@ Finish by listing every measure in NEEDS DECISION and what you'd suggest.</pre>
 </div>
 
 <script>
-document.querySelectorAll('.copy').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const text = btn.closest('.prompt').querySelector('pre').innerText;
-    try { await navigator.clipboard.writeText(text); }
-    catch { const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
-    btn.textContent = 'Copied'; btn.classList.add('done');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var root = btn.closest('.prompt') || btn.closest('.code') || btn.parentElement;
+    var pre = root ? root.querySelector('pre') : null;
+    var text = pre ? pre.innerText : '';
+    var done = function(){
+      btn.textContent = 'Copied'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+    };
+    var fallback = function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e) {}
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
   });
 });
 </script>
