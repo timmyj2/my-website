@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fabric Plan, Step by Step — The Dumbed-Down Version</title>
 <meta name="description" content="A plain-English, click-by-click walkthrough of Plan in Microsoft Fabric: what it is, why each step exists, and what to do when it breaks.">
@@ -232,6 +233,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 .homebtn:focus-visible{opacity:1;outline:2px solid currentColor;outline-offset:2px}
 .homebtn svg{width:14px;height:14px;display:block}
 @media (max-width:520px){.homebtn{width:27px;height:27px;border-radius:8px}}
+
+/* related strip */
+.related{margin:28px 0 8px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.related .rk{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+.related .rl{display:flex;flex-wrap:wrap;gap:8px 14px}
+.related a{font-size:.88rem;color:var(--mut);text-decoration:none;border-bottom:1px solid transparent}
+.related a:hover{color:var(--ink);border-bottom-color:currentColor}
+
 </style>
 </head>
 <body>
@@ -1014,6 +1023,16 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
 
   <div class="tip win"><b>When you've done all seven</b>You've used every concept that matters in Plan. Everything left &mdash; approval workflows, Intelligence sheets, Infobridge, PowerTable, allocation rules &mdash; is an addition to this skeleton, not a new thing to learn from scratch. That's the point at which Plan stops feeling like forty features and starts feeling like one tool.</div>
 </section>
+
+
+<aside class="related" aria-label="Related guides">
+  <p class="rk">Related</p>
+  <div class="rl">
+    <a href="../index.html">Tool-belt home</a>
+    <a href="git-vscode-gui.html">Git Without the Terminal</a>
+    <a href="github-copilot-operating-manual.html">Copilot Operating Manual</a>
+  </div>
+</aside>
 
 <a class="backlink" href="../index.html">&larr; back to the tool belt</a>
 

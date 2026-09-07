@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Build Your Own Agent App — On the Copilot Licence You Already Have</title>
 <meta name="description" content="A one-screen plan for building a BridgeMind-style agent app locally, on your existing GitHub Copilot licence. No IT ticket, no new spend.">
@@ -159,6 +160,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:8px}
   .topbar,.copy{display:none}
   .prompt,ol.steps li,.stack .box{box-shadow:none;border-color:#ccc}
 }
+
+/* related strip */
+.related{margin:28px 0 8px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.related .rk{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+.related .rl{display:flex;flex-wrap:wrap;gap:8px 14px}
+.related a{font-size:.88rem;color:var(--mut);text-decoration:none;border-bottom:1px solid transparent}
+.related a:hover{color:var(--rose,var(--ink));border-bottom-color:currentColor}
+
 </style>
 </head>
 <body>
@@ -347,6 +356,17 @@ double-click. Match the plain, light, text-first look of my other pages.</pre>
   <div class="tip go"><b>The prompting rule that matters</b>Tell it <b>what to refuse</b>, not just what to do. "Under 300 words." "Do not pad." "Skip it if it needs a server." Agents drift toward doing more; the constraints are what keep the output something you'll actually read on a Tuesday.</div>
 </section>
 
+
+<aside class="related" aria-label="Related guides">
+  <p class="rk">Related</p>
+  <div class="rl">
+    <a href="../index.html">Tool-belt home</a>
+    <a href="github-copilot-operating-manual.html">Operating Manual</a>
+    <a href="copilot-without-babysitting.html">Without Babysitting</a>
+    <a href="copilot-quick-reference.html">Quick Reference</a>
+  </div>
+</aside>
+
 <footer>
   <p>Researched Sept 2026. The Copilot SDK went generally available 2 June 2026 &mdash; before that, none of this was possible without breaking terms of service. If you're reading this much later, check whether the CLI flags have moved.</p>
   <div class="srcs">
@@ -361,13 +381,25 @@ double-click. Match the plain, light, text-first look of my other pages.</pre>
 </div>
 
 <script>
-document.querySelectorAll('.copy').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const text = btn.closest('.prompt').querySelector('pre').innerText;
-    try { await navigator.clipboard.writeText(text); }
-    catch { const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
-    btn.textContent = 'Copied'; btn.classList.add('done');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var root = btn.closest('.prompt') || btn.closest('.code') || btn.parentElement;
+    var pre = root ? root.querySelector('pre') : null;
+    var text = pre ? pre.innerText : '';
+    var done = function(){
+      btn.textContent = 'Copied'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1600);
+    };
+    var fallback = function(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e) {}
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
   });
 });
 </script>

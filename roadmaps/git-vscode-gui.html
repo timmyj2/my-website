@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Git Without the Terminal — VS Code's Source Control Panel, Explained</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,6 +174,14 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 @media (max-width:700px){.fig-legend{grid-template-columns:1fr}.fig{padding:13px 12px 12px}}
 @media (min-width:1000px){.fig-wide{margin-left:-26px;margin-right:-26px}}
 @media print{.fig{background:#fff;border-color:#ccc}}
+
+/* related strip */
+.related{margin:28px 0 8px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.related .rk{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+.related .rl{display:flex;flex-wrap:wrap;gap:8px 14px}
+.related a{font-size:.88rem;color:var(--mut);text-decoration:none;border-bottom:1px solid transparent}
+.related a:hover{color:var(--ink);border-bottom-color:currentColor}
+
 </style>
 </head>
 <body>
@@ -765,6 +774,16 @@ footer .fp{font-family:var(--mono);font-size:.73rem;margin-top:6px}
 
   <div class="tip ok"><b>Where the GUI genuinely beats the terminal</b>Reading a diff and resolving a conflict &mdash; side-by-side colour and click-to-accept beat staring at markers in a text file. Plenty of terminal-fluent people still switch to VS Code for exactly these two jobs.</div>
 </section>
+
+
+<aside class="related" aria-label="Related guides">
+  <p class="rk">Related</p>
+  <div class="rl">
+    <a href="../index.html">Tool-belt home</a>
+    <a href="fabric-plan-step-by-step.html">Fabric Plan, Step by Step</a>
+    <a href="github-copilot-operating-manual.html">Copilot Operating Manual</a>
+  </div>
+</aside>
 
 <a class="backlink" href="../index.html">&larr; back to the tool belt</a>
 

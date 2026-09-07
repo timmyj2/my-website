@@ -1,3 +1,17 @@
-# my-website
+# Tim's tool-belt
 
-My personal website — a place to share what I'm learning and building as I explore hobby projects with Claude.
+Personal tool reference — guides I wrote for myself on Git, GitHub Copilot, Microsoft Fabric, and Power BI, plus a few small games.
+
+**Live:** https://timmyjfly.pages.dev
+
+## Guides
+- Git Without the Terminal
+- GitHub Copilot — Operating Manual
+- Copilot Without Babysitting / Quick Reference
+- Build Your Own Agent App
+- Fabric Plan, Step by Step
+
+## Play
+- Brick Dash, Compute Cluster Tycoon, Hockey Play Board
+
+Static HTML only. Progress saves in your browser.
