@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bville visit — Cowork game plan</title>
+<meta name="description" content="Super light game plan for the Bartlesville office visit. Listen, clarify, navigate — don't own their build.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0b;--panel:#121214;--line:rgba(255,255,255,.1);
+  --text:#f2f3f5;--mut:#a1a5ad;--dim:#6a6e77;
+  --accent:#38bdf8;--warn:#f2b705;--stop:#fb7185;
+  --body:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.55;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 48px}
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);
+  border-bottom:1px solid transparent;display:flex;align-items:center;gap:12px;height:56px}
+.top.stuck{border-bottom-color:var(--line)}
+.home{font-family:var(--mono);font-size:.72rem;color:var(--dim)}
+.home:hover{color:var(--text)}
+.brand{margin-left:auto;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.hero{padding:28px 0 8px}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+h1{font-size:clamp(1.6rem,4.5vw,2.1rem);font-weight:600;letter-spacing:-.03em;line-height:1.15}
+.job{margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--panel)}
+.job .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.job p{color:var(--mut);font-size:.98rem}
+.job b{color:var(--text);font-weight:600}
+.one{margin-top:12px;font-size:1.02rem;color:var(--text)}
+.one em{font-style:normal;color:var(--accent)}
+section{margin-top:28px}
+h2{font-size:.95rem;font-weight:600;letter-spacing:-.01em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+ol,ul{padding-left:1.15rem;color:var(--mut)}
+li{margin:7px 0}
+li b{color:var(--text);font-weight:600}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:8px}
+.card .lbl{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.card p{color:var(--mut);font-size:.95rem}
+.card b{color:var(--text)}
+.stop{border-left:3px solid var(--stop)}
+.warn{border-left:3px solid var(--warn)}
+.rule{margin-top:28px;padding:14px 16px;border-radius:12px;background:rgba(242,183,5,.08);border:1px solid rgba(242,183,5,.28)}
+.rule b{color:var(--warn)}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.72rem;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="top" id="topbar">
+  <div class="wrap" style="display:flex;align-items:center;gap:12px;width:100%;padding-bottom:0">
+    <a class="home" href="../index.html">&larr; tool-belt</a>
+    <span class="brand">Notes · visit</span>
+  </div>
+</div>
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Bartlesville · office visit</p>
+    <h1>Bville visit — Cowork game plan</h1>
+    <div class="job">
+      <div class="k">Job</div>
+      <p><b>Listen → clarify → navigate.</b> Not own their build.</p>
+    </div>
+    <p class="one">One line: <em>I'm here to help you think it through — not take it home.</em></p>
+  </header>
+
+  <section>
+    <h2>Meeting spine</h2>
+    <ol>
+      <li>What problem hurts most?</li>
+      <li>What does good look like?</li>
+      <li>What have you already tried?</li>
+      <li>Where does the data live / who owns it?</li>
+      <li>What's the smallest safe next test?</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Consultant moves</h2>
+    <ul>
+      <li>Ask before you answer</li>
+      <li>Mirror: <b>So the pain is ___</b></li>
+      <li>Offer 2–3 paths — don't pick their winner</li>
+      <li><b>I don't know yet</b> + how you'd find out</li>
+      <li>End with <b>their</b> next step</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Don't sign up</h2>
+    <div class="card stop">
+      <div class="lbl">Boundaries</div>
+      <p><b>Point ≠ build.</b><br>
+      <b>Follow-up ≠ own it.</b><br>
+      Ownership push: <b>Your team owns it with IT — I can advise on the first cut.</b></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ready lines</h2>
+    <div class="card">
+      <div class="lbl">Open</div>
+      <p>Dan pointed me your way — happy to hear the use case and help navigate options.</p>
+    </div>
+    <div class="card warn">
+      <div class="lbl">Boundary</div>
+      <p>I may not have the perfect build answer today. I can help frame the problem and a first safe test.</p>
+    </div>
+    <div class="card">
+      <div class="lbl">Close</div>
+      <p>Here's what I heard… Here's what I'd try next… You own the call from here.</p>
+    </div>
+  </section>
+
+  <div class="rule"><b>Overthinker rule:</b> Brain spinning? Back to question 1 until it's crisp.</div>
+
+  <footer>timmyjfly.pages.dev/notes/office-visit-cowork.html</footer>
+</div>
+<script>
+  const bar = document.getElementById('topbar');
+  const onScroll = () => bar.classList.toggle('stuck', scrollY > 6);
+  onScroll(); addEventListener('scroll', onScroll, {passive:true});
+</script>
+</body>
+</html>
