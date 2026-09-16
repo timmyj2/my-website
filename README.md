@@ -15,3 +15,5 @@ Personal tool reference — guides I wrote for myself on Git, GitHub Copilot, Mi
 - Brick Dash, Compute Cluster Tycoon, Hockey Play Board
 
 Static HTML only. Progress saves in your browser.
+
+Also: `notes/` for short visit / talk-track cards (e.g. Bville Cowork game plan).
