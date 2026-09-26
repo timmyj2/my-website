@@ -12,7 +12,7 @@ Personal tool reference — guides I wrote for myself on Git, GitHub Copilot, Mi
 - Fabric Plan, Step by Step
 
 ## Home
-- House hunt — live HAR searches for Champions Forest, Cypress, Bridgeland, and Nottingham Country. $300–400k, 4 bedrooms.
+- House hunt — live HAR searches, $300–400k, 4 bedrooms, only zones where both the elementary and the middle school are TEA A or B.
 
 ## Play
 - Brick Dash, Compute Cluster Tycoon, Hockey Play Board
