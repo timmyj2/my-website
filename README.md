@@ -11,6 +11,9 @@ Personal tool reference — guides I wrote for myself on Git, GitHub Copilot, Mi
 - Build Your Own Agent App
 - Fabric Plan, Step by Step
 
+## Home
+- House hunt — Champions Forest, Cypress, Bridgeland, Nottingham. $300–400k, 4 bedrooms.
+
 ## Play
 - Brick Dash, Compute Cluster Tycoon, Hockey Play Board
 

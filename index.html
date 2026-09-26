@@ -128,6 +128,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
     <a class="mark" href="#top"><span class="dot"></span>Tim's tool-belt</a>
     <div class="navlinks">
       <a href="#notes">Notes</a>
+      <a href="homes/">Homes</a>
       <a href="#roadmaps">Roadmaps</a>
       <a href="#play">Play</a>
       <a href="reports/">Reports</a>
@@ -142,12 +143,14 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
     <div class="meta">
       <span><b>6</b> roadmaps</span>
       <span><b>3</b> games</span>
+      <span><b>1</b> home hunt</span>
       <span><b>1</b> note</span>
       <span>Progress saved locally</span>
     </div>
   </header>
   <div class="filters" id="filters" role="toolbar" aria-label="Filter guides">
     <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+    <button type="button" class="chip" data-filter="home" aria-pressed="false">Home</button>
     <button type="button" class="chip" data-filter="git" aria-pressed="false">Git</button>
     <button type="button" class="chip" data-filter="copilot" aria-pressed="false">Copilot</button>
     <button type="button" class="chip" data-filter="fabric" aria-pressed="false">Fabric</button>
@@ -155,6 +158,18 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
     <button type="button" class="chip" data-filter="play" aria-pressed="false">Play</button>
     <button type="button" class="chip" data-filter="notes" aria-pressed="false">Notes</button>
   </div>
+  <section id="home">
+    <div class="shead"><h2>Home</h2><p>Houston hunt</p></div>
+    <div class="grid">
+      <a class="cell" data-tags="home" href="homes/" style="--glow:rgba(35,66,55,.16);">
+        <div class="crow"><span class="cdot" style="--glow:#234237"></span><span class="kicker">Champions · Cypress · Bridgeland · Nottingham</span><span class="num">01</span></div>
+        <h3>Four bedrooms, under $400k</h3>
+        <p>The house hunt for those four pockets. $300k to $400k, four bedrooms, a fenced yard, outside the floodplain. Example homes, with a jump to live search. Saves on this phone.</p>
+        <div class="ctags"><span>$300–400k</span><span>4 bedrooms</span><span>Zone X</span></div>
+        <span class="go">Open the hunt <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </div>
+  </section>
   <section id="roadmaps">
     <div class="shead"><h2>Roadmaps</h2><p>Reference & practice</p></div>
     <div class="grid">
