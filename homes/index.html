@@ -3,194 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Porch — four bedrooms under $400k</title>
-<meta name="description" content="A Houston house hunt for Champions Forest, Cypress, Bridgeland, and Nottingham. $300k to $400k, four bedrooms, a fenced yard, outside the floodplain.">
+<title>Live HAR hunt — four bedrooms under $400k</title>
+<meta name="description" content="Open live HAR.com searches for Champions Forest, Cypress, Bridgeland, and Nottingham Country. $300k to $400k, four bedrooms.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#f3efe8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,640&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#f3efe8; --sheet:#faf8f4; --ink:#1e1a16; --muted:#5c554e; --faint:#7a726a;
-  --line:#e3dbd0; --pine:#234237; --pine-soft:#e6eee9; --warn:#6f4518; --warn-soft:#f3eadf;
+  --line:#e3dbd0; --pine:#234237; --warn:#6f4518; --warn-soft:#f3eadf;
   --display:"Fraunces",Georgia,serif; --sans:"Outfit",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
 a{color:inherit}
-button,input,select{font:inherit;color:inherit}
-img{max-width:100%;display:block}
-.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;height:60px;padding:0 16px;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:saturate(160%) blur(12px);border-bottom:1px solid transparent}
-.top.stuck{border-bottom-color:var(--line)}
-.back{font-size:.9rem;text-decoration:none;color:var(--muted)}
+.top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;height:60px;padding:0 16px;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.back{color:var(--muted);text-decoration:none;font-size:.9rem}
 .brand{font-family:var(--display);font-size:1.25rem;letter-spacing:-.03em}
-.spacer{flex:1}
-.ghost,.solid{border-radius:12px;min-height:40px;padding:0 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.ghost{background:transparent;border:1px solid var(--line)}
-.solid{background:var(--pine);color:#f7f4ee;border:0}
-.wrap{max-width:1120px;margin:0 auto;padding:22px 16px 88px}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 48px}
 .eyebrow{margin:0 0 8px;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
-h1{margin:0;font-family:var(--display);font-weight:560;font-size:clamp(2rem,6vw,3.1rem);letter-spacing:-.03em;line-height:1.05;max-width:16ch}
-.lede{max-width:62ch;color:var(--muted);margin:12px 0 0}
-.note{margin:14px 0 0;padding:12px 14px;background:var(--warn-soft);color:var(--warn);border-radius:14px;font-size:.92rem;max-width:70ch}
-.presets{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}
-.chip{border:1px solid var(--line);background:transparent;border-radius:999px;min-height:40px;padding:0 14px;cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
-.layout{display:grid;gap:22px;margin-top:22px}
-@media(min-width:920px){.layout{grid-template-columns:280px 1fr;align-items:start}}
-#panel{background:var(--sheet);border:1px solid var(--line);border-radius:18px;padding:16px}
-@media(min-width:920px){#panel{position:sticky;top:76px;max-height:calc(100vh - 92px);overflow:auto}}
-@media(max-width:919px){
-  #panel{display:none}
-  #panel.open{display:block;position:fixed;inset:0;z-index:40;max-height:none;border-radius:0;overflow:auto;padding:16px 16px 32px}
-}
-.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.panel-head h2{font-size:1rem;margin:0}
-.only-mobile{display:none}
-@media(max-width:919px){.only-mobile{display:inline-flex}}
-label.field{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted);margin-top:10px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-input,select{background:var(--paper);border:1px solid var(--line);border-radius:10px;min-height:44px;padding:0 10px;width:100%}
-.checks{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.check{display:flex;align-items:center;gap:8px;min-height:40px;font-size:.95rem;color:var(--ink)}
-.check input{width:18px;height:18px;min-height:0;accent-color:var(--pine)}
-.morebtn{margin-top:8px;background:none;border:0;color:var(--pine);padding:8px 0;cursor:pointer;font-weight:500}
-details{margin-top:8px}
-summary{cursor:pointer;min-height:40px;display:flex;align-items:center;color:var(--muted)}
-.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
-.count{margin:0;font-weight:600}
-.line{margin:2px 0 0;color:var(--muted);font-size:.92rem}
-.cards{display:grid;gap:14px}
-@media(min-width:700px){.cards{grid-template-columns:1fr 1fr}}
-.card{background:var(--sheet);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;text-align:left;padding:0;cursor:pointer;width:100%}
-.card:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
-.photo{position:relative;aspect-ratio:16/10;background:var(--pine-soft)}
-.photo img{width:100%;height:100%;object-fit:cover}
-.heart{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:999px;border:0;background:color-mix(in srgb,var(--sheet) 90%,transparent);cursor:pointer}
-.heart.on{background:var(--pine);color:#f7f4ee}
-.card-body{padding:12px 14px 14px}
+h1{margin:0;font-family:var(--display);font-weight:560;font-size:clamp(2rem,6vw,3rem);letter-spacing:-.03em;line-height:1.05}
+.lede{color:var(--muted);margin:12px 0 0}
+.note{margin:14px 0 0;padding:12px 14px;background:var(--warn-soft);color:var(--warn);border-radius:14px}
+.list{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.pocket{display:block;text-decoration:none;background:var(--sheet);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px}
+.pocket:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
 .kicker{margin:0;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.card h3{margin:4px 0 0;font-size:1.15rem;font-weight:600;letter-spacing:-.02em}
-.price{margin:6px 0 0;font-family:var(--display);font-size:1.45rem}
-.mo{margin:0;color:var(--pine);font-weight:500}
-.meta{margin:6px 0 0;color:var(--muted);font-size:.9rem}
-.empty{padding:22px;border:1px dashed var(--line);border-radius:18px;background:var(--sheet)}
-.empty h3{margin:0 0 6px;font-family:var(--display);font-weight:560}
-.pockets{margin-top:28px;display:grid;gap:12px}
-@media(min-width:700px){.pockets{grid-template-columns:1fr 1fr}}
-.pocket{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
-.pocket h3{margin:0;font-size:1.05rem}
-.pocket p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
-.watch{color:var(--warn)}
-dialog{border:0;padding:0;background:var(--sheet);color:var(--ink);width:min(680px,100%);max-height:100%;border-radius:18px}
-dialog::backdrop{background:rgba(30,26,22,.45)}
-@media(max-width:700px){dialog{width:100%;height:100%;max-height:none;border-radius:0}}
-.detail{padding:0 0 24px}
-.detail img{width:100%;height:240px;object-fit:cover;background:var(--pine-soft)}
-.detail-body{padding:16px 18px 0}
-.detail h2{font-family:var(--display);font-weight:560;font-size:1.8rem;margin:6px 0 0;letter-spacing:-.03em}
-.pay{display:grid;gap:6px;margin:14px 0;padding:12px;background:var(--paper);border-radius:14px}
-.pay div{display:flex;justify-content:space-between;gap:12px}
-.pay .total{font-weight:600;border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.dock{position:sticky;bottom:0;display:none;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--paper) 92%,transparent);border-top:1px solid var(--line)}
-@media(max-width:919px){.dock{display:flex}.dock .solid,.dock .ghost{flex:1}}
-.foot{margin-top:28px;color:var(--faint);font-size:.85rem}
+.pocket h2{margin:4px 0 0;font-size:1.35rem;letter-spacing:-.02em}
+.pocket p{margin:6px 0 0;color:var(--muted)}
+.go{display:inline-flex;align-items:center;margin-top:12px;min-height:44px;padding:0 14px;border-radius:12px;background:var(--pine);color:#f7f4ee;font-weight:500}
+.foot{margin-top:22px;color:var(--faint);font-size:.85rem}
 .foot a{color:var(--muted)}
 </style>
 </head>
 <body>
-<header class="top" id="top">
+<header class="top">
   <a class="back" href="../">← Tool-belt</a>
   <span class="brand">Porch</span>
-  <span class="spacer"></span>
-  <button type="button" class="ghost" id="savedBtn">Saved</button>
 </header>
 <main class="wrap">
-  <p class="eyebrow">Houston · house hunt</p>
+  <p class="eyebrow">Live on HAR</p>
   <h1>Four bedrooms, under $400k.</h1>
-  <p class="lede">Champions Forest, Cypress, Bridgeland, and Nottingham. $300k to $400k, a fenced yard, outside the floodplain. Bridgeland’s more typical 4-bedroom sits just over the cap until you raise it.</p>
-  <p class="note">Example homes, shaped like the market. Not live listings. Payments assume the rate and down payment in the rules, the pocket’s tax rate, and $340 a month for insurance.</p>
-  <div class="presets" id="presets"></div>
-  <div class="layout">
-    <aside id="panel">
-      <div class="panel-head">
-        <h2>Rules</h2>
-        <button type="button" class="solid only-mobile" id="closePanel">Done</button>
-      </div>
-      <div class="row2">
-        <label class="field">Minimum<input id="priceMin" inputmode="numeric" type="number" min="0" step="5000"></label>
-        <label class="field">Maximum<input id="priceMax" inputmode="numeric" type="number" min="0" step="5000"></label>
-      </div>
-      <div class="row2">
-        <label class="field">Bedrooms<input id="beds" type="number" min="1" max="6" step="1"></label>
-        <label class="field">Baths<input id="baths" type="number" min="1" max="5" step="0.5"></label>
-      </div>
-      <label class="field">Square feet, at least<input id="sqft" type="number" min="0" step="50"></label>
-      <label class="field">Stories
-        <select id="stories">
-          <option value="any">Any</option>
-          <option value="1">One story</option>
-          <option value="2+">Two or more</option>
-        </select>
-      </label>
-      <label class="field">Sort
-        <select id="sort">
-          <option value="price-asc">Price, low to high</option>
-          <option value="price-desc">Price, high to low</option>
-          <option value="sqft">Most space</option>
-          <option value="lot">Biggest lot</option>
-          <option value="year">Newest</option>
-          <option value="commute">Shorter drive</option>
-        </select>
-      </label>
-      <p class="kicker" style="margin-top:16px">Pockets</p>
-      <div class="checks" id="huntAreas"></div>
-      <button type="button" class="morebtn" id="moreAreasBtn">Other pockets</button>
-      <div class="checks" id="moreAreas" hidden></div>
-      <div class="checks">
-        <label class="check"><input type="checkbox" id="floodOnlyX"> Outside the floodplain</label>
-        <label class="check"><input type="checkbox" id="fenced"> Fenced yard</label>
-        <label class="check"><input type="checkbox" id="townhomes"> Include townhomes</label>
-      </div>
-      <details>
-        <summary>More rules</summary>
-        <div class="checks">
-          <label class="check"><input type="checkbox" id="pool"> Pool</label>
-          <label class="check"><input type="checkbox" id="garage2"> Two-car garage</label>
-          <label class="check"><input type="checkbox" id="kitchen"> Updated kitchen</label>
-          <label class="check"><input type="checkbox" id="primaryDown"> Primary downstairs</label>
-          <label class="check"><input type="checkbox" id="noHoa"> No HOA</label>
-        </div>
-      </details>
-      <div class="row2">
-        <label class="field">Rate %<input id="rate" type="number" min="0" max="15" step="0.1"></label>
-        <label class="field">Down %<input id="down" type="number" min="0" max="80" step="1"></label>
-      </div>
-    </aside>
-    <section>
-      <div class="bar">
-        <div>
-          <p class="count" id="count"></p>
-          <p class="line" id="line"></p>
-        </div>
-        <a class="solid" id="redfin" target="_blank" rel="noopener noreferrer">Live on Redfin</a>
-      </div>
-      <div class="cards" id="results"></div>
-      <h2 class="eyebrow" style="margin-top:28px">These pockets</h2>
-      <div class="pockets" id="pockets"></div>
-    </section>
+  <p class="lede">These open the real HAR.com search for each pocket, already set to $300,000–$400,000 and at least 4 bedrooms. The houses on the next screen are live. They change when one sells or a new one is listed. Nothing on this page is a sample house.</p>
+  <p class="note">HAR does not let another website copy its listings. A fenced yard and the flood map are not part of these links. Check both on the house before you like it.</p>
+  <div class="list">
+    <a class="pocket" href="https://www.har.com/champion-forest-spring/homes-for-sale/5433?listing_price_min=300000&listing_price_max=400000&bedroom_min=4&view=list">
+      <p class="kicker">Spring · Klein ISD</p>
+      <h2>Champions Forest</h2>
+      <p>The subdivision, not every house on Champion Forest Drive.</p>
+      <span class="go">Open live list</span>
+    </a>
+    <a class="pocket" href="https://www.har.com/cypress/realestate/for_sale?listing_price_min=300000&listing_price_max=400000&bedroom_min=4&view=list">
+      <p class="kicker">Cy-Fair ISD · the whole city</p>
+      <h2>Cypress</h2>
+      <p>Every Cypress listing in the budget, including Bridgeland. The next card is Bridgeland only.</p>
+      <span class="go">Open live list</span>
+    </a>
+    <a class="pocket" href="https://www.har.com/cypress/realestate/for_sale?listing_price_min=300000&listing_price_max=400000&bedroom_min=4&subdivision=Bridgeland&view=list">
+      <p class="kicker">Cypress · Cy-Fair ISD</p>
+      <h2>Bridgeland</h2>
+      <p>Only houses HAR files under Bridgeland. Newer, and often a high tax rate.</p>
+      <span class="go">Open live list</span>
+    </a>
+    <a class="pocket" href="https://www.har.com/nottingham-country-katy/homes-for-sale/6262?listing_price_min=300000&listing_price_max=400000&bedroom_min=4&view=list">
+      <p class="kicker">Katy · Katy ISD</p>
+      <h2>Nottingham Country</h2>
+      <p>The Katy neighborhood. Not Nottingham inside the Loop.</p>
+      <span class="go">Open live list</span>
+    </a>
   </div>
-  <p class="foot">Planning guide on <a href="https://timmyjfly.pages.dev/">Tim’s tool-belt</a>. Check the flood map, the tax bill, and a real listing before you fall for a house.</p>
+  <p class="foot">Back to <a href="https://timmyjfly.pages.dev/">Tim’s tool-belt</a>. Listings belong to HAR and the listing agents.</p>
 </main>
-<div class="dock">
-  <button type="button" class="solid" id="editBtn">Edit rules</button>
-  <a class="ghost" id="redfinDock" target="_blank" rel="noopener noreferrer">Redfin</a>
-</div>
-<dialog id="detail"><div id="detailBody"></div></dialog>
-<script src="data.js"></script>
-<script src="app.js"></script>
 </body>
 </html>
