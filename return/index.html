@@ -28,10 +28,14 @@ aside{background:var(--sheet);border-bottom:1px solid var(--line);padding:16px}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .mark{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:1.6rem}
 .mark i{display:grid;width:34px;height:34px;place-items:center;border-radius:50%;background:var(--ink);color:var(--paper);font-style:italic}
-nav{display:flex;gap:6px;overflow:auto;margin-top:14px}
-nav button,nav a.navbtn{min-height:44px;border:0;border-radius:12px;background:transparent;color:var(--muted);padding:0 12px;white-space:nowrap}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+nav button,nav a.navbtn{min-height:44px;border:0;border-radius:12px;background:transparent;color:var(--muted);padding:0 10px;white-space:nowrap}
 nav button.on{background:var(--ink);color:var(--paper)}
-.tags{display:none}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tags p{width:100%;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tags button{min-height:40px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:0 12px}
+.tags button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.read{border:0;background:none;text-align:left;font-weight:600;width:100%;min-height:44px}
 main{flex:1;padding:22px 16px 48px}
 .wrap{max-width:40rem;margin:0 auto}
 .kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -76,10 +80,10 @@ textarea.field{min-height:7rem;resize:vertical}
 @media(min-width:800px){
   .app{flex-direction:row}
   aside{width:250px;border-bottom:0;border-right:1px solid var(--line);padding:22px 14px}
-  nav{flex-direction:column;overflow:visible}
-  .tags{display:flex;flex-direction:column;gap:2px;margin-top:22px}
-  .tags p{padding:0 12px 6px;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .tags button{min-height:40px;border:0;background:transparent;text-align:left;color:var(--muted);border-radius:12px;padding:0 12px}
+  nav{flex-direction:column}
+  .tags{flex-direction:column;flex-wrap:nowrap;margin-top:22px}
+  .tags p{padding:0 12px 6px}
+  .tags button{border:0;border-radius:12px;text-align:left}
   .tags button.on{background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
   main{padding:28px}
 }
@@ -115,6 +119,7 @@ let projectFilter = "";
 let threadId = "";
 let selected = new Set();
 let armed = "";
+let openScrap = "";
 let month = startOfMonth(new Date());
 let picked = stamp(new Date());
 
@@ -252,14 +257,18 @@ function dumpView() {
     ${recent.length ? `<div class="stack">${recent.map((s) => `<article class="card"><p>${esc(s.text)}</p></article>`).join("")}</div>` : `<p class="empty">Nothing here yet.</p>`}`;
 }
 
+function clip(text, id) {
+  const open = openScrap === id;
+  const shown = !open && text.length > 90 ? text.slice(0, 72).trim() + "…" : text;
+  return `<button type="button" class="read" data-read="${esc(id)}">${esc(shown)}</button>`;
+}
 function taskCard(item, late) {
   const tag = item.projectId ? "#" + projectName(item.projectId) : "";
-  const title = item.title.length > 90 ? item.title.slice(0, 72).trim() + "…" : item.title;
   const open = item.kind === "thread" ? `<button type="button" data-thread="${esc(item.id)}">Open</button>` : "";
   return `<article class="card${late ? " late" : ""}">
-    <h2>${esc(title)}</h2>
+    <h2>${clip(item.title, item.kind + ":" + item.id)}</h2>
     ${item.next ? `<p class="muted">${esc(item.next)}</p>` : ""}
-    <div class="meta">${tag ? `<span>${esc(tag)}</span>` : ""}${open}<button type="button" data-done="${item.kind}:${esc(item.id)}">Done</button></div>
+    <div class="meta">${item.day ? `<span>${esc(item.day)}</span>` : ""}${tag ? `<span>${esc(tag)}</span>` : ""}${open}<button type="button" data-done="${item.kind}:${esc(item.id)}">Done</button></div>
   </article>`;
 }
 
@@ -317,12 +326,12 @@ function placeView(mode) {
       </div>
     </form>` : "";
   const list = items.length ? items.map((s) => {
-    const title = s.text.length > 72 ? s.text.slice(0, 56).trim() + "…" : s.text;
+    const title = openScrap === s.id ? s.text : (s.text.length > 72 ? s.text.slice(0, 56).trim() + "…" : s.text);
     const tag = s.projectId ? `#${projectName(s.projectId)}` : "";
     return `<article class="card note">
       <label class="check"><input type="checkbox" data-id="${esc(s.id)}" ${selected.has(s.id)?"checked":""} aria-label="Select scrap"></label>
       <div class="body">
-        <h2>${esc(title)}</h2>
+        <h2><button type="button" class="read" data-read="${esc(s.id)}">${esc(title)}</button></h2>
         <div class="meta"><span>${esc(when(s.createdAt))}</span>${tag?`<span>${esc(tag)}</span>`:""}<button type="button" data-remove="${esc(s.id)}">${armed===s.id?"Remove it":"Remove"}</button></div>
       </div>
     </article>`;
@@ -565,6 +574,12 @@ function bind() {
     again.focus();
     again.setSelectionRange(start, start);
   };
+  document.querySelectorAll("[data-read]").forEach((btn) => {
+    btn.onclick = () => {
+      openScrap = openScrap === btn.dataset.read ? "" : btn.dataset.read;
+      render();
+    };
+  });
 }
 
 render();
