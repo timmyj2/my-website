@@ -9,7 +9,7 @@ Personal tool reference — guides I wrote for myself on GitHub Copilot, Microso
 - Fabric Plan, Step by Step
 
 ## Desk
-- Return — Now, loose, no-date, and a month. Saved in the browser. Grok is not on this page. `/return/`
+- Blotter — Now, loose, no-date, and a month. Saved in the browser. Grok is not on this page. `/blotter/`
 
 ## Home
 - House hunt — live HAR searches, $300–400k, 4 bedrooms, only zones where both the elementary and the middle school are TEA A or B.
