@@ -1,14 +1,11 @@
 # Tim's tool-belt
 
-Personal tool reference — guides I wrote for myself on Git, GitHub Copilot, Microsoft Fabric, and Power BI, plus a few small games.
+Personal tool reference — guides I wrote for myself on GitHub Copilot, Microsoft Fabric, and Power BI, plus a few small games.
 
 **Live:** https://timmyjfly.pages.dev
 
 ## Guides
-- Git Without the Terminal
 - GitHub Copilot — Operating Manual
-- Copilot Without Babysitting / Quick Reference
-- Build Your Own Agent App
 - Fabric Plan, Step by Step
 
 ## Desk
@@ -22,7 +19,6 @@ Personal tool reference — guides I wrote for myself on Git, GitHub Copilot, Mi
 
 Static HTML only for the public pages. Progress saves in your browser.
 
-Also: `notes/` for short visit / talk-track cards (e.g. Bville Cowork game plan).
 
 ## Private reports
 
