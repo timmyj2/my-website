@@ -62,7 +62,7 @@ nav.stuck{border-bottom-color:var(--line)}
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
 .mark{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.94rem;letter-spacing:-.02em}
 .mark .dot{width:9px;height:9px;border-radius:50%;background:var(--text);flex:none}
-.navlinks{display:flex;gap:26px;font-family:var(--mono);font-size:.76rem;letter-spacing:.02em;color:var(--dim)}
+.navlinks{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:18px 26px;font-family:var(--mono);font-size:.76rem;letter-spacing:.02em;color:var(--dim)}
 .navlinks a{position:relative;padding:2px 0;transition:color .18s ease}
 .navlinks a:hover{color:var(--text)}
 .navlinks a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .22s ease}
@@ -131,6 +131,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
       <a href="homes/">Homes</a>
       <a href="#roadmaps">Roadmaps</a>
       <a href="#play">Play</a>
+      <a href="return/">Return</a>
       <a href="reports/">Reports</a>
     </div>
   </div>
@@ -145,6 +146,7 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
       <span><b>3</b> games</span>
       <span><b>1</b> home hunt</span>
       <span><b>1</b> note</span>
+      <span><b>1</b> desk</span>
       <span>Progress saved locally</span>
     </div>
   </header>
@@ -157,7 +159,20 @@ footer{margin:clamp(48px,6.5vw,80px) 0 44px}
     <button type="button" class="chip" data-filter="powerbi" aria-pressed="false">Power BI</button>
     <button type="button" class="chip" data-filter="play" aria-pressed="false">Play</button>
     <button type="button" class="chip" data-filter="notes" aria-pressed="false">Notes</button>
+    <button type="button" class="chip" data-filter="desk" aria-pressed="false">Desk</button>
   </div>
+  <section id="return">
+    <div class="shead"><h2>Desk</h2><p>Dump, then compile</p></div>
+    <div class="grid">
+      <a class="cell" data-tags="desk" href="return/" style="--glow:rgba(140,74,47,.18);">
+        <div class="crow"><span class="cdot" style="--glow:#8c4a2f"></span><span class="kicker">Grok · brain dump</span><span class="num">01</span></div>
+        <h3>Return</h3>
+        <p>Put a scrap down with no project and no date. Come back and have Grok tie the related ones, name a project, and set a date only when the words imply one.</p>
+        <div class="ctags"><span>Stays in the browser</span><span>Key stays on the server</span></div>
+        <span class="go">Open the desk <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </div>
+  </section>
   <section id="home">
     <div class="shead"><h2>Home</h2><p>Houston hunt</p></div>
     <div class="grid">
